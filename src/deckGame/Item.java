@@ -15,7 +15,7 @@ public abstract class Item {
 		rarity = tempRarity;
 	}
 	
-	public String ToString() {
+	public String toString() {
 		String output = "Item: "+name+"\nRarity: "+rarity+"\nSize: "+size+"\nDescription: "+description;
 		return output;
 	}
