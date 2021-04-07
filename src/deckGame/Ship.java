@@ -3,16 +3,59 @@ package deckGame;
 import java.util.ArrayList;
 
 public class Ship {
+	/**
+	 * The state that the ship is in, these can be repaired, damaged, or destroyed
+	 */
 	private String status = "repaired";
+	
+	/**
+	 * The name of the ship
+	 */
 	private String name;
+	
+	/**
+	 * The amount of health the ship will have when repaired
+	 */
 	private int maxHealth;
+	
+	/**
+	 * The ships current health
+	 */
 	private int health;
+	
+	/**
+	 * The distance that the ship can travel in 1 day
+	 */
 	private int speed;
+	
+	/**
+	 * The number of items that can be put on the ship
+	 */
 	private int capacity;
-	//private enum resistance;
-	private ArrayList<Crewmate> crew;
+	
+	/**
+	 * The damage types the ship has a resistance too
+	 */
+	//private ArrayList<Resistance> resistance;
+	
+	/**
+	 * The damage types the ship has a weakness too
+	 */
 	//private enum weakness;
+	
+	/**
+	 * A list of the crew currently hired
+	 */
+	private ArrayList<Crewmate> crew;
+	
+	/**
+	 * A list of cargo that is currently being transported
+	 */
 	private ArrayList<Cargo> inventory;
+	
+	/**
+	 * The base damage your ship will do
+	 */
 	private int strength;
 	
 	public Ship(String name, int health, int speed, int capacity, int strength) {
