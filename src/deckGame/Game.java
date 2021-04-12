@@ -22,7 +22,7 @@ public class Game {
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
-		Player player = new Player(names[0], names[1], 100, 15, 4, 3);
+		Player player = new Player(names[0], names[1], 100, 2, 4, 3);
 		return player;
 	}
 	
@@ -56,10 +56,11 @@ public class Game {
 	
 	public ArrayList<Island> generateIslands() {
 		ArrayList<Island> islands = new ArrayList<Island>();
-		islands.add(new Island("Top Left", -5, 5));
-		islands.add(new Island("Top Right", 5, 5));
-		islands.add(new Island("Bottom Left", -5, -5));
-		islands.add(new Island("Bottom Right", 5, -5));
+		islands.add(player.getLocation());
+		islands.add(new Island("Golgolles", -10, 5));
+		islands.add(new Island("Cansburg", 5, 5));
+		islands.add(new Island("Tisjour", -5, -5));
+		islands.add(new Island("Brighdown", 5, -5));
 		return islands;
 	}
 	
@@ -128,6 +129,7 @@ public class Game {
 	public void play() {
 		int selection;
 		while (currentDay <= days) {
+			System.out.println("Current day: " + currentDay);
 			System.out.println("Select an option to continue");
 			System.out.println("1: Interact with shop");
 			System.out.println("2: Set sail");
@@ -185,22 +187,51 @@ public class Game {
 				break;
 			case 3:
 				return;
+			default:
+				System.out.println("Please enter a number between 1 and 3");
+				break;
 			}
 		}
 	}
 	
 	public void selectRoute() {
-		System.out.println(player.getLocation());
-		player.getLocation().displayRoutes();
+		int selection;
+		ArrayList<Route> routes = player.getLocation().getRoutes();
+		while (true) {
+			int i = 1;
+			System.out.println("Select an option to continue");
+			for (Route route: routes) {
+				System.out.println(i++ + ": The journey to " + route.getDestination().getName() 
+						+ " will take " + route.getTime(player.getSpeed()) + " days to complete");
+			}
+			System.out.println(i++ + ": Return to island");
+			try {
+				selection = userInput.nextInt();
+				userInput.nextLine();
+			}catch (java.util.InputMismatchException e) {
+				System.out.println("Invalid character, please enter the number of the option you want.");
+				continue;
+			}
+			if (selection == i - 1) {
+				return;
+			}else if (selection > i - 1 | selection <= 0) {
+				System.out.println("Please enter a number between 1 and " + i);
+			}else {
+				int time = routes.get(selection).getTime(player.getSpeed());
+				player.sail(routes.get(selection));
+				currentDay += time;
+				//arrive(); generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
+				System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+				return;
+			}
+		}
+		
 	}
 	
 	public void pause() {
 		System.out.println("Press enter to continue");
 		userInput.nextLine();
 	}
-
-	
-	
 		
 	public void blank() {
 		int selection;

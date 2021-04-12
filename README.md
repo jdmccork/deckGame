@@ -18,3 +18,10 @@ Font ideas: Brush script MT, Freestyle script, Mistral, Terra Ignota.
 Events:
   King Midas
   Black cat
+  
+  
+Requests:
+	Having a chance that not all islands are accessible from each other island
+	Flexible on the variations of the ships
+	Generate stores on arrival
+	
