@@ -11,7 +11,7 @@ public class Ship {
 	/**
 	 * The name of the ship
 	 */
-	private String name;
+	private String shipName;
 	
 	/**
 	 * The amount of health the ship will have when repaired
@@ -58,8 +58,17 @@ public class Ship {
 	 */
 	private int strength;
 	
+	
+	public Ship() {
+		shipName= "Tester";
+		health = 100;
+		speed = 5;
+		capacity = 4;
+		strength = 3;
+	}
+	
 	public Ship(String name, int health, int speed, int capacity, int strength) {
-		this.name = name;
+		this.shipName = name;
 		this.maxHealth = health;
 		this.health = health;
 		this.speed = speed;
@@ -86,8 +95,8 @@ public class Ship {
 		return status;
 	}
 	
-	public String getName() {
-		return name;
+	public String getShipName() {
+		return shipName;
 	}
 	
 	public void getDestroyed() {
@@ -151,7 +160,7 @@ public class Ship {
 	}
 	
 	public static void main(String[] args) {
-		Player firstShip = new Player("Jolly Rogers", 200, 45, 5, 253);
+		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253);
 		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, "Common");
 		firstShip.addCargo(bread);
 		firstShip.printInventory();

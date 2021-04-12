@@ -12,5 +12,12 @@ public class Route {
 		distance = (int) Math.ceil(Island.getDistance(source, destination));
 	}
 	
+	public int getDistance(){
+		return distance;
+	}
+	
+	public String toString() {
+		return ("The journey from " + source.getName() + " to " + destination.getName() + " is " + getDistance() + " units.");
+	}
 	
 }
