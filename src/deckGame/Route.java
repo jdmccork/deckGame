@@ -16,6 +16,14 @@ public class Route {
 		return distance;
 	}
 	
+	public Island getDestination() {
+		return destination;
+	}
+	
+	public int getTime(int speed) {
+		return distance/speed;
+	}
+	
 	public String toString() {
 		return ("The journey from " + source.getName() + " to " + destination.getName() + " is " + getDistance() + " units.");
 	}
