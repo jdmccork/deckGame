@@ -2,11 +2,14 @@ package deckGame;
 
 import java.util.ArrayList;
 
+import enums.Stats;
+import enums.Statuses;
+
 public class Ship {
 	/**
 	 * The state that the ship is in, these can be repaired, damaged, or destroyed
 	 */
-	private String status = "repaired";
+	private Statuses status = Statuses.REPAIRED;
 	
 	/**
 	 * The name of the ship
@@ -58,7 +61,11 @@ public class Ship {
 	 */
 	private int strength;
 	
-	
+	/**
+	 * Creates a new instance of ship with pre-generated stats.
+	 * <p>
+	 * This exists purely as a developer tool for testing.
+	 */
 	public Ship() {
 		shipName= "Tester";
 		health = 100;
@@ -67,6 +74,14 @@ public class Ship {
 		strength = 3;
 	}
 	
+	/**
+	 * Creates a new instance of ship based on given parameters.
+	 * @param name the name of this ship
+	 * @param health the amount of health this ship has
+	 * @param speed the speed at which this ship can travel
+	 * @param capacity the amount of cargo space this ship has
+	 * @param strength the base damage this ship will do.
+	 */
 	public Ship(String name, int health, int speed, int capacity, int strength) {
 		this.shipName = name;
 		this.maxHealth = health;
@@ -78,35 +93,64 @@ public class Ship {
 		this.strength = strength;
 	}
 	
+	/**
+	 * Gets the speed of this ship.
+	 * @return the speed of this ship
+	 */
 	public int getSpeed() {
 		return speed;
 	}
 	
+	/**
+	 * Takes damage and alters the status of this ship.
+	 * @param damage the amount of damage this ship takes.
+	 */
 	public void damage(int damage) {
 		if (health >= damage) {
             health -= damage;
-            status = "damaged";
+            status = Statuses.DAMAGED;
     	} else {
     		getDestroyed();
     	}
     }
 	
-	public String getStatus() {
+	/**
+	 * Gets the status of this ship.
+	 * @return the status of the ship: destroyed, damaged or repaired
+	 */
+	public Statuses getStatus() {
 		return status;
 	}
 	
+	/**
+	 * Gets the name of this ship
+	 * @return this ship's name
+	 */
 	public String getShipName() {
 		return shipName;
 	}
 	
+	/**
+	 * Sets the status of the ship to destroyed
+	 */
 	public void getDestroyed() {
-		status = "destroyed";
+		status = Statuses.DESTROYED;
 	}
 	
+	/**
+	 * Fixes this ship by increasing to maximum health and 
+	 * setting the status to repaired.
+	 */
 	public void repair() {
 		health = maxHealth;
+		status = Statuses.REPAIRED;
 	}
 	
+	/**
+	 * Changes the given stat of the ship by the given amount.
+	 * @param stat the stat to be changed
+	 * @param amount the amount to change the stat by
+	 */
 	public void alterStat(Stats stat, int amount) {
 		//TODO add checks to ensure values are positive
 		switch (stat) {
@@ -125,15 +169,23 @@ public class Ship {
 		}
 	}
 	
+	/**
+	 * Damages the given enemy by the attack strength of this ship.
+	 * @param enemy the enemy to attack
+	 */
 	public void attack(Enemy enemy) {
 		enemy.damage(strength);
 	}
 	
+	/**
+	 * Prints out the number of items in this ship's inventory, 
+	 * then prints each item in turn.
+	 */
 	public void printInventory() {
 		if(inventory.size() == 1) {
-			System.out.println("There is " + inventory.size() + " item on the ship");
+			System.out.println("There is currently " + inventory.size() + " item on the ship:");
 		} else {
-			System.out.println("There is " + inventory.size() + " items on the ship");
+			System.out.println("There is currently " + inventory.size() + " items on the ship:");
 		}
 		
 		for (Cargo cargo: inventory) {
@@ -141,6 +193,11 @@ public class Ship {
 		}
 	}
 	
+	/**
+	 * Adds the given cargo to this ship's inventory and checks
+	 * if the capacity has not been exceeded.
+	 * @param cargo the cargo to remove
+	 */
 	public void addCargo(Cargo cargo) {
 		if (inventory.size() <= capacity) {
 			inventory.add(cargo);
@@ -148,6 +205,11 @@ public class Ship {
 		}
 	}
 	
+	/**
+	 * Removes the first instance of the given kind of cargo
+	 * from this ship's inventory.
+	 * @param cargo the cargo to remove
+	 */
 	public void removeCargo(Cargo cargo) {
 		if (inventory.contains(cargo)) {
 			inventory.remove(cargo);
@@ -155,6 +217,11 @@ public class Ship {
 		}
 	}
 	
+	/**
+	 * Changes this ship's location from the source island 
+	 * of the route to destination.
+	 * @param route the route to travel
+	 */
 	public void sail(Route route) {
 		
 	}
