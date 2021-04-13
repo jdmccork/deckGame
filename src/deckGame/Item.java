@@ -1,10 +1,29 @@
 package deckGame;
 
 public abstract class Item {
+	/**
+	 * The name of this item.
+	 */
 	private String name;
+	
+	/**
+	 * The description of this item.
+	 */
 	private String description;
+	
+	/**
+	 * The amount of space this item requires to store.
+	 */
 	private int size;
+	
+	/**
+	 * The base value of this item.
+	 */
 	private int basePrice;
+	
+	/**
+	 * The rarity of this item.
+	 */
 	private String rarity;
 	
 	/**
@@ -24,8 +43,8 @@ public abstract class Item {
 	}
 	
 	/**
-	 * Gets a string representation of this item
-	 * @return the string representing the item
+	 * Gets a string representation of this item.
+	 * @return the string representing this item
 	 */
 	public String toString() {
 		String output = "Item: "+name+"\nRarity: "+rarity+"\nSize: "+size+"\nDescription: "+description;
@@ -33,8 +52,8 @@ public abstract class Item {
 	}
 	
 	/**
-	 * Gets the base price of the item
-	 * @return the base price of the item
+	 * Gets the base price of this item.
+	 * @return the base price of this item
 	 */
 	public int GetPrice() {
 		return basePrice;
