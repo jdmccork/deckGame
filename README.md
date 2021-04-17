@@ -25,3 +25,12 @@ Requests:
 	Flexible on the variations of the ships
 	Generate stores on arrival
 	
+Items:
+	Coffee
+	Lantern case
+	Oil
+	Bread
+	Horse
+	Box of 4 leaf clovers
+	Box of horseshoes
+	Seeds

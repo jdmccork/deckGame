@@ -15,7 +15,7 @@ public class Player extends Ship {
 	/**
 	 * The amount of cards the player can hold
 	 */
-	private int deckSize; //I think^^^
+	private int deckSize; //I think^^^. Yep
 	
 	/**
 	 * The place where the player is.
@@ -37,10 +37,10 @@ public class Player extends Ship {
 	 * @param capacity the amount of cargo this player's ship can hold
 	 * @param power the amount of damage this player's ship can do
 	 */
-	public Player(String userName, String shipName, int health, int speed, int capacity, int power) {
+	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold) {
 		super(shipName, health, speed, capacity, power);
-		// TODO Auto-generated constructor stub
 		location = new Island("Home", 0, 0);
+		this.gold = gold;
 		this.userName = userName;
 		luck = 0;
 	}
@@ -56,7 +56,6 @@ public class Player extends Ship {
 	 */
 	public Player(String name, int health, int speed, int capacity, int power, int luck) {
 		super(name, health, speed, capacity, power);
-		// TODO Auto-generated constructor stub
 		luck = 0;
 	}
 	
@@ -84,6 +83,23 @@ public class Player extends Ship {
 	public void getDestroyed() {
 		System.out.println("The " + getShipName() + " has been destroyed. Game Over.");
 		super.getDestroyed();
+	}
+	
+	/**
+	 * Changes this ship's location from the source island 
+	 * of the route to destination.
+	 * @param route the route to travel
+	 */
+	public void sail(Route route) {
+		location = route.getDestination();
+	}
+	
+	public void modifyGold(int amount) {
+		gold += amount;
+	}
+	
+	public int getGold() {
+		return gold;
 	}
 
 }

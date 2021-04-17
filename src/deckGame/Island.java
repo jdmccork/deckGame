@@ -4,9 +4,14 @@ import java.util.ArrayList;
 
 public class Island {
 	/**
-	 * The store(s) that are on this island.
+	 * The cargo store that is on this island.
 	 */
-	private String stores; // temp till the Store class is added
+	private Store cargoStore;
+	
+	/**
+	 * The card store on the island
+	 */
+	private Store cardStore;
 	
 	/**
 	 * The name of this island.
@@ -39,6 +44,7 @@ public class Island {
 		routes = new ArrayList<Route>();
 		locationX = x;
 		locationY = y;
+		cargoStore = new Store(islandName);
 	}
 	
 	/**
@@ -87,8 +93,8 @@ public class Island {
 	 * Gets the store(s) at this island.
 	 * @return This island's store(s)
 	 */
-	public String getStore(){
-		return stores;
+	public Store getCargoStore(){
+		return cargoStore;
 	}
 	
 	/**

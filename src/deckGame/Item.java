@@ -24,7 +24,7 @@ public abstract class Item {
 	/**
 	 * The rarity of this item.
 	 */
-	private String rarity;
+	private Rarity rarity;
 	
 	/**
 	 * Creates a new instance of item from the given data.
@@ -34,7 +34,7 @@ public abstract class Item {
 	 * @param tempBasePrice the base price of this item
 	 * @param tempRarity the rarity of this item
 	 */
-	public Item(String tempName, String tempDescription, int tempSize, int tempBasePrice, String tempRarity) {
+	public Item(String tempName, String tempDescription, int tempSize, int tempBasePrice, Rarity tempRarity) {
 		name = tempName;
 		description = tempDescription;
 		size = tempSize;
@@ -52,10 +52,25 @@ public abstract class Item {
 	}
 	
 	/**
+	 * @return the name of the product
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	public int getBasePrice() {
+		return basePrice;
+	}
+	
+	/**
 	 * Gets the base price of this item.
 	 * @return the base price of this item
 	 */
 	public int GetPrice() {
 		return basePrice;
+	}
+	
+	public Rarity getRarity() {
+		return rarity;
 	}
 }

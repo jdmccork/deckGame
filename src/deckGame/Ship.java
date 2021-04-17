@@ -198,11 +198,13 @@ public class Ship {
 	 * if the capacity has not been exceeded.
 	 * @param cargo the cargo to remove
 	 */
-	public void addCargo(Cargo cargo) {
+	public boolean addCargo(Cargo cargo) {
 		if (inventory.size() <= capacity) {
 			inventory.add(cargo);
 			alterStat(cargo.getModifyStat(), cargo.getModifyAmount());
+			return true;
 		}
+		return false;
 	}
 	
 	/**
@@ -217,18 +219,17 @@ public class Ship {
 		}
 	}
 	
-	/**
-	 * Changes this ship's location from the source island 
-	 * of the route to destination.
-	 * @param route the route to travel
-	 */
-	public void sail(Route route) {
-		
+	public int getCapacity() {
+		return capacity;
 	}
 	
+	public ArrayList<Cargo> getInventory(){
+		return inventory;
+	}
+
 	public static void main(String[] args) {
-		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253);
-		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, "Common");
+		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25);
+		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
 		firstShip.addCargo(bread);
 		firstShip.printInventory();
 		firstShip.removeCargo(bread);
