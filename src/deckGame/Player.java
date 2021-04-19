@@ -101,5 +101,15 @@ public class Player extends Ship {
 	public int getGold() {
 		return gold;
 	}
+	
+	/*
+	public boolean addItem(Card card) {
+		return false;
+	}
+	*/
+	
+	public boolean addItem(Cargo cargo) {
+		return super.addItem(cargo);
+	}
 
 }

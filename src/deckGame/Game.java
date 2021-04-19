@@ -5,6 +5,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import enums.ItemType;
+
 
 public class Game {
 	public void print(String string){
@@ -17,19 +19,24 @@ public class Game {
 	private int days;
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
+	private ArrayList<Cargo> allCargo;
+	//private ArrayList<Cards> allCards;
 	
 	public Game() {
 		userInput = new Scanner(System.in);
-		mainMenu();
+		boolean playing = true;
+		while(playing = true) {
+			playing = mainMenu();
+		}
 		userInput.close();
 	}
 	public Game(int testNum) {
 		userInput = new Scanner(System.in);
 		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
+		generateStore(player.getLocation());
 		priceModifier = 1;
 		islands = generateIslands();
 		generateRoutes(islands);
-		generateStores();
 		days = 25;
 		play();
 		userInput.close();	
@@ -118,56 +125,65 @@ public class Game {
 		player = createPlayer();
 		islands = generateIslands();
 		generateRoutes(islands);
-		generateStores();
+		generateStore(player.getLocation());
 	}
 	
-	public void mainMenu(){
+	public boolean mainMenu(){
 		int selection;
-		while (true) {
-			System.out.println("Select an option to continue");
-			System.out.println("1: Play");
-			System.out.println("2: Quit");
-			selection = getInt();
-			userInput.nextLine();
-			if (selection == 1) {
-				gameSetup();
-				welcome(player);
-				days = getGameLength();
-				play();
-			} else if (selection == 2) {
-				System.out.println("Goodbye");
-				return;
-			} else {
-				System.out.println("Invalid option, please enter the number of the option you want.");
+		try {
+			while (true) {
+				System.out.println("Select an option to continue");
+				System.out.println("1: Play");
+				System.out.println("2: Quit");
+				selection = getInt();
+				if (selection == 1) {
+					gameSetup();
+					welcome(player);
+					days = getGameLength();
+					play();
+				} else if (selection == 2) {
+					System.out.println("Thanks for playing. Goodbye");
+					return false;
+				} else {
+					System.out.println("Invalid option, please enter the number of the option you want.");
+				}
+			}
+		}catch(EndGameException e){
+			System.out.println("Play again?");
+			System.out.println("1: Yes");
+			System.out.println("2: No");
+			switch (getInt()) {
+			case 1:
+				return true;
+			case 2:
+				System.out.println("Thanks for playing. Goodbye");
+				return false;
 			}
 		}
+		return false;//should never be reached in reality
 	}
 	
 	public void play() {
 		while (currentDay <= days) {
-			System.out.println("Current day: " + currentDay);
+			System.out.println("Current day: " + currentDay + "/" + days);
 			System.out.println("Select an option to continue");
-			System.out.println("1: Interact with cargo store");
-			System.out.println("2: Interact with card store");
-			System.out.println("3: Set sail");
-			System.out.println("4: See inventory");
-			System.out.println("5: Return to main menu");
+			System.out.println("1: Interact with store");
+			System.out.println("2: Set sail");
+			System.out.println("3: See inventory");
+			System.out.println("4: Return to main menu");
 			
 			switch (getInt()) {
 			case 1:
 				//interact with shop
-				shopInteraction((player.getLocation()).getCargoStore());
+				shopInteraction((player.getLocation()).getStore());
 				break;
 			case 2:
-				//shopInteraction((player.getLocation()).getCardStore());
-			case 3:
 				selectRoute();
 				break;
-			case 4:
-				player.printInventory();
-				pause();
+			case 3:
+				viewInventory();
 				break;
-			case 5:
+			case 4:
 				return;
 			}
 		}
@@ -187,6 +203,7 @@ public class Game {
 				//see what's for sale
 				break;
 			case 2:
+				sellStock(store);
 				//see the price that you can sell your items for
 				break;
 			case 3:
@@ -200,7 +217,7 @@ public class Game {
 	
 	public void buyStock(Store store) {
 		store.printStock();
-		if (store.getCargo().size() == 0) {
+		if (store.getStock().size() == 0) {
 			pause();
 			return;
 		}
@@ -208,23 +225,31 @@ public class Game {
 		int selection = getInt();
 		if (selection == 0) {
 			return;
-		}else if (selection <= store.getCargo().size()) {
-			viewCargoItem(store.getCargo().get(selection - 1));
+		}else if (selection <= store.getStock().size()) {
+			viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
 		}else {
-			System.out.println("Please enter a number between 0 and " + store.getCargo().size() + ".");
+			System.out.println("Please enter a number between 0 and " + store.getStock().size() + ".");
 		}
 	}
 	
-	public void viewCargoItem(Cargo cargo) {
-		System.out.println(cargo);
-		System.out.println("The " + cargo.getName() + " will cost $" + getPrice(cargo));
+	public void viewItem(Item item, double priceModifier, String option) {
+		System.out.println(item);
+		if (option == "Buy") {
+			System.out.println("The " + item.getName() + " will cost $" + getPrice(item, priceModifier));
+		} else {
+			System.out.println("You will recive $" + getPrice(item, priceModifier) + " for the " + item.getName() + ".");
+		}
 		System.out.println("You currently have $" + player.getGold());
 		System.out.println("Select an option to continue");
-		System.out.println("1: Buy");
+		System.out.println("1: " + option);
 		System.out.println("2: Return to shop");
 		switch (getInt()) {
 		case 1:
-			purchaseItem(cargo);
+			if (option == "Buy") {
+				purchaseItem(item, priceModifier);
+			}else {
+				sellItem(item, priceModifier);
+			}
 			break;
 		case 2:
 			return;
@@ -234,13 +259,31 @@ public class Game {
 		}
 	}
 	
-	public void purchaseItem(Cargo cargo) {
-		int price = getPrice(cargo);
+	public void viewItem(Item item) {
+		System.out.println(item);
+		System.out.println("Select an option to continue");
+		System.out.println("1: Return to ship");
+		switch (getInt()) {
+		case 1:
+			return;
+		default:
+			System.out.println("Please enter a number between 1 and 2");
+			break;
+		}
+	}
+	
+	public void purchaseItem(Item item, double priceModifier) {
+		int price = getPrice(item, priceModifier);
 		if (player.getGold() >= price & player.getInventory().size() < player.getCapacity()) {
-			player.addCargo(cargo);
+			if (item instanceof Cargo) {
+				player.addItem((Cargo) item);
+				item.setDayPurchased(currentDay);
+			}else {
+				//player.addItem((Card) item);
+			}
 			player.modifyGold(-price);
-			player.getLocation().getCargoStore().removeStock(cargo);
-			System.out.println("Purchase successful. " + cargo.getName() + " has been added to your ship");
+			player.getLocation().getStore().buy(item);
+			System.out.println("Purchase successful. " + item.getName() + " has been added to your ship");
 		}else if (player.getGold() < price){
 			System.out.println("Your don't have enough money to buy this item.");
 		}else {
@@ -250,18 +293,48 @@ public class Game {
 		pause();
 	}
 	
-	public int getPrice(Cargo cargo) {
-		switch(cargo.getRarity()) {
+	public void sellItem(Item item, double priceModifier) {
+		int price = getPrice(item, priceModifier);
+		if (player.getInventory().contains(item)) {
+			if (item instanceof Cargo) {
+				player.removeCargo((Cargo) item);
+				item.setDayPurchased(0);
+			}else {
+				//player.removeItem((Card) item);
+			}
+			player.modifyGold(price);
+			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
+		}
+		pause();
+	}
+	
+	public int getPrice(Item item, double buySellModifier) {
+		double timeModifier = (item.getDaysPassed(currentDay) * 0.2 + 1);
+		switch(item.getRarity()) {
 		case COMMON:
-			return (int) (cargo.getBasePrice() * priceModifier * 1);
+			return (int) (item.getBasePrice() * priceModifier * 1 * buySellModifier * timeModifier);
 		case UNCOMMON:
-			return (int) (cargo.getBasePrice() * priceModifier * 1.2);
+			return (int) (item.getBasePrice() * priceModifier * 1.2 * buySellModifier * timeModifier);
 		case RARE:
-			return (int) (cargo.getBasePrice() * priceModifier * 1.5);
+			return (int) (item.getBasePrice() * priceModifier * 1.5 * buySellModifier * timeModifier);
 		case LEGENDARY:
-			return (int) (cargo.getBasePrice() * priceModifier * 2);
+			return (int) (item.getBasePrice() * priceModifier * 2 * buySellModifier * timeModifier);
 		default:
-			return cargo.getBasePrice();
+			return item.getBasePrice();
+		}
+	}
+	
+	public void sellStock(Store store) {
+		System.out.println("Select an item to sell.");
+		player.printInventory();
+		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		int selection = getInt();
+		if (selection == player.getInventory().size() + 1) {
+			return;
+		}else if (selection <= player.getInventory().size()) {
+			viewItem(player.getInventory().get(selection - 1), player.getLocation().getStore().getSellModifier(), "Sell");
+		}else {
+			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
 		}
 	}
 	
@@ -272,7 +345,8 @@ public class Game {
 				userInput.nextLine();
 				return selection;
 			}catch (java.util.InputMismatchException e) {
-				System.out.println("Invalid character, please enter the number of the option you want.");
+				System.out.println("Invalid character, please enter a valid option.");
+				userInput.nextLine();
 			}
 		}
 	}
@@ -281,35 +355,67 @@ public class Game {
 		int selection;
 		ArrayList<Route> routes = player.getLocation().getRoutes();
 		while (true) {
-			int i = 1;
+			int index = 1;
 			System.out.println("Select an option to continue");
 			for (Route route: routes) {
-				System.out.println(i++ + ": The journey to " + route.getDestination().getName() 
+				System.out.println(index++ + ": The journey to " + route.getDestination().getName() 
 						+ " will take " + route.getTime(player.getSpeed()) + " days to complete");
 			}
-			System.out.println(i++ + ": Return to island");
+			System.out.println(index++ + ": Return to island");
 			try {
-				selection = userInput.nextInt() - 1;
-				userInput.nextLine();
+				selection = getInt() - 1;
 			}catch (java.util.InputMismatchException e) {
 				System.out.println("Invalid character, please enter the number of the option you want.");
 				userInput.nextLine();
 				continue;
 			}
-			if (selection == i) {
+			if (selection == index) {
 				return;
-			}else if (selection > i | selection <= 0) {
-				System.out.println("Please enter a number between 1 and " + i);
+			}else if (selection > index | selection < 0) {
+				System.out.println("Please enter a number between 1 and " + index);
 			}else {
 				int time = routes.get(selection).getTime(player.getSpeed());
+				if (currentDay + time >= days) {
+					System.out.println("Note, this trip will exceed your remaining time, all items will"
+							+ " be sold for their base price on day " + days + ".\nContinue?");
+					System.out.println("1: Yes");
+					System.out.println("2: No");
+					switch (getInt()) {
+					case 1:
+						break;
+					case 2:
+						return;
+					default:
+						System.out.println("Please enter the number 1 or 2.");
+					}
+				}
 				player.sail(routes.get(selection));
-				currentDay += time;
-				generateStores(); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
-				System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+				for (int i = 0; i != time & currentDay < days; i++) {
+					currentDay += 1;
+					//event()
+				}
+				if (currentDay < days) {
+					generateStore(player.getLocation()); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
+					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+				}else {
+					endGame();
+				}
 				return;
 			}
 		}
-		
+	}
+	
+	public void viewInventory() {
+		player.printInventory();
+		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		int selection = getInt();
+		if (selection == player.getInventory().size() + 1) {
+			return;
+		}else if (selection <= player.getInventory().size()) {
+			viewItem(player.getInventory().get(selection - 1));
+		}else {
+			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
+		}
 	}
 	
 	public void pause() {
@@ -317,9 +423,12 @@ public class Game {
 		userInput.nextLine();
 	}
 	
-	public void generateStores() {
-		player.getLocation().getCargoStore().generateCargoStock();
-		//player.getLocation().getCardStore().generateCardStock();
+	public void generateStore(Island island) {
+		island.generateStore();
+	}
+	
+	public void endGame() {
+		throw new EndGameException();
 	}
 		
 	public void template() {
@@ -344,7 +453,7 @@ public class Game {
 			
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Game game = new Game(1);
+		Game game = new Game();
 	}
 
 }

@@ -2,6 +2,7 @@ package deckGame;
 
 import java.util.ArrayList;
 
+import enums.ItemType;
 import enums.Stats;
 import enums.Statuses;
 
@@ -187,9 +188,9 @@ public class Ship {
 		} else {
 			System.out.println("There is currently " + inventory.size() + " items on the ship:");
 		}
-		
+		int i = 1;
 		for (Cargo cargo: inventory) {
-			System.out.println(cargo);
+			System.out.println(i++ + ": " + cargo.getName());
 		}
 	}
 	
@@ -198,7 +199,7 @@ public class Ship {
 	 * if the capacity has not been exceeded.
 	 * @param cargo the cargo to remove
 	 */
-	public boolean addCargo(Cargo cargo) {
+	public boolean addItem(Cargo cargo) {
 		if (inventory.size() <= capacity) {
 			inventory.add(cargo);
 			alterStat(cargo.getModifyStat(), cargo.getModifyAmount());
@@ -229,8 +230,8 @@ public class Ship {
 
 	public static void main(String[] args) {
 		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25);
-		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
-		firstShip.addCargo(bread);
+		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON, ItemType.CARGO);
+		firstShip.addItem(bread);
 		firstShip.printInventory();
 		firstShip.removeCargo(bread);
 		firstShip.printInventory();

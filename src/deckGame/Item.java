@@ -1,5 +1,7 @@
 package deckGame;
 
+import enums.ItemType;
+
 public abstract class Item {
 	/**
 	 * The name of this item.
@@ -26,6 +28,10 @@ public abstract class Item {
 	 */
 	private Rarity rarity;
 	
+	private int dayPurchased = -1;
+	
+	private ItemType itemType;
+	
 	/**
 	 * Creates a new instance of item from the given data.
 	 * @param tempName the name of the item
@@ -34,12 +40,13 @@ public abstract class Item {
 	 * @param tempBasePrice the base price of this item
 	 * @param tempRarity the rarity of this item
 	 */
-	public Item(String tempName, String tempDescription, int tempSize, int tempBasePrice, Rarity tempRarity) {
+	public Item(String tempName, String tempDescription, int tempSize, int tempBasePrice, Rarity tempRarity, ItemType type) {
 		name = tempName;
 		description = tempDescription;
 		size = tempSize;
 		basePrice = tempBasePrice;
 		rarity = tempRarity;
+		itemType = type;
 	}
 	
 	/**
@@ -49,6 +56,22 @@ public abstract class Item {
 	public String toString() {
 		String output = "Item: "+name+"\nRarity: "+rarity+"\nSize: "+size+"\nDescription: "+description;
 		return output;
+	}
+	
+	public void setDayPurchased(int day) {
+		dayPurchased = day;
+	}
+	
+	public int getDayPurchased() {
+		return dayPurchased;
+	}
+	
+	public int getDaysPassed(int currentDay) {
+		if (dayPurchased == -1) {
+			return 0;
+		}else {
+			return currentDay - dayPurchased;
+		} 
 	}
 	
 	/**

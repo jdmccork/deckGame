@@ -6,12 +6,7 @@ public class Island {
 	/**
 	 * The cargo store that is on this island.
 	 */
-	private Store cargoStore;
-	
-	/**
-	 * The card store on the island
-	 */
-	private Store cardStore;
+	private Store store;
 	
 	/**
 	 * The name of this island.
@@ -44,7 +39,6 @@ public class Island {
 		routes = new ArrayList<Route>();
 		locationX = x;
 		locationY = y;
-		cargoStore = new Store(islandName);
 	}
 	
 	/**
@@ -93,8 +87,12 @@ public class Island {
 	 * Gets the store(s) at this island.
 	 * @return This island's store(s)
 	 */
-	public Store getCargoStore(){
-		return cargoStore;
+	public Store getStore(){
+		return store;
+	}
+	
+	public void generateStore() {
+		store = new Store(islandName);
 	}
 	
 	/**
