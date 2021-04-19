@@ -149,7 +149,7 @@ public class Game {
 				}
 			}
 		}catch(EndGameException e){
-			System.out.println("Play again?");
+			System.out.println("Would you like to return to the main menu?");
 			System.out.println("1: Yes");
 			System.out.println("2: No");
 			switch (getInt()) {
@@ -361,9 +361,9 @@ public class Game {
 				System.out.println(index++ + ": The journey to " + route.getDestination().getName() 
 						+ " will take " + route.getTime(player.getSpeed()) + " days to complete");
 			}
-			System.out.println(index++ + ": Return to island");
+			System.out.println(index + ": Return to island");
 			try {
-				selection = getInt() - 1;
+				selection = getInt();
 			}catch (java.util.InputMismatchException e) {
 				System.out.println("Invalid character, please enter the number of the option you want.");
 				userInput.nextLine();
@@ -374,10 +374,11 @@ public class Game {
 			}else if (selection > index | selection < 0) {
 				System.out.println("Please enter a number between 1 and " + index);
 			}else {
+				selection++; // accounts for the index's starting at 0 and not 1
 				int time = routes.get(selection).getTime(player.getSpeed());
 				if (currentDay + time >= days) {
 					System.out.println("Note, this trip will exceed your remaining time, all items will"
-							+ " be sold for their base price on day " + days + ".\nContinue?");
+							+ " be sold on day " + days + ".\nContinue?");
 					System.out.println("1: Yes");
 					System.out.println("2: No");
 					switch (getInt()) {
@@ -428,7 +429,23 @@ public class Game {
 	}
 	
 	public void endGame() {
+		int gold = getTotalWorth();
+		printResults(gold);
+		//extendGame(); question with y/n answer
 		throw new EndGameException();
+	}
+	
+	public int getTotalWorth() {
+		int totalGold = 0;
+		totalGold += player.getGold();
+		for (Item item: player.getInventory()) {
+			totalGold += getPrice(item, 1);
+		}
+		return totalGold;
+	}
+	
+	public void printResults(int gold) {
+		System.out.println("Total gold: " + gold);
 	}
 		
 	public void template() {
