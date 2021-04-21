@@ -1,30 +1,50 @@
 package deckGame;
 
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 import enums.ItemType;
 
 public class Store {
 	
+	/**
+	 * The stock which the store has
+	 */
 	private ArrayList<Item> stock = new ArrayList<Item>();
 
 	/**
-	 * The name of this store.
+	 * The counter ensuring that advice cycles, even between stores.
 	 */
-	//i don't think the store needs a name
-	private String name;
+	private static int adviceCount;
 	
+	/**
+	 * A list of the possible advice available from shopkeepers.
+	 */
+	private static ArrayList<String> adviceList = new ArrayList<String>();
+	
+	/**
+	 * A variable that stores whether the advice file has been successfully read
+	 */
+	private static boolean adviceRead = false;
+	
+	/**
+	 * The modifier used when this store sells an item
+	 */
 	private double buyModifier = 1; //put in to allow for changes later
 	
+	/**
+	 * The modifier used when this store buys an item
+	 */
 	private double sellModifier = 0.8; //should be less than 1 to prevent the ability to buy and sell instantly
 	
 	/**
-	 * Creates a new store with the given name.
-	 * @param islandName the name of the island
+	 * Creates a new store and generates its stock.
 	 */
 	public Store(String islandName){
-		name = islandName + " General Store";
 		generateStock();
+		readAdvice();
 	}
 	
 	public ArrayList<Item> getStock(){
@@ -40,7 +60,7 @@ public class Store {
 	}
 	
 	/**
-	 * Gets the items for sale.
+	 * Creates the stock which the store will sell.
 	 */
 	public void generateStock() {
 		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON, ItemType.CARGO);
@@ -51,7 +71,7 @@ public class Store {
 	 * Prints the items for sale.
 	 */
 	public void printStock() {
-		System.out.print(name + " has " + stock.size());
+		System.out.print("This store has " + stock.size());
 		if (stock.size() == 0) {
 			System.out.println(" items in stock. Please try again later.");
 			return;
@@ -66,10 +86,17 @@ public class Store {
 		}
 	}
 	
+	/**
+	 * TBD
+	 */
 	public void addStock() {
 		
 	}
 	
+	/**
+	 * Removes an item from stock.
+	 * @param item the item to be removed.
+	 */
 	public void removeStock(Item item) {
 		stock.remove(item);
 	}
@@ -91,5 +118,46 @@ public class Store {
 	 */
 	public void buy(Item sale) {
 		stock.remove(sale);
+	}
+	
+	/**
+	 * Attempts to read the advice file in the resources package.
+	 * If successful, adds each line to the list of possible advice.
+	 */
+	private void readAdvice() {
+		if (!adviceRead) {
+			try {
+				//Defines the advice file as a new file
+				File myObj = new File("src/resources/Advice");
+				//Creates a scanner object to read the advice file
+			    Scanner myReader = new Scanner(myObj);
+			    //While the scanner finds new lines, keep adding them to the list
+			    while (myReader.hasNextLine()) {
+			        String data = myReader.nextLine();
+			        adviceList.add(data);
+			    }
+			    myReader.close();
+			    adviceRead = true;
+			} catch (FileNotFoundException e) {
+				System.out.println("An error occurred.");
+			    e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * Prints a piece of advice and increments an advice counter.
+	 */
+	public void talkToShopKeep() {
+		if (adviceRead) {
+			String advice = adviceList.get(adviceCount);
+		    adviceCount += 1;
+		    if(adviceCount == adviceList.size()) {
+		    	adviceCount = 0;
+		    }
+	        System.out.println(advice);
+		} else {
+			System.out.println("*The shopkeeper has forgotten their advice*");
+		}
 	}
 }
