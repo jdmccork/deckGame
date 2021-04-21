@@ -1,11 +1,15 @@
 package deckGame;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import enums.ItemType;
+import enums.Rarity;
+import enums.Stats;
 
 
 public class Game {
@@ -19,10 +23,11 @@ public class Game {
 	private int days;
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
-	private ArrayList<Cargo> allCargo;
+	private ArrayList<Cargo> allCargo = new ArrayList<Cargo>();
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
+		getItems();
 		userInput = new Scanner(System.in);
 		boolean playing = true;
 		while(playing = true) {
@@ -465,6 +470,63 @@ public class Game {
 			case 1:
 				break;
 			}
+		}
+	}
+	
+	private ArrayList<String> readItems() {
+		ArrayList<String> items = new ArrayList<String>();
+		try {
+			//Defines the items file as a new file to read
+			File myObj = new File("src/resources/Items");
+			//Creates a scanner object to read the items file
+		    Scanner myReader = new Scanner(myObj);
+		    //While the scanner finds new lines, keep adding them to the list
+		    while (myReader.hasNextLine()) {
+		        String data = myReader.nextLine();
+		        items.add(data);
+		    }
+		    myReader.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("An error occurred.");
+		    e.printStackTrace();
+		}
+		return items;
+	}
+	
+	public void getItems() {
+		ArrayList<String> items = readItems();
+		for(String item : items) {
+			String[] temp = item.split(" #");
+			ArrayList<String> parts = new ArrayList<String>();
+			for(String part: temp) {
+				String[] values = part.split(": ");
+				parts.add(values[1]);
+			}
+			if(parts.get(0).equals("Cargo")) {
+				Cargo cargo;
+				String name = parts.get(1);
+				String description = parts.get(2);
+				int size = Integer.parseInt(parts.get(3));
+				int basePrice = Integer.parseInt(parts.get(4));
+				Rarity rarity = Rarity.valueOf(parts.get(5));
+				if(parts.size() == 8) {
+					Stats stat = Stats.valueOf(parts.get(6));
+					int statAmount = Integer.parseInt(parts.get(7));
+					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
+				} else {
+					cargo = new Cargo(name, description, size, basePrice, rarity);
+				}
+				allCargo.add(cargo);
+			} /*else { //To be implemented once cards are implemented
+				String name = parts.get(1);
+				String description = parts.get(2);
+				int size = Integer.parseInt(parts.get(3));
+				int basePrice = Integer.parseInt(parts.get(4));
+				Rarity rarity = Rarity.valueOf(parts.get(5));
+				Stats stat = Stats.valueOf(parts.get(6));
+				int statAmount = Integer.parseInt(parts.get(7));
+				Card card = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
+			}*/
 		}
 	}
 			

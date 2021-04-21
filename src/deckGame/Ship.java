@@ -3,6 +3,7 @@ package deckGame;
 import java.util.ArrayList;
 
 import enums.ItemType;
+import enums.Rarity;
 import enums.Stats;
 import enums.Statuses;
 

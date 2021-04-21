@@ -1,6 +1,7 @@
 package deckGame;
 
 import enums.ItemType;
+import enums.Rarity;
 
 public abstract class Item {
 	/**
@@ -91,6 +92,10 @@ public abstract class Item {
 	 */
 	public int GetPrice() {
 		return basePrice;
+	}
+	
+	public String getDesription() {
+		return description;
 	}
 	
 	public Rarity getRarity() {

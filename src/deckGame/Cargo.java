@@ -1,6 +1,7 @@
 package deckGame;
 
 import enums.ItemType;
+import enums.Rarity;
 import enums.Stats;
 
 /*
@@ -42,9 +43,10 @@ public class Cargo extends Item{
 	 * @param basePrice the base value of the cargo
 	 * @param rarity the rarity of the cargo
 	 */
-	Cargo(String name, String description, int size, int basePrice, Rarity rarity, ItemType type) {
-		super(name, description, size, basePrice, rarity, type);
+	Cargo(String name, String description, int size, int basePrice, Rarity rarity) {
+		super(name, description, size, basePrice, rarity, ItemType.CARGO);
 		this.modifyStat = Stats.NONE;
+		this.modifyAmount = 0;
 	}
 	
 	/**

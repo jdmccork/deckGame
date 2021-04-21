@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import enums.ItemType;
+import enums.Rarity;
 
 public class Store {
 	
@@ -63,7 +64,7 @@ public class Store {
 	 * Creates the stock which the store will sell.
 	 */
 	public void generateStock() {
-		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON, ItemType.CARGO);
+		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
 		stock.add(bread);
 	}
 	
