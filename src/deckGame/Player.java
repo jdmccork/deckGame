@@ -26,7 +26,7 @@ public class Player extends Ship {
 	/**
 	 * Alters the chance for item and card rarity 
 	 */
-	private int luck;
+	private double luck;
 	
 	/**
 	 * Creates a new player as an extension of the ship class.
@@ -100,6 +100,10 @@ public class Player extends Ship {
 	
 	public int getGold() {
 		return gold;
+	}
+	
+	public double getLuck() {
+		return luck;
 	}
 	
 	/*

@@ -231,7 +231,7 @@ public class Ship {
 
 	public static void main(String[] args) {
 		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25);
-		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON, ItemType.CARGO);
+		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
 		firstShip.addItem(bread);
 		firstShip.printInventory();
 		firstShip.removeCargo(bread);

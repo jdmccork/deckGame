@@ -43,8 +43,8 @@ public class Store {
 	/**
 	 * Creates a new store and generates its stock.
 	 */
-	public Store(String islandName){
-		generateStock();
+	public Store(String islandName, ArrayList<Item> possibleStock, Player player){
+		generateStock(possibleStock, player);
 		readAdvice();
 	}
 	
@@ -63,9 +63,18 @@ public class Store {
 	/**
 	 * Creates the stock which the store will sell.
 	 */
-	public void generateStock() {
-		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
-		stock.add(bread);
+	public void generateStock(ArrayList<Item> items, Player player) {
+		int randomNum;
+		while (stock.size() < 3) {
+			randomNum = (int) (Math.random() * items.size());
+			Item item = items.get(randomNum);
+			if (!stock.contains(item) & !player.getInventory().contains(item)) {
+				int chance = (int) (Math.random() * player.getLuck() * 4);
+				if (chance >= item.getRarity().getChanceModifier()) {
+					stock.add(item);
+				}				
+			}
+		}
 	}
 	
 	/**
@@ -151,12 +160,11 @@ public class Store {
 	 */
 	public void talkToShopKeep() {
 		if (adviceRead) {
-			String advice = adviceList.get(adviceCount);
+			System.out.println(adviceList.get(adviceCount));
 		    adviceCount += 1;
 		    if(adviceCount == adviceList.size()) {
 		    	adviceCount = 0;
 		    }
-	        System.out.println(advice);
 		} else {
 			System.out.println("*The shopkeeper has forgotten their advice*");
 		}

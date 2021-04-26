@@ -23,11 +23,10 @@ public class Game {
 	private int days;
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
-	private ArrayList<Cargo> allCargo = new ArrayList<Cargo>();
+	private ArrayList<Item> allItems = new ArrayList<Item>();
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
-		getItems();
 		userInput = new Scanner(System.in);
 		boolean playing = true;
 		while(playing = true) {
@@ -36,6 +35,7 @@ public class Game {
 		userInput.close();
 	}
 	public Game(int testNum) {
+		generateItems();
 		userInput = new Scanner(System.in);
 		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
 		generateStore(player.getLocation());
@@ -100,8 +100,9 @@ public class Game {
 	
 	public void welcome(Player player) {
 		System.out.println(player.getUserName() + " is the new captain of The " + player.getShipName() + "."
-				+ "\nEarn as much gold as you can in the time you have left."
+				+ "\nEarn as much gold as you can in the " + days + " days you have left."
 				+ "\nWelcome abord Captain " + player.getUserName() + ".");
+		pause();
 	}
 	
 	public int getGameLength() {
@@ -122,15 +123,15 @@ public class Game {
 	}
 	
 	public void gameSetup() {
-		
+		generateItems();	
 		//temporary
 		priceModifier = 1;
-		
-		
+
 		player = createPlayer();
 		islands = generateIslands();
 		generateRoutes(islands);
 		generateStore(player.getLocation());
+		days = getGameLength();
 	}
 	
 	public boolean mainMenu(){
@@ -144,7 +145,6 @@ public class Game {
 				if (selection == 1) {
 					gameSetup();
 					welcome(player);
-					days = getGameLength();
 					play();
 				} else if (selection == 2) {
 					System.out.println("Thanks for playing. Goodbye");
@@ -226,14 +226,15 @@ public class Game {
 			pause();
 			return;
 		}
-		System.out.println("Select an item to view more options or return with 0.");
+		System.out.println((store.getStock().size() + 1) + ": Return");
+		System.out.println("Select an item to view more information");
 		int selection = getInt();
-		if (selection == 0) {
+		if (selection == store.getStock().size() + 1) {
 			return;
 		}else if (selection <= store.getStock().size()) {
 			viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
 		}else {
-			System.out.println("Please enter a number between 0 and " + store.getStock().size() + ".");
+			System.out.println("Please enter a number between 1 and " + (store.getStock().size() + 1) + ".");
 		}
 	}
 	
@@ -430,7 +431,7 @@ public class Game {
 	}
 	
 	public void generateStore(Island island) {
-		island.generateStore();
+		island.generateStore(allItems, player);
 	}
 	
 	public void endGame() {
@@ -493,7 +494,7 @@ public class Game {
 		return items;
 	}
 	
-	public void getItems() {
+	public void generateItems() {
 		ArrayList<String> items = readItems();
 		for(String item : items) {
 			String[] temp = item.split(" #");
@@ -503,7 +504,7 @@ public class Game {
 				parts.add(values[1]);
 			}
 			if(parts.get(0).equals("Cargo")) {
-				Cargo cargo;
+				Cargo cargo;//what's this needed for?
 				String name = parts.get(1);
 				String description = parts.get(2);
 				int size = Integer.parseInt(parts.get(3));
@@ -516,7 +517,7 @@ public class Game {
 				} else {
 					cargo = new Cargo(name, description, size, basePrice, rarity);
 				}
-				allCargo.add(cargo);
+				allItems.add(cargo);
 			} /*else { //To be implemented once cards are implemented
 				String name = parts.get(1);
 				String description = parts.get(2);
@@ -529,10 +530,19 @@ public class Game {
 			}*/
 		}
 	}
+		
+	public Item getItem(String name) {
+		for (Item item: allItems) {
+			if (item.getName() == name) {
+				return item;
+			}
+		}
+		return null;
+	}
 			
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Game game = new Game();
+		Game game = new Game(1);
 	}
 
 }

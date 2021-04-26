@@ -1,2 +1,4 @@
+Type: Cargo #name: Bread #Description: It's bread. These loaves are wholegrain. #Size: 1 #Base Price: 5 #Rarity: COMMON
+Type: Cargo #name: Rainbow Bread #Description: While it's still bread, the loaves are every colour. #Size: 1 #Base Price: 15 #Rarity: UNCOMMON
 Type: Cargo #Name: Box of Four-Leaved Clovers #Description: Do you have any idea how lucky you are? #Size: 3 #Base Price: 1000 #Rarity: LEGENDARY #Stat: LUCK #Stat Amount: 15 #
 Type: Cargo #Name: Box of Horseshoes #Description: These 12 horseshoes are only lucky if they are kept upright. #Size: 3 #Base Price: 600 #Rarity: RARE #Stat: LUCK #Stat Amount: 6 #
