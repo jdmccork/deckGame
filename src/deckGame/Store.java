@@ -65,7 +65,7 @@ public class Store {
 	 */
 	public void generateStock(ArrayList<Item> items, Player player) {
 		int randomNum;
-		while (stock.size() < 3) {
+		while (stock.size() < 4) {
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
 			if (!stock.contains(item) & !player.getInventory().contains(item)) {

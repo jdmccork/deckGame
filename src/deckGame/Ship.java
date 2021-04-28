@@ -59,7 +59,7 @@ public class Ship {
 	private ArrayList<Cargo> inventory;
 	
 	/**
-	 * The base damage your ship will do
+	 * The number of dice that are available to roll
 	 */
 	private int strength;
 	
@@ -114,7 +114,17 @@ public class Ship {
     	} else {
     		getDestroyed();
     	}
+		System.out.println("The " + shipName + " took " + damage + " damage."
+				+ "\nIt currently has " + health + " health remaining.");
     }
+	
+	public void damage(ArrayList<Integer> dice) {
+		int damage = 0;
+		for (int die:dice) {
+			damage += die;
+		}
+		damage(damage);
+	}
 	
 	/**
 	 * Gets the status of this ship.
@@ -227,6 +237,10 @@ public class Ship {
 	
 	public ArrayList<Cargo> getInventory(){
 		return inventory;
+	}
+	
+	public int getStrength() {
+		return strength;
 	}
 
 	public static void main(String[] args) {

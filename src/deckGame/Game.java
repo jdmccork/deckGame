@@ -17,7 +17,7 @@ public class Game {
 		System.out.println(string);
 	}
 
-	private Scanner userInput;
+	private static Scanner userInput = new Scanner(System.in);
 	private Player player;
 	private ArrayList<Island> islands;
 	private int days;
@@ -27,7 +27,6 @@ public class Game {
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
-		userInput = new Scanner(System.in);
 		boolean playing = true;
 		while(playing = true) {
 			playing = mainMenu();
@@ -155,6 +154,7 @@ public class Game {
 				}
 			}
 		}catch(EndGameException e){
+			endGame();
 			System.out.println("Would you like to return to the main menu?");
 			System.out.println("1: Yes");
 			System.out.println("2: No");
@@ -222,20 +222,22 @@ public class Game {
 	}
 	
 	public void buyStock(Store store) {
-		store.printStock();
-		if (store.getStock().size() == 0) {
-			pause();
-			return;
-		}
-		System.out.println((store.getStock().size() + 1) + ": Return");
-		System.out.println("Select an item to view more information");
-		int selection = getInt();
-		if (selection == store.getStock().size() + 1) {
-			return;
-		}else if (selection <= store.getStock().size()) {
-			viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
-		}else {
-			System.out.println("Please enter a number between 1 and " + (store.getStock().size() + 1) + ".");
+		while (true) {
+			store.printStock();
+			if (store.getStock().size() == 0) {
+				pause();
+				return;
+			}
+			System.out.println((store.getStock().size() + 1) + ": Return");
+			System.out.println("Select an item to view more information");
+			int selection = getInt();
+			if (selection == store.getStock().size() + 1) {
+				return;
+			}else if (selection <= store.getStock().size()) {
+				viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
+			}else {
+				System.out.println("Please enter a number between 1 and " + (store.getStock().size() + 1) + ".");
+			}
 		}
 	}
 	
@@ -250,19 +252,21 @@ public class Game {
 		System.out.println("Select an option to continue");
 		System.out.println("1: " + option);
 		System.out.println("2: Return to shop");
-		switch (getInt()) {
-		case 1:
-			if (option == "Buy") {
-				purchaseItem(item, priceModifier);
-			}else {
-				sellItem(item, priceModifier);
+		while (true) {
+			switch (getInt()) {
+			case 1:
+				if (option == "Buy") {
+					purchaseItem(item, priceModifier);
+				}else {
+					sellItem(item, priceModifier);
+				}
+				return;
+			case 2:
+				return;
+			default:
+				System.out.println("Please enter a number between 1 and 2");
+				break;
 			}
-			break;
-		case 2:
-			return;
-		default:
-			System.out.println("Please enter a number between 1 and 2");
-			break;
 		}
 	}
 	
@@ -311,6 +315,7 @@ public class Game {
 			}
 			player.modifyGold(price);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
+			item.setDayPurchased(-1);
 		}
 		pause();
 	}
@@ -345,7 +350,7 @@ public class Game {
 		}
 	}
 	
-	public int getInt(){
+	public static int getInt(){
 		while(true) {
 			try {
 				int selection = userInput.nextInt();
@@ -359,6 +364,12 @@ public class Game {
 	}
 	
 	public void selectRoute() {
+		
+		/* 
+		 * Might change this to be similar to the store, you select where you want to go then select the route.
+		 * Should also probably separate it more as it is one of the longest methods
+		 */
+		
 		int selection;
 		ArrayList<Route> routes = player.getLocation().getRoutes();
 		while (true) {
@@ -381,8 +392,9 @@ public class Game {
 			}else if (selection > index | selection < 0) {
 				System.out.println("Please enter a number between 1 and " + index);
 			}else {
-				selection++; // accounts for the index's starting at 0 and not 1
-				int time = routes.get(selection).getTime(player.getSpeed());
+				selection--; // accounts for the index's starting at 0 and not 1
+				Route route = routes.get(selection);
+				int time = route.getTime(player.getSpeed());
 				if (currentDay + time >= days) {
 					System.out.println("Note, this trip will exceed your remaining time, all items will"
 							+ " be sold on day " + days + ".\nContinue?");
@@ -397,16 +409,18 @@ public class Game {
 						System.out.println("Please enter the number 1 or 2.");
 					}
 				}
-				player.sail(routes.get(selection));
+				player.sail(route);
 				for (int i = 0; i != time & currentDay < days; i++) {
 					currentDay += 1;
-					//event()
+					Event event = new Event();
+					event.selectEvent(route, player);
 				}
 				if (currentDay < days) {
 					generateStore(player.getLocation()); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
 					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+					pause();
 				}else {
-					endGame();
+					throw new EndGameException();
 				}
 				return;
 			}
@@ -426,7 +440,7 @@ public class Game {
 		}
 	}
 	
-	public void pause() {
+	public static void pause() {
 		System.out.println("Press enter to continue");
 		userInput.nextLine();
 	}
@@ -439,7 +453,7 @@ public class Game {
 		int gold = getTotalWorth();
 		printResults(gold);
 		//extendGame(); question with y/n answer
-		throw new EndGameException();
+		
 	}
 	
 	public int getTotalWorth() {
@@ -452,7 +466,7 @@ public class Game {
 	}
 	
 	public void printResults(int gold) {
-		System.out.println("Total gold: " + gold);
+		System.out.println("Total gold earned: " + gold);
 	}
 		
 	public void template() {
@@ -515,6 +529,11 @@ public class Game {
 					Stats stat = Stats.valueOf(parts.get(6));
 					int statAmount = Integer.parseInt(parts.get(7));
 					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
+				} else if (parts.size() == 9){
+					//handling the special cases, note, all special will be percentages
+					Stats stat = Stats.valueOf(parts.get(6));
+					int statAmount = Integer.parseInt(parts.get(7));
+					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
 				} else {
 					cargo = new Cargo(name, description, size, basePrice, rarity);
 				}
@@ -543,7 +562,7 @@ public class Game {
 			
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Game game = new Game(1);
+		Game game = new Game();
 	}
 
 }

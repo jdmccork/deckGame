@@ -18,6 +18,14 @@ public class Route {
 	//private ArrayList<Event> dangers;
 	
 	/**
+	 * The likelihood of a dangerous event happening;
+	 */
+	private double eventChance;
+	
+	
+	private int routeSafety;
+	
+	/**
 	 * Creates a new route from the source island to the destination island.
 	 * @param source the island from which this route starts
 	 * @param destination the island to which this route goes
@@ -26,6 +34,8 @@ public class Route {
 		this.source = source;
 		this.destination = destination;
 		distance = (int) Math.ceil(Island.getDistance(source, destination));
+		eventChance = Math.random()*2;
+		routeSafety = 1;
 	}
 	
 	/**
@@ -51,6 +61,18 @@ public class Route {
 	 */
 	public int getTime(int speed) {
 		return distance/speed;
+	}
+	
+	public double getEventChance() {
+		return eventChance;
+	}
+	
+	public void modifyEventChance(double value) {
+		if (eventChance + (value * routeSafety) > 0) {
+			eventChance += value * routeSafety;
+		}else {
+			eventChance = 0;
+		}
 	}
 	
 	/**

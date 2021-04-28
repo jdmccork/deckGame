@@ -83,6 +83,7 @@ public class Player extends Ship {
 	public void getDestroyed() {
 		System.out.println("The " + getShipName() + " has been destroyed. Game Over.");
 		super.getDestroyed();
+		throw new EndGameException();
 	}
 	
 	/**
