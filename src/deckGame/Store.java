@@ -69,7 +69,7 @@ public class Store {
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
 			if (!stock.contains(item) & !player.getInventory().contains(item)) {
-				int chance = (int) (Math.random() * player.getLuck() * 4);
+				int chance = (int) (Math.random() * player.getLuck() * 4 + 1);
 				if (chance >= item.getRarity().getChanceModifier()) {
 					stock.add(item);
 				}				

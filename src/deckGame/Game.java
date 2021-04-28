@@ -34,6 +34,7 @@ public class Game {
 		}
 		userInput.close();
 	}
+	
 	public Game(int testNum) {
 		generateItems();
 		userInput = new Scanner(System.in);

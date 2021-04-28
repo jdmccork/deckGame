@@ -42,7 +42,7 @@ public class Player extends Ship {
 		location = new Island("Home", 0, 0);
 		this.gold = gold;
 		this.userName = userName;
-		luck = 0;
+		luck = 1;
 	}
 	
 	/**
