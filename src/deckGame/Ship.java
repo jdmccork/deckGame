@@ -225,8 +225,19 @@ public class Ship {
 		return capacity;
 	}
 	
-	public ArrayList<Cargo> getInventory(){
+	public ArrayList<Cargo> getInventory() {
 		return inventory;
+	}
+	
+	public String getStats() {
+		String output = "The " + shipName + " has the following stats:\n";
+		output += "Health: " + health + "/" + maxHealth + "\n";
+		output += "Speed: " + speed + "\n";
+		output += "Strength: " + strength + "\n";
+		output += "Weakness: to be implemented" + "\n";
+		output += "Capacity: " + capacity + "\n";
+		output += "Resistance: to be implemented" + "\n";
+		return output;
 	}
 
 	public static void main(String[] args) {
