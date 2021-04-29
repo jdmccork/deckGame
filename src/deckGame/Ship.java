@@ -6,6 +6,7 @@ import enums.ItemType;
 import enums.Rarity;
 import enums.Stats;
 import enums.Statuses;
+import enums.Damages;
 
 public class Ship {
 	/**
@@ -41,12 +42,12 @@ public class Ship {
 	/**
 	 * The damage types the ship has a resistance too
 	 */
-	//private ArrayList<Resistance> resistance;
+	private ArrayList<Damages> resistance = new ArrayList<Damages>();
 	
 	/**
-	 * The damage types the ship has a weakness too
+	 * The damage type the ship has a weakness too
 	 */
-	//private enum weakness;
+	private Damages weakness;
 	
 	/**
 	 * A list of the crew currently hired
@@ -74,6 +75,8 @@ public class Ship {
 		speed = 5;
 		capacity = 4;
 		strength = 3;
+		weakness = Damages.FIRE;
+		crew.add(new Crewmate());
 	}
 	
 	/**
@@ -93,6 +96,7 @@ public class Ship {
 		crew = new ArrayList<Crewmate>();
 		inventory = new ArrayList<Cargo>();
 		this.strength = strength;
+		weakness = Damages.FIRE;
 	}
 	
 	/**
@@ -108,6 +112,25 @@ public class Ship {
 	 * @param damage the amount of damage this ship takes.
 	 */
 	public void damage(int damage) {
+		if (health >= damage) {
+            health -= damage;
+            status = Statuses.DAMAGED;
+    	} else {
+    		getDestroyed();
+    	}
+    }
+	
+	/**
+	 * Takes damage and alters the status of this ship.
+	 * @param damage the amount of damage this ship takes.
+	 */
+	public void damage(int damage, Damages type) {
+		if (type == this.weakness) {
+			damage *= 1.5;
+		}
+		if(this.resistance.contains(type)) {
+			damage /= 1.5;
+		}
 		if (health >= damage) {
             health -= damage;
             status = Statuses.DAMAGED;
@@ -229,14 +252,28 @@ public class Ship {
 		return inventory;
 	}
 	
+	public void addResistance(Damages damage) {
+		if (!resistance.contains(damage)) {
+			resistance.add(damage);
+		}
+	}
+	
+	public void removeResistance(Damages damage) {
+		resistance.remove(damage);
+	}
+	
 	public String getStats() {
 		String output = "The " + shipName + " has the following stats:\n";
 		output += "Health: " + health + "/" + maxHealth + "\n";
 		output += "Speed: " + speed + "\n";
 		output += "Strength: " + strength + "\n";
-		output += "Weakness: to be implemented" + "\n";
+		output += "Weakness: " + weakness + "\n";
 		output += "Capacity: " + capacity + "\n";
-		output += "Resistance: to be implemented" + "\n";
+		String resistances = "";
+		for (Damages damage: resistance) {
+			resistances += damage + ", ";
+		}
+		output += "Resistance: " + resistances.substring(0, resistances.length() - 2) + "\n";
 		return output;
 	}
 
