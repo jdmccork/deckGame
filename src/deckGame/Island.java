@@ -91,6 +91,11 @@ public class Island {
 		return store;
 	}
 	
+	/**
+	 * Generates the store for this island
+	 * @param possibleStock the items in play
+	 * @param player the player
+	 */
 	public void generateStore(ArrayList<Item> possibleStock, Player player) {
 		store = new Store(islandName, possibleStock, player);
 	}

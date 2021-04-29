@@ -15,12 +15,16 @@ public class Player extends Ship {
 	/**
 	 * The amount of cards the player can hold
 	 */
-	private int deckSize; //I think^^^. Yep
+	//private int deckSize;
 	
 	/**
 	 * The place where the player is.
 	 */
 	private Island location;
+	
+	/**
+	 * The cards the player has
+	 */
 	//private ArrayList<Card> cards;
 	
 	/**
@@ -94,14 +98,26 @@ public class Player extends Ship {
 		location = route.getDestination();
 	}
 	
+	/**
+	 * Changes the amount of gold this player has
+	 * @param amount the amount of gold to change by
+	 */
 	public void modifyGold(int amount) {
 		gold += amount;
 	}
 	
+	/**
+	 * Gets the amount of gold that this player has
+	 * @return the amount of gold
+	 */
 	public int getGold() {
 		return gold;
 	}
 	
+	/**
+	 * Gets the value of the player's luck stat
+	 * @return the value of the player's luck
+	 */
 	public double getLuck() {
 		return luck;
 	}
@@ -112,6 +128,9 @@ public class Player extends Ship {
 	}
 	*/
 	
+	/**
+	 * Adds a cargo item to this player's inventory using the ship method
+	 */
 	public boolean addItem(Cargo cargo) {
 		return super.addItem(cargo);
 	}
