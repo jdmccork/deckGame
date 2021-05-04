@@ -91,8 +91,8 @@ public class Island {
 		return store;
 	}
 	
-	public void generateStore(ArrayList<Item> possibleStock, Player player) {
-		store = new Store(islandName, possibleStock, player);
+	public void generateStore(Player player) {
+		store = new Store(islandName, player);
 	}
 	
 	/**

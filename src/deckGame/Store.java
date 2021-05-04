@@ -40,11 +40,13 @@ public class Store {
 	 */
 	private double sellModifier = 0.8; //should be less than 1 to prevent the ability to buy and sell instantly
 	
+	private int storeModifier = 1;
+	
 	/**
 	 * Creates a new store and generates its stock.
 	 */
-	public Store(String islandName, ArrayList<Item> possibleStock, Player player){
-		generateStock(possibleStock, player);
+	public Store(String islandName, Player player){
+		generateStock(player);
 		readAdvice();
 	}
 	
@@ -63,14 +65,14 @@ public class Store {
 	/**
 	 * Creates the stock which the store will sell.
 	 */
-	public void generateStock(ArrayList<Item> items, Player player) {
+	public void generateStock(Player player) {
 		int randomNum;
 		while (stock.size() < 4) {
-			randomNum = (int) (Math.random() * items.size());
-			Item item = items.get(randomNum);
+			randomNum = (int) (Math.random() * Game.getItems().size());
+			Item item = Game.getItems().get(randomNum);
 			if (!stock.contains(item) & !player.getInventory().contains(item)) {
-				int chance = (int) (Math.random() * player.getLuck() * 4 + 1);
-				if (chance >= item.getRarity().getChanceModifier()) {
+				int rareChance = (int) (Math.random() * player.getLuck() * 12 + 1) + storeModifier;
+				if (rareChance >= item.getRarity().getChanceModifier()) {
 					stock.add(item);
 				}				
 			}

@@ -23,10 +23,11 @@ public class Game {
 	private int days;
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
-	private ArrayList<Item> allItems = new ArrayList<Item>();
+	private static ArrayList<Item> allItems = new ArrayList<Item>();
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
+		gameSetup();
 		boolean playing = true;
 		while(playing = true) {
 			playing = mainMenu();
@@ -37,11 +38,11 @@ public class Game {
 	public Game(int testNum) {
 		generateItems();
 		userInput = new Scanner(System.in);
-		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
-		generateStore(player.getLocation());
 		priceModifier = 1;
 		islands = generateIslands();
 		generateRoutes(islands);
+		player = new Player("Tester", "The void", 100, 2, 4, 3, 25, islands.get(0));
+		generateStore(player.getLocation());
 		days = 25;
 		play();
 		userInput.close();	
@@ -50,7 +51,7 @@ public class Game {
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
-		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 25);
+		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 25, islands.get(0));
 		return player;
 	}
 	
@@ -84,7 +85,7 @@ public class Game {
 	
 	public ArrayList<Island> generateIslands() {
 		ArrayList<Island> islands = new ArrayList<Island>();
-		islands.add(player.getLocation());
+		islands.add(new Island("Home", 0, 0));
 		islands.add(new Island("Golgolles", -10, 5));
 		islands.add(new Island("Cansburg", 5, 5));
 		islands.add(new Island("Tisjour", -5, -5));
@@ -124,12 +125,14 @@ public class Game {
 	
 	public void gameSetup() {
 		generateItems();	
-		//temporary
-		priceModifier = 1;
-
-		player = createPlayer();
 		islands = generateIslands();
 		generateRoutes(islands);
+	}
+	
+	public void sessionSetup() {
+		//temporary
+		priceModifier = 1; // difficulty
+		player = createPlayer();
 		generateStore(player.getLocation());
 		days = getGameLength();
 	}
@@ -143,7 +146,7 @@ public class Game {
 				System.out.println("2: Quit");
 				selection = getInt();
 				if (selection == 1) {
-					gameSetup();
+					sessionSetup();
 					welcome(player);
 					play();
 				} else if (selection == 2) {
@@ -446,7 +449,7 @@ public class Game {
 	}
 	
 	public void generateStore(Island island) {
-		island.generateStore(allItems, player);
+		island.generateStore(player);
 	}
 	
 	public void endGame() {
@@ -489,7 +492,7 @@ public class Game {
 		}
 	}
 	
-	private ArrayList<String> readItems() {
+	private static ArrayList<String> readItems() {
 		ArrayList<String> items = new ArrayList<String>();
 		try {
 			//Defines the items file as a new file to read
@@ -509,7 +512,7 @@ public class Game {
 		return items;
 	}
 	
-	public void generateItems() {
+	public static void generateItems() {
 		ArrayList<String> items = readItems();
 		for(String item : items) {
 			String[] temp = item.split(" #");
@@ -530,7 +533,7 @@ public class Game {
 					int statAmount = Integer.parseInt(parts.get(7));
 					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
 				} else if (parts.size() == 9){
-					//handling the special cases, note, all special will be percentages
+					//handling the special cases, note, all special will probably be percentages
 					Stats stat = Stats.valueOf(parts.get(6));
 					int statAmount = Integer.parseInt(parts.get(7));
 					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
@@ -558,6 +561,10 @@ public class Game {
 			}
 		}
 		return null;
+	}
+	
+	public static ArrayList<Item> getItems() {
+		return allItems;
 	}
 			
 	public static void main(String[] args) {

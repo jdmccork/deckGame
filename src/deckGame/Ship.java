@@ -86,7 +86,7 @@ public class Ship {
 	 */
 	public Ship(String name, int health, int speed, int capacity, int strength) {
 		this.shipName = name;
-		this.maxHealth = health;
+		this.setMaxHealth(health);
 		this.health = health;
 		this.speed = speed;
 		this.capacity = capacity;
@@ -126,6 +126,10 @@ public class Ship {
 		damage(damage);
 	}
 	
+	public int getHealth() {
+		return health;
+	}
+	
 	/**
 	 * Gets the status of this ship.
 	 * @return the status of the ship: destroyed, damaged or repaired
@@ -154,7 +158,7 @@ public class Ship {
 	 * setting the status to repaired.
 	 */
 	public void repair() {
-		health = maxHealth;
+		health = getMaxHealth();
 		status = Statuses.REPAIRED;
 	}
 	
@@ -167,7 +171,7 @@ public class Ship {
 		//TODO add checks to ensure values are positive
 		switch (stat) {
 			case MAXHEALTH:
-				maxHealth += amount;
+				setMaxHealth(getMaxHealth() + amount);
 				health += amount;
 				break;
 			case SPEED:
@@ -211,7 +215,7 @@ public class Ship {
 	 * @param cargo the cargo to remove
 	 */
 	public boolean addItem(Cargo cargo) {
-		if (inventory.size() <= capacity) {
+		if (inventory.size() < capacity) {
 			inventory.add(cargo);
 			alterStat(cargo.getModifyStat(), cargo.getModifyAmount());
 			return true;
@@ -244,11 +248,19 @@ public class Ship {
 	}
 
 	public static void main(String[] args) {
-		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25);
+		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25, new Island("test", 0, 0));
 		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
 		firstShip.addItem(bread);
 		firstShip.printInventory();
 		firstShip.removeCargo(bread);
 		firstShip.printInventory();
+	}
+
+	public int getMaxHealth() {
+		return maxHealth;
+	}
+
+	public void setMaxHealth(int maxHealth) {
+		this.maxHealth = maxHealth;
 	}
 }
