@@ -36,6 +36,10 @@ public class Game {
 	}
 	
 	public Game(int testNum) {
+		/*
+		Display display = new Display();
+		display.updateDay("24");
+		*/
 		generateItems();
 		userInput = new Scanner(System.in);
 		priceModifier = 1;
