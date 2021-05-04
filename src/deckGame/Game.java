@@ -27,9 +27,10 @@ public class Game {
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
+		Display display = new Display();
 		gameSetup();
 		boolean playing = true;
-		while(playing = true) {
+		while(playing == true) {
 			playing = mainMenu();
 		}
 		userInput.close();

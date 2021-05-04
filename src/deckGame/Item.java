@@ -53,7 +53,8 @@ public abstract class Item {
 	 */
 	public String toString() {
 		String output = "Item: " + name + "\nRarity: " + rarity + "\nSize: " + size;
-		output += "\nDescription: " + description + "\nType: " + itemType;
+		output += "\nDescription: " + description + "\n";
+		//output += "Type: " + itemType;
 		return output;
 	}
 	

@@ -52,7 +52,7 @@ public class Cargo extends Item{
 	 * @param type the type of damage that will be used
 	 */
 	Cargo(String name, String description, int size, int basePrice, Rarity rarity, Stats modifyStat, Damages type) {
-		super(name, description, size, basePrice, rarity, ItemType.CARGO);
+		super(name, description, size, basePrice, rarity/*, ItemType.CARGO*/);
 		this.modifyStat = modifyStat;
 		this.modifyType = type;
 		this.modifyAmount = 0;
