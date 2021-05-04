@@ -17,17 +17,17 @@ public class Game {
 		System.out.println(string);
 	}
 
-	private Scanner userInput;
+	private static Scanner userInput = new Scanner(System.in);
 	private Player player;
 	private ArrayList<Island> islands;
 	private int days;
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
-	private ArrayList<Item> allItems = new ArrayList<Item>();
+	private static ArrayList<Item> allItems = new ArrayList<Item>();
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
-		userInput = new Scanner(System.in);
+		gameSetup();
 		boolean playing = true;
 		while(playing = true) {
 			playing = mainMenu();
@@ -38,11 +38,11 @@ public class Game {
 	public Game(int testNum) {
 		generateItems();
 		userInput = new Scanner(System.in);
-		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
-		generateStore(player.getLocation());
 		priceModifier = 1;
 		islands = generateIslands();
 		generateRoutes(islands);
+		player = new Player("Tester", "The void", 100, 2, 4, 3, 25, islands.get(0));
+		generateStore(player.getLocation());
 		days = 25;
 		play();
 		userInput.close();	
@@ -51,7 +51,7 @@ public class Game {
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
-		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 25);
+		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 25, islands.get(0));
 		return player;
 	}
 	
@@ -85,7 +85,7 @@ public class Game {
 	
 	public ArrayList<Island> generateIslands() {
 		ArrayList<Island> islands = new ArrayList<Island>();
-		islands.add(player.getLocation());
+		islands.add(new Island("Home", 0, 0));
 		islands.add(new Island("Golgolles", -10, 5));
 		islands.add(new Island("Cansburg", 5, 5));
 		islands.add(new Island("Tisjour", -5, -5));
@@ -125,12 +125,14 @@ public class Game {
 	
 	public void gameSetup() {
 		generateItems();	
-		//temporary
-		priceModifier = 1;
-
-		player = createPlayer();
 		islands = generateIslands();
 		generateRoutes(islands);
+	}
+	
+	public void sessionSetup() {
+		//temporary
+		priceModifier = 1; // difficulty
+		player = createPlayer();
 		generateStore(player.getLocation());
 		days = getGameLength();
 	}
@@ -144,7 +146,7 @@ public class Game {
 				System.out.println("2: Quit");
 				selection = getInt();
 				if (selection == 1) {
-					gameSetup();
+					sessionSetup();
 					welcome(player);
 					play();
 				} else if (selection == 2) {
@@ -155,6 +157,7 @@ public class Game {
 				}
 			}
 		}catch(EndGameException e){
+			endGame();
 			System.out.println("Would you like to return to the main menu?");
 			System.out.println("1: Yes");
 			System.out.println("2: No");
@@ -222,20 +225,22 @@ public class Game {
 	}
 	
 	public void buyStock(Store store) {
-		store.printStock();
-		if (store.getStock().size() == 0) {
-			pause();
-			return;
-		}
-		System.out.println((store.getStock().size() + 1) + ": Return");
-		System.out.println("Select an item to view more information");
-		int selection = getInt();
-		if (selection == store.getStock().size() + 1) {
-			return;
-		}else if (selection <= store.getStock().size()) {
-			viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
-		}else {
-			System.out.println("Please enter a number between 1 and " + (store.getStock().size() + 1) + ".");
+		while (true) {
+			store.printStock();
+			if (store.getStock().size() == 0) {
+				pause();
+				return;
+			}
+			System.out.println((store.getStock().size() + 1) + ": Return");
+			System.out.println("Select an item to view more information");
+			int selection = getInt();
+			if (selection == store.getStock().size() + 1) {
+				return;
+			}else if (selection <= store.getStock().size()) {
+				viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
+			}else {
+				System.out.println("Please enter a number between 1 and " + (store.getStock().size() + 1) + ".");
+			}
 		}
 	}
 	
@@ -250,19 +255,21 @@ public class Game {
 		System.out.println("Select an option to continue");
 		System.out.println("1: " + option);
 		System.out.println("2: Return to shop");
-		switch (getInt()) {
-		case 1:
-			if (option == "Buy") {
-				purchaseItem(item, priceModifier);
-			}else {
-				sellItem(item, priceModifier);
+		while (true) {
+			switch (getInt()) {
+			case 1:
+				if (option == "Buy") {
+					purchaseItem(item, priceModifier);
+				}else {
+					sellItem(item, priceModifier);
+				}
+				return;
+			case 2:
+				return;
+			default:
+				System.out.println("Please enter a number between 1 and 2");
+				break;
 			}
-			break;
-		case 2:
-			return;
-		default:
-			System.out.println("Please enter a number between 1 and 2");
-			break;
 		}
 	}
 	
@@ -311,6 +318,7 @@ public class Game {
 			}
 			player.modifyGold(price);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
+			item.setDayPurchased(-1);
 		}
 		pause();
 	}
@@ -345,7 +353,7 @@ public class Game {
 		}
 	}
 	
-	public int getInt(){
+	public static int getInt(){
 		while(true) {
 			try {
 				int selection = userInput.nextInt();
@@ -359,6 +367,12 @@ public class Game {
 	}
 	
 	public void selectRoute() {
+		
+		/* 
+		 * Might change this to be similar to the store, you select where you want to go then select the route.
+		 * Should also probably separate it more as it is one of the longest methods
+		 */
+		
 		int selection;
 		ArrayList<Route> routes = player.getLocation().getRoutes();
 		while (true) {
@@ -381,8 +395,9 @@ public class Game {
 			}else if (selection > index | selection < 0) {
 				System.out.println("Please enter a number between 1 and " + index);
 			}else {
-				selection++; // accounts for the index's starting at 0 and not 1
-				int time = routes.get(selection).getTime(player.getSpeed());
+				selection--; // accounts for the index's starting at 0 and not 1
+				Route route = routes.get(selection);
+				int time = route.getTime(player.getSpeed());
 				if (currentDay + time >= days) {
 					System.out.println("Note, this trip will exceed your remaining time, all items will"
 							+ " be sold on day " + days + ".\nContinue?");
@@ -397,16 +412,18 @@ public class Game {
 						System.out.println("Please enter the number 1 or 2.");
 					}
 				}
-				player.sail(routes.get(selection));
+				player.sail(route);
 				for (int i = 0; i != time & currentDay < days; i++) {
 					currentDay += 1;
-					//event()
+					Event event = new Event();
+					event.selectEvent(route, player);
 				}
 				if (currentDay < days) {
 					generateStore(player.getLocation()); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
 					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+					pause();
 				}else {
-					endGame();
+					throw new EndGameException();
 				}
 				return;
 			}
@@ -426,20 +443,20 @@ public class Game {
 		}
 	}
 	
-	public void pause() {
+	public static void pause() {
 		System.out.println("Press enter to continue");
 		userInput.nextLine();
 	}
 	
 	public void generateStore(Island island) {
-		island.generateStore(allItems, player);
+		island.generateStore(player);
 	}
 	
 	public void endGame() {
 		int gold = getTotalWorth();
 		printResults(gold);
 		//extendGame(); question with y/n answer
-		throw new EndGameException();
+		
 	}
 	
 	public int getTotalWorth() {
@@ -452,7 +469,7 @@ public class Game {
 	}
 	
 	public void printResults(int gold) {
-		System.out.println("Total gold: " + gold);
+		System.out.println("Total gold earned: " + gold);
 	}
 		
 	public void template() {
@@ -475,7 +492,7 @@ public class Game {
 		}
 	}
 	
-	private ArrayList<String> readItems() {
+	private static ArrayList<String> readItems() {
 		ArrayList<String> items = new ArrayList<String>();
 		try {
 			//Defines the items file as a new file to read
@@ -495,7 +512,7 @@ public class Game {
 		return items;
 	}
 	
-	public void generateItems() {
+	public static void generateItems() {
 		ArrayList<String> items = readItems();
 		for(String item : items) {
 			String[] temp = item.split(" #");
@@ -512,6 +529,11 @@ public class Game {
 				int basePrice = Integer.parseInt(parts.get(4));
 				Rarity rarity = Rarity.valueOf(parts.get(5));
 				if(parts.size() == 8) {
+					Stats stat = Stats.valueOf(parts.get(6));
+					int statAmount = Integer.parseInt(parts.get(7));
+					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
+				} else if (parts.size() == 9){
+					//handling the special cases, note, all special will probably be percentages
 					Stats stat = Stats.valueOf(parts.get(6));
 					int statAmount = Integer.parseInt(parts.get(7));
 					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
@@ -540,10 +562,14 @@ public class Game {
 		}
 		return null;
 	}
+	
+	public static ArrayList<Item> getItems() {
+		return allItems;
+	}
 			
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Game game = new Game(1);
+		Game game = new Game();
 	}
 
 }

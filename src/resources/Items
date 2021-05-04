@@ -6,15 +6,16 @@ Type: Cargo #Name: Rum #Description: Drink up, me hearties yo ho! #Size: 1 #Base
 Type: Cargo #Name: "Sugar" #Description: At least I think it's sugar. #Size: 2 #Base Price: 15 #Rarity: COMMON #Stat: SPEED #Stat Amount: 4
 Type: Cargo #Name: Oak Planks #Description: Shipbuilder's gold. Sturdy and straight. #Size: 6 #Base Price: 40 #Rarity: COMMON
 Type: Cargo #Name: Cotton #Description: Silky soft slave labour. It's illegal to ship in anything but raw form. #Size: 4 #Base Price: 50 #Rarity: UNCOMMON
-Type: Cargo #Name: Beaver Pelts #Description: Hunted by the Native Americans, bought from the dutch. #Size: 1 #Base Price: 20 #Rarity: UNCOMMON
+Type: Cargo #Name: Beaver Pelts #Description: Hunted by the Native Americans, bought from the Dutch. #Size: 1 #Base Price: 20 #Rarity: UNCOMMON
 Type: Cargo #Name: Corn #Description: Grown by the Native Americans. #Size: 2 #Base Price: 10 #Rarity: COMMON
-Type: Cargo #Name: Tools #Description: Manufactured by the Dutch! #Size: 3 #Base Price: 100 #Rarity: UNCOMMON
+Type: Cargo #Name: Tools #Description: Manufactured by the Dutch! (Reduces the cost of repairing the ship by 25%) #Size: 3 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPECIAL #Stat Amount: 25 #Special Type: Repair 
 Type: Cargo #Name: Silver #Description: Finest quality, I'm told. #Size: 1 #Base Price: 300 #Rarity: RARE
 Type: Cargo #Name: Tobacco #Description: Low-quality pipe filler. #Size: 2 #Base Price: 30 #Rarity: UNCOMMON
-Type: Cargo #Name: Rice #Description: Dried grains. #Size: 2 #Base Price: 20 #Rarity: COMMON
+Type: Cargo #Name: Rice #Description: Dried grains. #Size: 1 #Base Price: 20 #Rarity: COMMON
 Type: Cargo #Name: Tequila #Description: *buh duh buh duh bu-buh duh duh* Tequilaaaa! #Size: 1 #Base Price: 30 #Rarity: UNCOMMON
 Type: Cargo #Name: Gunpowder #Description: DO NOT let it ignite, unless you want to die a fiery death. #Size: 3 #Base Price: 50 #Rarity: UNCOMMON #Stat: RESISTANCE #Stat Amount: -1
 Type: Cargo #Name: Hard Tack #Description: Solid food for solid sailors. Dry and boring. #Size: 2 #Base Price: 10 #Rarity: COMMON
 Type: Cargo #Name: Live Chickens #Description: Yippee kiyay, mother clucker. #Size: 3 #Base Price: 50 #Rarity: UNCOMMON #Stat: SPEED #Stat Amount: 2
 Type: Cargo #Name: Spices #Description: Ground paprika, chili and cinnamon. #Size: 1 #Base Price: 20 #Rarity: RARE
 Type: Cargo #Name: Whale Oil #Description: Used to light lanterns. #Size: 2 #Base Price: 30 #Rarity: UNCOMMON
+Type: Cargo #Name: Sail #Description: A triangular sail that the shopkeep swears will make you go faster than your current square one. #Size: 1 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPEED # Stat Amount: 3

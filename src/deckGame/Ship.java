@@ -60,7 +60,7 @@ public class Ship {
 	private ArrayList<Cargo> inventory;
 	
 	/**
-	 * The base damage your ship will do
+	 * The number of dice that are available to roll
 	 */
 	private int strength;
 	
@@ -89,7 +89,7 @@ public class Ship {
 	 */
 	public Ship(String name, int health, int speed, int capacity, int strength) {
 		this.shipName = name;
-		this.maxHealth = health;
+		this.setMaxHealth(health);
 		this.health = health;
 		this.speed = speed;
 		this.capacity = capacity;
@@ -118,7 +118,21 @@ public class Ship {
     	} else {
     		getDestroyed();
     	}
+		System.out.println("The " + shipName + " took " + damage + " damage."
+				+ "\nIt currently has " + health + " health remaining.");
     }
+	
+	public void damage(ArrayList<Integer> dice) {
+		int damage = 0;
+		for (int die:dice) {
+			damage += die;
+		}
+		damage(damage);
+	}
+	
+	public int getHealth() {
+		return health;
+	}
 	
 	/**
 	 * Takes damage and alters the status of this ship.
@@ -167,7 +181,7 @@ public class Ship {
 	 * setting the status to repaired.
 	 */
 	public void repair() {
-		health = maxHealth;
+		health = getMaxHealth();
 		status = Statuses.REPAIRED;
 	}
 	
@@ -180,7 +194,7 @@ public class Ship {
 		//TODO add checks to ensure values are positive
 		switch (stat) {
 			case MAXHEALTH:
-				maxHealth += amount;
+				setMaxHealth(getMaxHealth() + amount);
 				health += amount;
 				break;
 			case SPEED:
@@ -224,7 +238,7 @@ public class Ship {
 	 * @param cargo the cargo to remove
 	 */
 	public boolean addItem(Cargo cargo) {
-		if (inventory.size() <= capacity) {
+		if (inventory.size() < capacity) {
 			inventory.add(cargo);
 			alterStat(cargo.getModifyStat(), cargo.getModifyAmount());
 			return true;
@@ -276,13 +290,25 @@ public class Ship {
 		output += "Resistance: " + resistances.substring(0, resistances.length() - 2) + "\n";
 		return output;
 	}
+	
+	public int getStrength() {
+		return strength;
+	}
 
 	public static void main(String[] args) {
-		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25);
+		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25, new Island("test", 0, 0));
 		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
 		firstShip.addItem(bread);
 		firstShip.printInventory();
 		firstShip.removeCargo(bread);
 		firstShip.printInventory();
+	}
+
+	public int getMaxHealth() {
+		return maxHealth;
+	}
+
+	public void setMaxHealth(int maxHealth) {
+		this.maxHealth = maxHealth;
 	}
 }

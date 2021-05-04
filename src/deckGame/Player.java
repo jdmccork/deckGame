@@ -26,7 +26,7 @@ public class Player extends Ship {
 	/**
 	 * Alters the chance for item and card rarity 
 	 */
-	private double luck;
+	private int luck;
 	
 	/**
 	 * Creates a new player as an extension of the ship class.
@@ -37,12 +37,12 @@ public class Player extends Ship {
 	 * @param capacity the amount of cargo this player's ship can hold
 	 * @param power the amount of damage this player's ship can do
 	 */
-	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold) {
+	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold, Island location) {
 		super(shipName, health, speed, capacity, power);
-		location = new Island("Home", 0, 0);
+		this.location = location;
 		this.gold = gold;
 		this.userName = userName;
-		luck = 1;
+		luck = 0;
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class Player extends Ship {
 	 */
 	public Player(String name, int health, int speed, int capacity, int power, int luck) {
 		super(name, health, speed, capacity, power);
-		luck = 0;
+		this.luck = luck;
 	}
 	
 	/**
@@ -83,6 +83,7 @@ public class Player extends Ship {
 	public void getDestroyed() {
 		System.out.println("The " + getShipName() + " has been destroyed. Game Over.");
 		super.getDestroyed();
+		throw new EndGameException();
 	}
 	
 	/**
@@ -102,7 +103,7 @@ public class Player extends Ship {
 		return gold;
 	}
 	
-	public double getLuck() {
+	public int getLuck() {
 		return luck;
 	}
 	
@@ -114,6 +115,13 @@ public class Player extends Ship {
 	
 	public boolean addItem(Cargo cargo) {
 		return super.addItem(cargo);
+	}
+	
+	public boolean addItem(Item item) {
+		if (item instanceof Cargo){
+			return addItem((Cargo) item);
+		}
+		return false;
 	}
 
 }

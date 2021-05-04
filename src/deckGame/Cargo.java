@@ -29,8 +29,8 @@ public class Cargo extends Item{
 	 * @param modifyStat the stat that the cargo will modify
 	 * @param modifyAmount the amount the cargo will modify the given stat by
 	 */
-	Cargo(String name, String description, int size, int basePrice, Rarity rarity, Stats modifyStat, int modifyAmount) {
-		super(name, description, size, basePrice, rarity, ItemType.CARGO);
+	public Cargo(String name, String description, int size, int basePrice, Rarity rarity, Stats modifyStat, int modifyAmount) {
+		super(name, description, size, basePrice, rarity);
 		this.modifyStat = modifyStat;
 		this.modifyAmount = modifyAmount;
 	}
@@ -43,8 +43,8 @@ public class Cargo extends Item{
 	 * @param basePrice the base value of the cargo
 	 * @param rarity the rarity of the cargo
 	 */
-	Cargo(String name, String description, int size, int basePrice, Rarity rarity) {
-		super(name, description, size, basePrice, rarity, ItemType.CARGO);
+	public Cargo(String name, String description, int size, int basePrice, Rarity rarity) {
+		super(name, description, size, basePrice, rarity);
 		this.modifyStat = Stats.NONE;
 		this.modifyAmount = 0;
 	}

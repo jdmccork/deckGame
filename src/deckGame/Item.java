@@ -29,10 +29,8 @@ public abstract class Item {
 	 */
 	private Rarity rarity;
 	
-	private int dayPurchased = -1;
-	
-	private ItemType itemType;
-	
+	private int dayPurchased = -1; //Thinking it should be distance so that being faster doesn't negatively effect the profit margin
+		
 	/**
 	 * Creates a new instance of item from the given data.
 	 * @param tempName the name of the item
@@ -41,13 +39,12 @@ public abstract class Item {
 	 * @param tempBasePrice the base price of this item
 	 * @param tempRarity the rarity of this item
 	 */
-	public Item(String tempName, String tempDescription, int tempSize, int tempBasePrice, Rarity tempRarity, ItemType type) {
+	public Item(String tempName, String tempDescription, int tempSize, int tempBasePrice, Rarity tempRarity) {
 		name = tempName;
 		description = tempDescription;
 		size = tempSize;
 		basePrice = tempBasePrice;
 		rarity = tempRarity;
-		itemType = type;
 	}
 	
 	/**
