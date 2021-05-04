@@ -36,6 +36,10 @@ public class Game {
 	}
 	
 	public Game(int testNum) {
+		/*
+		Display display = new Display();
+		display.updateDay("24");
+		*/
 		generateItems();
 		userInput = new Scanner(System.in);
 		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
