@@ -52,18 +52,40 @@ public abstract class Item {
 	 * @return the string representing this item
 	 */
 	public String toString() {
-		String output = "Item: "+name+"\nRarity: "+rarity+"\nSize: "+size+"\nDescription: "+description;
+		String output = "Item: " + name + "\nRarity: " + rarity + "\nSize: " + size;
+		output += "\nDescription: " + description + "\nType: " + itemType;
 		return output;
 	}
 	
+	/**
+	 * Gets the space this item takes up
+	 * @return the size of this item
+	 */
+	public int getSize() {
+		return size;
+	}
+	
+	/**
+	 * Sets the day which this item was purchased
+	 * @param day the day this item was purchased
+	 */
 	public void setDayPurchased(int day) {
 		dayPurchased = day;
 	}
 	
+	/**
+	 * Gets the day this item was purchased
+	 * @return the day this was purchased
+	 */
 	public int getDayPurchased() {
 		return dayPurchased;
 	}
 	
+	/**
+	 * Gets the number of days that have passed since this was purchased
+	 * @param currentDay the current day
+	 * @return the days between the purchase day and the current day
+	 */
 	public int getDaysPassed(int currentDay) {
 		if (dayPurchased == -1) {
 			return 0;
@@ -73,28 +95,33 @@ public abstract class Item {
 	}
 	
 	/**
+	 * Gets the name of this item
 	 * @return the name of the product
 	 */
 	public String getName() {
 		return name;
 	}
 	
-	public int getBasePrice() {
-		return basePrice;
-	}
-	
 	/**
 	 * Gets the base price of this item.
 	 * @return the base price of this item
 	 */
-	public int GetPrice() {
+	public int getPrice() {
 		return basePrice;
 	}
 	
+	/**
+	 * Gets the description of this item
+	 * @return this item's description
+	 */
 	public String getDesription() {
 		return description;
 	}
 	
+	/**
+	 * Gets the rarity of this item
+	 * @return this item's rarity
+	 */
 	public Rarity getRarity() {
 		return rarity;
 	}

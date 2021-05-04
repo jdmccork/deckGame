@@ -5,8 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import enums.ItemType;
-import enums.Rarity;
+//import enums.ItemType;
 
 public class Store {
 	
@@ -50,20 +49,34 @@ public class Store {
 		readAdvice();
 	}
 	
+	/**
+	 * Gets the stock of this store
+	 * @return the stock
+	 */
 	public ArrayList<Item> getStock(){
 		return stock;
 	}
 	
+	/**
+	 * Gets the buy modifier of items
+	 * @return the buy modifier of items
+	 */
 	public double getBuyModifier() {
 		return buyModifier;
 	}
 	
+	/**
+	 * Gets the sell modifier of items
+	 * @return the sell modifier of items
+	 */
 	public double getSellModifier() {
 		return sellModifier;
 	}
 	
 	/**
 	 * Creates the stock which the store will sell.
+	 * @param items the items in play
+	 * @param player the player
 	 */
 	public void generateStock(Player player) {
 		int randomNum;
@@ -80,7 +93,7 @@ public class Store {
 	}
 	
 	/**
-	 * Prints the items for sale.
+	 * Prints out the items in the stock of this store
 	 */
 	public void printStock() {
 		System.out.print("This store has " + stock.size());

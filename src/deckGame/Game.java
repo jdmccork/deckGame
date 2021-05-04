@@ -327,15 +327,15 @@ public class Game {
 		double timeModifier = (item.getDaysPassed(currentDay) * 0.2 + 1);
 		switch(item.getRarity()) {
 		case COMMON:
-			return (int) (item.getBasePrice() * priceModifier * 1 * buySellModifier * timeModifier);
+			return (int) (item.getPrice() * priceModifier * 1 * buySellModifier * timeModifier);
 		case UNCOMMON:
-			return (int) (item.getBasePrice() * priceModifier * 1.2 * buySellModifier * timeModifier);
+			return (int) (item.getPrice() * priceModifier * 1.2 * buySellModifier * timeModifier);
 		case RARE:
-			return (int) (item.getBasePrice() * priceModifier * 1.5 * buySellModifier * timeModifier);
+			return (int) (item.getPrice() * priceModifier * 1.5 * buySellModifier * timeModifier);
 		case LEGENDARY:
-			return (int) (item.getBasePrice() * priceModifier * 2 * buySellModifier * timeModifier);
+			return (int) (item.getPrice() * priceModifier * 2 * buySellModifier * timeModifier);
 		default:
-			return item.getBasePrice();
+			return item.getPrice();
 		}
 	}
 	
