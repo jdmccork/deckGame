@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import deckGame.Cargo;
 import deckGame.Game;
 import deckGame.Island;
+import deckGame.Item;
 import deckGame.Player;
 import deckGame.Ship;
 import enums.Rarity;
@@ -24,7 +25,7 @@ class ShipTest {
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		Game.generateItems();
+		Item.generateItems();
 		islands.add(new Island("Home", 0, 0));
 		islands.add(new Island("Golgolles", -10, 5));
 		islands.add(new Island("Cansburg", 5, 5));
@@ -47,14 +48,14 @@ class ShipTest {
 	
 	@Test
 	void inventoryTest() {
-		ship.addItem((Cargo) Game.getItems().get(0));
-		assertEquals(ship.getInventory().get(0), Game.getItems().get(0));
+		ship.addItem((Cargo) Item.getItems().get(0));
+		assertEquals(ship.getInventory().get(0), Item.getItems().get(0));
 	}
 	
 	@Test
 	void smallInventoryTest() {
 		ship = new Ship("Jolly Rogers", 200, 45, 0, 253);
-		ship.addItem((Cargo) Game.getItems().get(0));
+		ship.addItem((Cargo) Item.getItems().get(0));
 		assertEquals(ship.getInventory().size(), 0);
 	}
 	

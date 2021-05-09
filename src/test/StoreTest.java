@@ -21,7 +21,7 @@ class StoreTest {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		Game.generateItems();
+		Item.generateItems();
 		
 		islands.add(new Island("Home", 0, 0));
 		islands.add(new Island("Golgolles", -10, 5));
@@ -39,6 +39,6 @@ class StoreTest {
 	void storeCreationTest() {
 		Store testStore = new Store("test store", player);
 		Item item = testStore.getStock().get(0);
-		assertTrue(Game.getItems().contains(item));
+		assertTrue(Item.getItems().contains(item));
 	}
 }
