@@ -23,7 +23,6 @@ public class Game {
 	private int days;
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
-	private static ArrayList<Item> allItems = new ArrayList<Item>();
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
@@ -37,11 +36,11 @@ public class Game {
 	}
 	
 	public Game(int testNum) {
+		Item.generateItems();
 		/*
 		Display display = new Display();
 		display.updateDay("24");
 		*/
-		generateItems();
 		userInput = new Scanner(System.in);
 		priceModifier = 1;
 		islands = generateIslands();
@@ -56,7 +55,7 @@ public class Game {
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
-		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 25, islands.get(0));
+		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 100, islands.get(0));
 		return player;
 	}
 	
@@ -129,7 +128,7 @@ public class Game {
 	}
 	
 	public void gameSetup() {
-		generateItems();	
+		Item.generateItems();	
 		islands = generateIslands();
 		generateRoutes(islands);
 	}
@@ -170,7 +169,7 @@ public class Game {
 			case 1:
 				return true;
 			case 2:
-				System.out.println("Thanks for playing. Goodbye");
+				System.out.println("Thanks for playing. Goodbye.");
 				return false;
 			}
 		}
@@ -275,19 +274,6 @@ public class Game {
 				System.out.println("Please enter a number between 1 and 2");
 				break;
 			}
-		}
-	}
-	
-	public void viewItem(Item item) {
-		System.out.println(item);
-		System.out.println("Select an option to continue");
-		System.out.println("1: Return to ship");
-		switch (getInt()) {
-		case 1:
-			return;
-		default:
-			System.out.println("Please enter a number between 1 and 2");
-			break;
 		}
 	}
 	
@@ -424,7 +410,9 @@ public class Game {
 					event.selectEvent(route, player);
 				}
 				if (currentDay < days) {
+					System.out.println("----------------");
 					generateStore(player.getLocation()); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
+					System.out.println("+++++++++++++++++++++++++++");
 					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
 					pause();
 				}else {
@@ -442,7 +430,7 @@ public class Game {
 		if (selection == player.getInventory().size() + 1) {
 			return;
 		}else if (selection <= player.getInventory().size()) {
-			viewItem(player.getInventory().get(selection - 1));
+			player.getInventory().get(selection - 1).viewItem();
 		}else {
 			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
 		}
@@ -495,81 +483,6 @@ public class Game {
 				break;
 			}
 		}
-	}
-	
-	private static ArrayList<String> readItems() {
-		ArrayList<String> items = new ArrayList<String>();
-		try {
-			//Defines the items file as a new file to read
-			File myObj = new File("src/resources/Items");
-			//Creates a scanner object to read the items file
-		    Scanner myReader = new Scanner(myObj);
-		    //While the scanner finds new lines, keep adding them to the list
-		    while (myReader.hasNextLine()) {
-		        String data = myReader.nextLine();
-		        items.add(data);
-		    }
-		    myReader.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-		    e.printStackTrace();
-		}
-		return items;
-	}
-	
-	public static void generateItems() {
-		ArrayList<String> items = readItems();
-		for(String item : items) {
-			String[] temp = item.split(" #");
-			ArrayList<String> parts = new ArrayList<String>();
-			for(String part: temp) {
-				String[] values = part.split(": ");
-				parts.add(values[1]);
-			}
-			if(parts.get(0).equals("Cargo")) {
-				Cargo cargo;//what's this needed for?
-				String name = parts.get(1);
-				String description = parts.get(2);
-				int size = Integer.parseInt(parts.get(3));
-				int basePrice = Integer.parseInt(parts.get(4));
-				Rarity rarity = Rarity.valueOf(parts.get(5));
-				if(parts.size() == 8) {
-					Stats stat = Stats.valueOf(parts.get(6));
-					int statAmount = Integer.parseInt(parts.get(7));
-					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
-				} else if (parts.size() == 9){
-					//handling the special cases, note, all special will probably be percentages
-					Stats stat = Stats.valueOf(parts.get(6));
-					int statAmount = Integer.parseInt(parts.get(7));
-					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
-				} else {
-					cargo = new Cargo(name, description, size, basePrice, rarity);
-				}
-				allItems.add(cargo);
-			} /*else { //To be implemented once cards are implemented
-				String name = parts.get(1);
-				String description = parts.get(2);
-				int size = Integer.parseInt(parts.get(3));
-				int basePrice = Integer.parseInt(parts.get(4));
-				Rarity rarity = Rarity.valueOf(parts.get(5));
-				Stats stat = Stats.valueOf(parts.get(6));
-				int statAmount = Integer.parseInt(parts.get(7));
-				Card card = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
-			}*/
-		}
-	}
-		
-	public Item getItem(String name) {
-		for (Item item: allItems) {
-			if (item.getName() == name) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
-	public static ArrayList<Item> getItems() {
-		return allItems;
 	}
 			
 	public static void main(String[] args) {

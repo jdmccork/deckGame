@@ -1,7 +1,7 @@
 package enums;
 
 public enum Rarity {
-	COMMON(1), UNCOMMON(4), RARE(8), LEGENDARY(16);
+	COMMON(1), UNCOMMON(10), RARE(16), LEGENDARY(20);
 	
 	private int chanceModifier;
 

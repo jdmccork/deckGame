@@ -22,7 +22,7 @@ public class Event {
 			fightLogic(player); // I want to have this called something else, just not sure what
 			break;
 		case 3: //Storm
-			storm();
+			storm(player);
 			player.damage(5);
 			break;
 		}
@@ -40,7 +40,7 @@ public class Event {
 			switch (Game.getInt()) {
 			case 1:
 				fight(enemy, player);
-				reward(player);
+				reward(player, 0);
 				return;
 			case 2:
 				if (flee(enemy, player)) {
@@ -97,45 +97,40 @@ public class Event {
 		
 	}
 	
-	public void storm(){
+	public void storm(Player player){
 		System.out.println("Storm");
+		reward(player, -5);
 	}
 
 	//Item
 	
-	
-	
-	public void reward(Player player) {
-		ArrayList<Item> items = Game.getItems();
+	public void reward(Player player, int eventModifier) {
 		int randomNum;
-		int chance = (int) (Math.random() * 20);
-		chance = 20;
-		while (chance > 15 & player.getCapacity() > player.getInventory().size()) {
-			chance = (int) (Math.random() * 20) + player.getLuck();
+		int chance;
+		chance = (int) (Math.random() * 20) + player.getLuck() + eventModifier + 1;
+		ArrayList<Item> items = Item.getRandomItems(player.getLuck());
+		while (chance > 10) {
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
 			if (!player.getInventory().contains(item)) {
-				int rareChance = (int) (Math.random() * 12 * player.getLuck() + 1);
-				if (rareChance >= item.getRarity().getChanceModifier()) {
-					while (true) {
-						System.out.println("You found a " + item.getName() + " among the wreakage.");
-						System.out.println("Bring it aboard?\n1: Yes\n2: No");
-						switch (Game.getInt()) {
-						case 1:
-							if (player.addItem(item)) {
-								System.out.println("You aquired " + item.getName() + " and it has been added to your ship.");
-							}else {
-								System.out.println("You don't have enough space to take this item. Dump an item or leave it behind.");
-								player.printInventory();
-								continue;
-								//need to implement dumping
-							}
-							return;
-						case 2:
-							return;
-						default:
-							System.out.println("Invalid option, please try again");
+				while (true) {
+					System.out.println("You found " + item.getName() + " among the wreakage.");
+					System.out.println("Bring it aboard?\n1: Yes\n2: No");
+					switch (Game.getInt()) {
+					case 1:
+						if (player.addItem(item)) {
+							System.out.println("You aquired " + item.getName() + " and it has been added to your ship.");
+						}else {
+							System.out.println("You don't have enough space to take this item. Dump an item or leave it behind.");
+							player.printInventory();
+							continue;
+							//need to implement dumping
 						}
+						return;
+					case 2:
+						return;
+					default:
+						System.out.println("Invalid option, please try again");
 					}
 				}
 			}
