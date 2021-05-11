@@ -24,6 +24,7 @@ public class Game {
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
 	private ArrayList<Item> allItems = new ArrayList<Item>();
+	private Display display = new Display();
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
@@ -36,10 +37,6 @@ public class Game {
 	}
 	
 	public Game(int testNum) {
-		/*
-		Display display = new Display();
-		display.updateDay("24");
-		*/
 		generateItems();
 		userInput = new Scanner(System.in);
 		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
