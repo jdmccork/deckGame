@@ -39,6 +39,7 @@ public class Island {
 		routes = new ArrayList<Route>();
 		locationX = x;
 		locationY = y;
+		generateStore();
 	}
 	
 	/**
@@ -91,8 +92,8 @@ public class Island {
 		return store;
 	}
 	
-	public void generateStore(Player player) {
-		store = new Store(islandName, player);
+	public void generateStore() {
+		store = new Store(islandName);
 	}
 	
 	/**

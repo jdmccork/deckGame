@@ -19,3 +19,4 @@ Type: Cargo #Name: Live Chickens #Description: Yippee kiyay, mother clucker. #Si
 Type: Cargo #Name: Spices #Description: Ground paprika, chili and cinnamon. #Size: 1 #Base Price: 20 #Rarity: RARE
 Type: Cargo #Name: Whale Oil #Description: Used to light lanterns. #Size: 2 #Base Price: 30 #Rarity: UNCOMMON
 Type: Cargo #Name: Sail #Description: A triangular sail that the shopkeep swears will make you go faster than your current square one. #Size: 1 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPEED # Stat Amount: 3
+Type: Cargo #Name: Jar of Dirt #Description: I got a jar of dirt, I got a jar of dirt, and guess what's inside it!

@@ -25,11 +25,6 @@ public class Store {
 	private static ArrayList<String> adviceList = new ArrayList<String>();
 	
 	/**
-	 * A variable that stores whether the advice file has been successfully read
-	 */
-	private static boolean adviceRead = false;
-	
-	/**
 	 * The modifier used when this store sells an item
 	 */
 	private double buyModifier = 1; //put in to allow for changes later
@@ -48,9 +43,8 @@ public class Store {
 	/**
 	 * Creates a new store and generates its stock.
 	 */
-	public Store(String islandName, Player player){
-		generateStock(player);
-		readAdvice();
+	public Store(String islandName){
+		;
 	}
 	
 	/**
@@ -85,12 +79,11 @@ public class Store {
 	public void generateStock(Player player) {
 		int randomNum;
 		while (stock.size() < 4) {
-			System.out.println(stock.size());
 			ArrayList<Item> items = Item.getRandomItems(storeModifier);
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
 			if (!stock.contains(item) & !player.getInventory().contains(item)) {
-				stock.add(item);			
+				addStock(item);
 			}
 		}
 	}
@@ -117,8 +110,8 @@ public class Store {
 	/**
 	 * TBD
 	 */
-	public void addStock() {
-		
+	public void addStock(Item item) {
+		stock.add(item);
 	}
 	
 	/**
@@ -128,63 +121,182 @@ public class Store {
 	public void removeStock(Item item) {
 		stock.remove(item);
 	}
-	
-	/**
-	 * This store buys an item.
-	 * @param newStock the item this store tries to buy
-	 * @return true if the item is in this store's quota,
-	 * 		   false if not.
-	 */
-	public boolean sell(Item stock) {
-		//This may have to be re-engineered with a for loop to check equality.
-		return true;
-	}
-	
-	/**
-	 * This store sells an item.
-	 * @param sale the item this store sells.
-	 */
-	public void buy(Item sale) {
-		stock.remove(sale);
-	}
-	
+
 	/**
 	 * Attempts to read the advice file in the resources package.
 	 * If successful, adds each line to the list of possible advice.
 	 */
-	private void readAdvice() {
-		if (!adviceRead) {
-			try {
-				//Defines the advice file as a new file
-				File myObj = new File("src/resources/Advice");
-				//Creates a scanner object to read the advice file
-			    Scanner myReader = new Scanner(myObj);
-			    //While the scanner finds new lines, keep adding them to the list
-			    while (myReader.hasNextLine()) {
-			        String data = myReader.nextLine();
-			        adviceList.add(data);
-			    }
-			    myReader.close();
-			    adviceRead = true;
-			} catch (FileNotFoundException e) {
-				System.out.println("An error occurred.");
-			    e.printStackTrace();
+	public static void readAdvice() {
+		try {
+			//Defines the advice file as a new file
+			File myObj = new File("src/resources/Advice");
+			//Creates a scanner object to read the advice file
+		    Scanner myReader = new Scanner(myObj);
+		    //While the scanner finds new lines, keep adding them to the list
+		    while (myReader.hasNextLine()) {
+		        String data = myReader.nextLine();
+		        adviceList.add(data);
+		    }
+		    myReader.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("An error occurred.");
+		    e.printStackTrace();
+		}
+	}
+	
+	public static ArrayList<String> getAdvice(){
+		return adviceList;
+	}
+	
+	public void interact(Player player) {
+		while (true) {
+			talkToShopKeep();
+			System.out.println("Select an option to continue");
+			System.out.println("1: Buy");
+			System.out.println("2: Sell");
+			System.out.println("3: Exit shop");
+			
+			switch (Game.getInt()) {
+			case 1:
+				buyOptions(player);
+				//see what's for sale
+				break;
+			case 2:
+				sellOptions(player);
+				//see the price that you can sell your items for
+				break;
+			case 3:
+				return;
+			default:
+				System.out.println("Please enter a number between 1 and 3");
+				break;
 			}
 		}
+	}
+	
+	public void buyOptions(Player player) {
+		while (true) {
+			printStock();
+			if (stock.size() == 0) {
+				Game.pause();
+				return;
+			}
+			System.out.println((getStock().size() + 1) + ": Return");
+			System.out.println("Select an item to view more information");
+			int selection = Game.getInt();
+			if (selection == stock.size() + 1) {
+				return;
+			}else if (selection <= getStock().size() & selection > 0) {
+				Item item = stock.get(selection - 1);
+				boolean complete = false;
+				while (complete == false) {
+					System.out.println(item);
+					System.out.println("1: Buy for $" + item.getPrice(buyModifier));
+					System.out.println("2: Return");
+					switch (Game.getInt()) {
+					case 1:
+						complete = buyItem(item, player);
+						break;
+					case 2:
+						break;						
+					default:
+						System.out.println("Please enter a number between 1 and 2");
+						Game.pause();
+						break;
+					}
+				}
+			}else {
+				System.out.println("Please enter a number between 1 and " + (stock.size() + 1) + ".");
+			}
+		}
+	}
+	
+	public boolean buyItem(Item item, Player player) {
+		int price = item.getPrice(buyModifier);
+		if (player.getGold() >= price & player.getInventory().size() < player.getCapacity()) {
+			if (item instanceof Cargo) {
+				player.addItem((Cargo) item);
+				item.setDayPurchased(Game.getGame().getCurrentDay());
+			}else {
+				//player.addItem((Card) item);
+			}
+			player.modifyGold(-price);
+			removeStock(item);
+			System.out.println("Purchase successful. " + item.getName() + " has been added to your ship");
+			Game.pause();
+			return true;
+		}else if (player.getGold() < price){
+			System.out.println("Your don't have enough money to buy this item.");
+			Game.pause();
+			return false;
+		}else {
+			System.out.println("Your ship currently has " + player.getInventory().size() + "/" + player.getCapacity()   
+					+ " items. Upgrade your ship or sell an item to purchace this item.");
+			Game.pause();
+			return false;
+		}
+	}
+	
+	public void sellOptions(Player player) {
+		System.out.println("Select an item to sell.");
+		player.printInventory();
+		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		int selection = Game.getInt();
+		if (selection == player.getInventory().size() + 1) {
+			return;
+		}else if (selection <= player.getInventory().size()) {
+			Item item = stock.get(selection - 1);
+			boolean complete = false;
+			while (complete == false) {
+				switch (Game.getInt()) {
+				case 1:
+					complete = sellItem(item, player);
+					break;
+				case 2:
+					complete = true;
+					break;
+				default:
+					System.out.println("Please enter a number between 1 and 2");
+					break;
+				}
+			}
+		}else {
+			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
+		}
+	}
+	
+	public boolean sellItem(Item item, Player player) {
+		int price = item.getPrice(sellModifier);
+		if (player.getInventory().contains(item)) {
+			if (item instanceof Cargo) {
+				player.removeCargo((Cargo) item); //TODO change to removeItem then determine if it is a card or cargo
+				item.setDayPurchased(0);
+			}else {
+				System.out.println("Not implemented");
+				//player.removeItem((Card) item);
+			}
+			player.modifyGold(price);
+			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
+			item.setDayPurchased(-1);
+			Game.pause();
+			return true;
+		}
+		Game.pause();
+		return false;
 	}
 	
 	/**
 	 * Prints a piece of advice and increments an advice counter.
 	 */
 	public void talkToShopKeep() {
-		if (adviceRead) {
+		try {
 			System.out.println(adviceList.get(adviceCount));
 		    adviceCount += 1;
 		    if(adviceCount == adviceList.size()) {
 		    	adviceCount = 0;
 		    }
-		} else {
-			System.out.println("*The shopkeeper has forgotten their advice*");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("*The shopkeeper seems like he's had a bit too much to drink to give advice*");
 		}
 	}
 }

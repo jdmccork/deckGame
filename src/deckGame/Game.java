@@ -13,10 +13,7 @@ import enums.Stats;
 
 
 public class Game {
-	public void print(String string){
-		System.out.println(string);
-	}
-
+	private static Game currentGame;
 	private static Scanner userInput = new Scanner(System.in);
 	private Player player;
 	private ArrayList<Island> islands;
@@ -25,33 +22,23 @@ public class Game {
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
 	//private ArrayList<Cards> allCards;
 	
+	public void setTestInput() {
+		userInput = new Scanner(System.in);
+	}
+	
 	public Game() {
-		Display display = new Display();
 		gameSetup();
+	}
+	
+	public void run() {
+		Display display = new Display();
 		boolean playing = true;
 		while(playing == true) {
 			playing = mainMenu();
 		}
 		userInput.close();
 	}
-	
-	public Game(int testNum) {
-		Item.generateItems();
-		/*
-		Display display = new Display();
-		display.updateDay("24");
-		*/
-		userInput = new Scanner(System.in);
-		priceModifier = 1;
-		islands = generateIslands();
-		generateRoutes(islands);
-		player = new Player("Tester", "The void", 100, 2, 4, 3, 25, islands.get(0));
-		generateStore(player.getLocation());
-		days = 25;
-		play();
-		userInput.close();	
-	}
-	
+
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
@@ -72,16 +59,16 @@ public class Game {
 			System.out.print("Enter username: Captain ");
 			userName = userInput.nextLine();
 		}while (userName.length() < 3 | userName.length() > 15 | hasSpecial(userName));
-		System.out.print("Enter your ship's name: The ");
+		System.out.print("Enter your ship's name: ");
 		String shipName = userInput.nextLine();
 		return new String[] {userName, shipName};
 	}
 	
 	public boolean hasSpecial(String string) {
 		//allowing spaces in people names
-		Pattern my_pattern = Pattern.compile("[^a-z ]", Pattern.CASE_INSENSITIVE);
+		Pattern my_pattern = Pattern.compile("[^(a-z)\s]", Pattern.CASE_INSENSITIVE);
 		Matcher my_match = my_pattern.matcher(string);
-	    if (my_match.find())
+	    if (my_match.find() | string.contains("\s\s"))
 	    	return true;
 	    else
 	        return false;
@@ -114,7 +101,7 @@ public class Game {
 		while (true) {
 			System.out.println("Choose game length:");
 			try {
-				int days = userInput.nextInt();
+				int days = getInt();
 				if (days >= 20 & days <= 50) {
 					return days;
 				}else {
@@ -128,7 +115,9 @@ public class Game {
 	}
 	
 	public void gameSetup() {
-		Item.generateItems();	
+		currentGame = this;
+		Item.generateItems();
+		Store.readAdvice();
 		islands = generateIslands();
 		generateRoutes(islands);
 	}
@@ -154,7 +143,7 @@ public class Game {
 					welcome(player);
 					play();
 				} else if (selection == 2) {
-					System.out.println("Thanks for playing. Goodbye");
+					System.out.println("Thanks for playing. Goodbye.");
 					return false;
 				} else {
 					System.out.println("Invalid option, please enter the number of the option you want.");
@@ -188,7 +177,7 @@ public class Game {
 			switch (getInt()) {
 			case 1:
 				//interact with shop
-				shopInteraction((player.getLocation()).getStore());
+				player.getLocation().getStore().interact(player);
 				break;
 			case 2:
 				selectRoute();
@@ -201,59 +190,13 @@ public class Game {
 			}
 		}
 	}
-	
-	
-	public void shopInteraction(Store store) {
-		while (true) {
-			System.out.println("Select an option to continue");
-			System.out.println("1: Buy");
-			System.out.println("2: Sell");
-			System.out.println("3: Exit shop");
-			
-			switch (getInt()) {
-			case 1:
-				buyStock(store);
-				//see what's for sale
-				break;
-			case 2:
-				sellStock(store);
-				//see the price that you can sell your items for
-				break;
-			case 3:
-				return;
-			default:
-				System.out.println("Please enter a number between 1 and 3");
-				break;
-			}
-		}
-	}
-	
-	public void buyStock(Store store) {
-		while (true) {
-			store.printStock();
-			if (store.getStock().size() == 0) {
-				pause();
-				return;
-			}
-			System.out.println((store.getStock().size() + 1) + ": Return");
-			System.out.println("Select an item to view more information");
-			int selection = getInt();
-			if (selection == store.getStock().size() + 1) {
-				return;
-			}else if (selection <= store.getStock().size()) {
-				viewItem(store.getStock().get(selection - 1), store.getBuyModifier(), "Buy");
-			}else {
-				System.out.println("Please enter a number between 1 and " + (store.getStock().size() + 1) + ".");
-			}
-		}
-	}
-	
+/*
 	public void viewItem(Item item, double priceModifier, String option) {
 		System.out.println(item);
 		if (option == "Buy") {
-			System.out.println("The " + item.getName() + " will cost $" + getPrice(item, priceModifier));
+			System.out.println("The " + item.getName() + " will cost $" + item.getPrice(priceModifier));
 		} else {
-			System.out.println("You will recive $" + getPrice(item, priceModifier) + " for the " + item.getName() + ".");
+			System.out.println("You will recive $" + item.getPrice(priceModifier) + " for the " + item.getName() + ".");
 		}
 		System.out.println("You currently have $" + player.getGold());
 		System.out.println("Select an option to continue");
@@ -276,74 +219,7 @@ public class Game {
 			}
 		}
 	}
-	
-	public void purchaseItem(Item item, double priceModifier) {
-		int price = getPrice(item, priceModifier);
-		if (player.getGold() >= price & player.getInventory().size() < player.getCapacity()) {
-			if (item instanceof Cargo) {
-				player.addItem((Cargo) item);
-				item.setDayPurchased(currentDay);
-			}else {
-				//player.addItem((Card) item);
-			}
-			player.modifyGold(-price);
-			player.getLocation().getStore().buy(item);
-			System.out.println("Purchase successful. " + item.getName() + " has been added to your ship");
-		}else if (player.getGold() < price){
-			System.out.println("Your don't have enough money to buy this item.");
-		}else {
-			System.out.println("Your ship currently has " + player.getInventory().size() + "/" + player.getCapacity()   
-					+ " items. Upgrade your ship or sell an item to purchace this item.");
-		}
-		pause();
-	}
-	
-	public void sellItem(Item item, double priceModifier) {
-		int price = getPrice(item, priceModifier);
-		if (player.getInventory().contains(item)) {
-			if (item instanceof Cargo) {
-				player.removeCargo((Cargo) item);
-				item.setDayPurchased(0);
-			}else {
-				//player.removeItem((Card) item);
-			}
-			player.modifyGold(price);
-			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
-			item.setDayPurchased(-1);
-		}
-		pause();
-	}
-	
-	public int getPrice(Item item, double buySellModifier) {
-		double timeModifier = (item.getDaysPassed(currentDay) * 0.2 + 1);
-		switch(item.getRarity()) {
-		case COMMON:
-			return (int) (item.getPrice() * priceModifier * 1 * buySellModifier * timeModifier);
-		case UNCOMMON:
-			return (int) (item.getPrice() * priceModifier * 1.2 * buySellModifier * timeModifier);
-		case RARE:
-			return (int) (item.getPrice() * priceModifier * 1.5 * buySellModifier * timeModifier);
-		case LEGENDARY:
-			return (int) (item.getPrice() * priceModifier * 2 * buySellModifier * timeModifier);
-		default:
-			return item.getPrice();
-		}
-	}
-	
-	public void sellStock(Store store) {
-		System.out.println("Select an item to sell.");
-		player.printInventory();
-		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
-		int selection = getInt();
-		if (selection == player.getInventory().size() + 1) {
-			return;
-		}else if (selection <= player.getInventory().size()) {
-			viewItem(player.getInventory().get(selection - 1), player.getLocation().getStore().getSellModifier(), "Sell");
-		}else {
-			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
-		}
-	}
-	
+*/
 	public static int getInt(){
 		while(true) {
 			try {
@@ -442,7 +318,7 @@ public class Game {
 	}
 	
 	public void generateStore(Island island) {
-		island.generateStore(player);
+		island.getStore().generateStock(player);
 	}
 	
 	public void endGame() {
@@ -456,7 +332,7 @@ public class Game {
 		int totalGold = 0;
 		totalGold += player.getGold();
 		for (Item item: player.getInventory()) {
-			totalGold += getPrice(item, 1);
+			totalGold += item.getPrice(1);
 		}
 		return totalGold;
 	}
@@ -484,10 +360,22 @@ public class Game {
 			}
 		}
 	}
+	
+	public int getCurrentDay() {
+		return currentDay;
+	}
+	
+	public Player getPlayer() {
+		return player;
+	}
+	
+	public static Game getGame() {
+		return currentGame;
+	}
 			
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Game game = new Game();
+		game.run();
 	}
-
 }

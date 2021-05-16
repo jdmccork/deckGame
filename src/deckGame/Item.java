@@ -61,9 +61,8 @@ public abstract class Item {
 	 * @return the string representing this item
 	 */
 	public String toString() {
-		String output = "Item: " + name + "\nRarity: " + rarity + "\nSize: " + size;
-		output += "\nDescription: " + description + "\n";
-		//output += "Type: " + itemType;
+		String output = "Item: " + name + "\nRarity: " + rarity
+				+ "\nSize: " + size + "\nDescription: " + description + "\n";
 		return output;
 	}
 	
@@ -137,6 +136,7 @@ public abstract class Item {
 	}
 	
 	public static void generateItems() {
+		//TODO This can be changed to conform with the builder patterns we are currently doing in the lectures
 		ArrayList<Item> common = new ArrayList<Item>();
 		ArrayList<Item> uncommon = new ArrayList<Item>();
 		ArrayList<Item> rare = new ArrayList<Item>();
@@ -144,50 +144,50 @@ public abstract class Item {
 		
 		ArrayList<String> items = readItems();
 		for(String item : items) {
-			String[] temp = item.split(" #");
-			ArrayList<String> parts = new ArrayList<String>();
-			for(String part: temp) {
-				String[] values = part.split(": ");
-				parts.add(values[1]);
-			}
-			if(parts.get(0).equals("Cargo")) {
-				Cargo cargo;//what's this needed for?
-				String name = parts.get(1);
-				String description = parts.get(2);
-				int size = Integer.parseInt(parts.get(3));
-				int basePrice = Integer.parseInt(parts.get(4));
-				Rarity rarity = Rarity.valueOf(parts.get(5));
-				if(parts.size() == 8) {
-					Stats stat = Stats.valueOf(parts.get(6));
-					int statAmount = Integer.parseInt(parts.get(7));
-					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
-				} else if (parts.size() == 9){
-					//handling the special cases, note, all special will probably be percentages
-					Stats stat = Stats.valueOf(parts.get(6));
-					int statAmount = Integer.parseInt(parts.get(7));
-					cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
-				} else {
-					cargo = new Cargo(name, description, size, basePrice, rarity);
+			try {
+				String[] temp = item.split(" #");
+				ArrayList<String> parts = new ArrayList<String>();
+				for(String part: temp) {
+					String[] values = part.split(": ");
+					parts.add(values[1]);
 				}
-				switch (cargo.getRarity()) {
-				case COMMON:
-					common.add(cargo);
-					break;
-				case UNCOMMON:
-					uncommon.add(cargo);
-					break;
-				case RARE:					
-					rare.add(cargo);
-					break;
-				case LEGENDARY:
-					legendary.add(cargo);
-					break;
+				if(parts.get(0).equals("Cargo")) {
+					Cargo cargo;
+					String name = parts.get(1);
+					String description = parts.get(2);
+					int size = Integer.parseInt(parts.get(3));
+					int basePrice = Integer.parseInt(parts.get(4));
+					Rarity rarity = Rarity.valueOf(parts.get(5));
+					if(parts.size() == 8) {
+						Stats stat = Stats.valueOf(parts.get(6));
+						int statAmount = Integer.parseInt(parts.get(7));
+						cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
+					} else if (parts.size() == 9){
+						//handling the special cases, note, all special will probably be percentages
+						Stats stat = Stats.valueOf(parts.get(6));
+						int statAmount = Integer.parseInt(parts.get(7));
+						cargo = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
+					} else {
+						cargo = new Cargo(name, description, size, basePrice, rarity);
+					}
+					switch (cargo.getRarity()) {
+					case COMMON:
+						common.add(cargo);
+						break;
+					case UNCOMMON:
+						uncommon.add(cargo);
+						break;
+					case RARE:					
+						rare.add(cargo);
+						break;
+					case LEGENDARY:
+						legendary.add(cargo);
+						break;
+					}
 				}
+			}catch(Exception e){
+				;
 			}
-			allItems.add(common);
-			allItems.add(uncommon);
-			allItems.add(rare);
-			allItems.add(legendary);
 			/*else { //To be implemented once cards are implemented
 			String name = parts.get(1);
 			String description = parts.get(2);
@@ -199,6 +199,10 @@ public abstract class Item {
 			Card card = new Cargo(name, description, size, basePrice, rarity, stat, statAmount);
 			}*/
 		}
+		allItems.add(common);
+		allItems.add(uncommon);
+		allItems.add(rare);
+		allItems.add(legendary);
 	}
 	private static ArrayList<String> readItems() {
 		ArrayList<String> items = new ArrayList<String>();
@@ -225,32 +229,37 @@ public abstract class Item {
 	}
 	
 	public static ArrayList<Item> getUncommonItems() {
-		return allItems.get(0);
+		return allItems.get(1);
 	}
 	
 	public static ArrayList<Item> getRareItems() {
-		return allItems.get(0);
+		return allItems.get(2);
 	}
 	
 	public static ArrayList<Item> getLegendaryItems() {
-		return allItems.get(0);
+		return allItems.get(3);
+	}
+	
+	public static Item getRandomItem() {
+		return getRandomItem(0);
+	}
+	
+	public static Item getRandomItem(int luck) {
+		ArrayList<Item> itemList = getRandomItems(luck);
+		return itemList.get((int) (Math.random() * itemList.size()));
 	}
 	
 	public static ArrayList<Item> getRandomItems(int luck){
 		int chance = (int) (Math.random() * 20) + luck + 1;
-		System.out.println(chance);
-		int possible;
-		System.out.println(chance > Rarity.LEGENDARY.getChanceModifier());
-		if (chance > Rarity.LEGENDARY.getChanceModifier()) {
-			possible = 4;
-		} else if(chance > Rarity.RARE.getChanceModifier()){
-			possible = 3;
-		} else if(chance > Rarity.UNCOMMON.getChanceModifier()){
-			possible = 2;
+		if (chance >= Rarity.LEGENDARY.getChanceModifier()) {
+			return getLegendaryItems();
+		} else if(chance >= Rarity.RARE.getChanceModifier()){
+			return getRareItems();
+		} else if(chance >= Rarity.UNCOMMON.getChanceModifier()){
+			return getUncommonItems();
 		} else {
-			possible = 1;
+			return getCommonItems();
 		}
-		return allItems.get((int) (possible * Math.random()));
 	}
 	
 	public static ArrayList<Item> getItems() {
@@ -264,14 +273,23 @@ public abstract class Item {
 	
 	public void viewItem() {
 		System.out.println(this);
-		System.out.println("Select an item to see to continue");
-		System.out.println("1: Return");
-		switch (Game.getInt()) {
-		case 1:
-			return;
+		Game.pause();
+	}
+	
+	public int getPrice(double priceModifier/*double buySellModifier*/) {
+		double timeModifier = (getDaysPassed(Game.getGame().getCurrentDay()) * 0.2) + 1;
+		switch(getRarity()) {
+		case COMMON:
+			return (int) (getPrice() * priceModifier * timeModifier);
+		case UNCOMMON:
+			return (int) (getPrice() * priceModifier * 1.2 * timeModifier);
+		case RARE:
+			return (int) (getPrice() * priceModifier * 1.5 * timeModifier);
+		case LEGENDARY:
+			return (int) (getPrice() * priceModifier * 2 * timeModifier);
 		default:
-			System.out.println("Please enter a number between 1 and 2");
-			break;
+			return getPrice();
 		}
 	}
+
 }
