@@ -24,7 +24,7 @@ public class Game {
 	private int currentDay;
 	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
 	private ArrayList<Item> allItems = new ArrayList<Item>();
-	private Display display = new Display();
+	private Display display = new Display(this);
 	//private ArrayList<Cards> allCards;
 	
 	public Game() {
