@@ -58,6 +58,11 @@ public class Cargo extends Item{
 		this.modifyAmount = 0;
 	}
 	
+	public void addModifier(Stats modifyStat, int modifyAmount) {
+		this.modifyStat = modifyStat;
+		this.modifyAmount = modifyAmount;
+	}
+	
 	/**
 	 * Creates a new instance of cargo which does not modify a stat.
 	 * @param name the name of the cargo
@@ -108,5 +113,33 @@ public class Cargo extends Item{
 	public int getModifyAmount(){
 		return modifyAmount;
 	}
+	
+	/**
+	 * Changes the given stat of the ship by the given amount.
+	 * @param stat the stat to be changed
+	 * @param amount the amount to change the stat by
+	 */
+	public boolean alterStat(Player player) {
+		//TODO add checks to ensure values are positive
+		switch (modifyStat) {
+			case MAXHEALTH:
+				player.setMaxHealth(player.getMaxHealth() + modifyAmount);
+				player.repair(modifyAmount);
+				break;
+			case SPEED:
+				player.modifySpeed(modifyAmount);
+				break;
+			case CAPACITY:
+				if (player.modifyCapacity(modifyAmount)) {
+					return true;
+				}
+				return false;
+			default:
+				break;
+		}
+		return true;
+	}
+	
+	
 	
 }

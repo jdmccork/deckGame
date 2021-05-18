@@ -60,7 +60,12 @@ public class Route {
 	 * @return the time to sail the entire route
 	 */
 	public int getTime(int speed) {
-		return distance/speed;
+		int time = distance/speed;
+		if (time <= 0) {
+			return 1;
+		} else {
+			return time;
+		}
 	}
 	
 	public double getEventChance() {

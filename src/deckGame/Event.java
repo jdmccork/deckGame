@@ -30,7 +30,7 @@ public class Event {
 	}
 	
 	public void fightLogic(Player player){
-		Enemy enemy = new Enemy("Enemy", 50, 4, 2);
+		Ship enemy = new Ship("Enemy", 50, 4, 2);
 		System.out.println("You are attacked by a ship full of pirates. Choose and option to continue");
 		while (true) {
 			System.out.println("1: Fight");
@@ -40,6 +40,8 @@ public class Event {
 			switch (Game.getInt()) {
 			case 1:
 				fight(enemy, player);
+				System.out.println("The enemy has been sunk");
+				Game.pause();
 				reward(player, 0);
 				return;
 			case 2:
@@ -63,13 +65,12 @@ public class Event {
 	}
 	
 	
-	public void fight(Enemy enemy, Player player) {
+	public void fight(Ship enemy, Ship player) {
 		while (enemy.getStatus() != Statuses.DESTROYED) {
 			ArrayList<Integer> playerDice = roll(player);
 			enemy.damage(playerDice);
 			
 			if (enemy.getStatus() == Statuses.DESTROYED) {
-				//Gain reward
 				return;
 			}
 			
@@ -79,7 +80,7 @@ public class Event {
 		}
 	}
 	
-	public boolean flee(Enemy enemy, Player player) {
+	public boolean flee(Ship enemy, Ship player) {
 		int d20 = (int)(Math.random() * 20) + 1;
 		int speedDifference = player.getSpeed() - enemy.getSpeed();
 		return (d20 + speedDifference > 10);
@@ -91,7 +92,11 @@ public class Event {
 		do {
 			dice.add((int) (Math.random() * 6) + 1);
 		} while (dice.size() < attacker.getStrength());
-		//Do the special abilities crew mates will have (reroll 1 etc)
+		if (attacker instanceof Player) {
+			for (Card card: ((Player) attacker).getCards()) {
+				dice = card.doSpecial(dice);
+			}
+		}
 		System.out.println(dice);
 		return dice;
 		
