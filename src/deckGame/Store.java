@@ -85,7 +85,6 @@ public class Store {
 			ArrayList<Item> items = Item.getRandomItems(storeModifier);
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
-			System.out.println(item.getName());
 			if (!stock.contains(item) & !player.getInventory().contains(item) & !player.getCards().contains(item)) {
 				addStock(item);
 			}
