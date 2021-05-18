@@ -49,6 +49,9 @@ public class Island {
 	 * @return the distance of the straight line between the two islands
 	 */
 	public static double getDistance(Island source, Island destination) {
+		if (source == null | destination == null) {
+			return 0;
+		}
 		int x = source.locationX - destination.locationX;
 		int y = source.locationY - destination.locationY;
 		return Math.sqrt(x*x+y*y);
@@ -93,7 +96,7 @@ public class Island {
 	}
 	
 	public void generateStore() {
-		store = new Store(islandName);
+		store = new Store(this);
 	}
 	
 	/**

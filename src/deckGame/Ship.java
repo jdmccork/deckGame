@@ -35,11 +35,6 @@ public class Ship {
 	private int speed;
 	
 	/**
-	 * The number of item space that can be used on the ship
-	 */
-	private int capacity;
-	
-	/**
 	 * The damage types the ship has a resistance to
 	 */
 	private ArrayList<Damages> resistance = new ArrayList<Damages>();
@@ -55,29 +50,9 @@ public class Ship {
 	private ArrayList<Crewmate> crew;
 	
 	/**
-	 * A list of cargo that is currently being transported
-	 */
-	private ArrayList<Cargo> inventory;
-	
-	/**
 	 * The number of dice that are available to roll
 	 */
 	private int strength;
-	
-	/**
-	 * Creates a new instance of ship with pre-generated stats.
-	 * <p>
-	 * This exists purely as a developer tool for testing.
-	 */
-	public Ship() {
-		shipName= "Tester";
-		health = 100;
-		speed = 5;
-		capacity = 4;
-		strength = 3;
-		weakness = Damages.FIRE;
-		crew.add(new Crewmate());
-	}
 	
 	/**
 	 * Creates a new instance of ship based on given parameters.
@@ -87,14 +62,12 @@ public class Ship {
 	 * @param capacity the amount of cargo space this ship has
 	 * @param strength the base damage this ship will do.
 	 */
-	public Ship(String name, int health, int speed, int capacity, int strength) {
+	public Ship(String name, int health, int speed, int strength) {
 		this.shipName = name;
 		this.setMaxHealth(health);
 		this.health = health;
 		this.speed = speed;
-		this.capacity = capacity;
 		crew = new ArrayList<Crewmate>();
-		inventory = new ArrayList<Cargo>();
 		this.strength = strength;
 		weakness = Damages.FIRE;
 	}
@@ -104,6 +77,9 @@ public class Ship {
 	 * @return speed the speed of this ship
 	 */
 	public int getSpeed() {
+		if (speed <= 0) {
+			return 1;
+		}
 		return speed;
 	}
 	
@@ -188,97 +164,12 @@ public class Ship {
 		status = Statuses.REPAIRED;
 	}
 	
-	/**
-	 * Changes the given stat of the ship by the given amount.
-	 * @param stat the stat to be changed
-	 * @param amount the amount to change the stat by
-	 */
-	public void alterStat(Stats stat, int amount) {
-		//TODO add checks to ensure values are positive
-		switch (stat) {
-			case MAXHEALTH:
-				setMaxHealth(getMaxHealth() + amount);
-				health += amount;
-				break;
-			case SPEED:
-				speed += amount;
-				break;
-			case CAPACITY:
-				capacity += amount;
-				break;
-			default:
-				break;
+	public void repair(int amount) {
+		health += amount;
+		if (health >= maxHealth) {
+			health = maxHealth;
+			status = Statuses.REPAIRED;
 		}
-	}
-	
-	/**
-	 * Damages the given enemy by the attack strength of this ship.
-	 * @param enemy the enemy to attack
-	 */
-	public void attack(Enemy enemy) {
-		enemy.damage(strength);
-	}
-	
-	/**
-	 * Prints out the number of items in this ship's inventory, 
-	 * then prints each item in turn.
-	 */
-	public void printInventory() {
-		if(inventory.size() == 1) {
-			System.out.println("There is currently " + inventory.size() + " item on the ship:");
-		} else {
-			System.out.println("There are currently " + inventory.size() + " items on the ship:");
-		}
-		int i = 1;
-		for (Cargo cargo: inventory) {
-			System.out.println(i++ + ": " + cargo.getName());
-		}
-	}
-	
-	/**
-	 * Adds the given cargo to this ship's inventory and checks
-	 * if the capacity has not been exceeded.
-	 * @param cargo the cargo to add
-	 */
-	public boolean addItem(Cargo cargo) {
-		int space = 0;
-		for (Cargo item: inventory) {
-			space += item.getSize();
-		}
-		if (space <= capacity) {
-			inventory.add(cargo);
-			alterStat(cargo.getModifyStat(), cargo.getModifyAmount());
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Removes the first instance of the given kind of cargo
-	 * from this ship's inventory.
-	 * @param cargo the cargo to remove
-	 */
-	public void removeCargo(Cargo cargo) {
-		if (inventory.contains(cargo)) {
-			inventory.remove(cargo);
-			alterStat(cargo.getModifyStat(), -cargo.getModifyAmount());
-		}
-	}
-	
-	/**
-	 * Gets the capacity of this ship
-	 * @return the capacity of the ship
-	 */
-	public int getCapacity() {
-		return capacity;
-	}
-	
-	/**
-	 * Gets the inventory of the ship
-	 * @return the ArrayList of the items in the inventory
-	 */
-	public ArrayList<Cargo> getInventory() {
-		return inventory;
 	}
 	
 	/**
@@ -308,8 +199,11 @@ public class Ship {
 		output += "Health: " + health + "/" + maxHealth + "\n";
 		output += "Speed: " + speed + "\n";
 		output += "Strength: " + strength + "\n";
-		output += "Weakness: " + weakness + "\n";
-		output += "Capacity: " + capacity + "\n";
+		if (this instanceof Player) {
+			output += "Capacity: " + ((Player) this).getCapacity() + "\n";
+		}else {
+			output += "Capacity: 4\n"; //TODO literally anything with this
+		}
 		String resistances = "";
 		for (Damages damage: resistance) {
 			resistances += damage + ", ";
@@ -322,24 +216,15 @@ public class Ship {
 		return strength;
 	}
 
-	/**
-	 * For testing purposes
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Player firstShip = new Player("Jack", "Jolly Rogers", 200, 45, 5, 253, 25, new Island("test", 0, 0));
-		Cargo bread = new Cargo("Bread", "It's bread", 1, 1, Rarity.COMMON);
-		firstShip.addItem(bread);
-		firstShip.printInventory();
-		firstShip.removeCargo(bread);
-		firstShip.printInventory();
-	}
-
 	public int getMaxHealth() {
 		return maxHealth;
 	}
 
 	public void setMaxHealth(int maxHealth) {
 		this.maxHealth = maxHealth;
+	}
+	
+	public void modifySpeed(int amount) {
+		speed += amount;
 	}
 }

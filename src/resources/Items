@@ -8,7 +8,7 @@ Type: Cargo #Name: Oak Planks #Description: Shipbuilder's gold. Sturdy and strai
 Type: Cargo #Name: Cotton #Description: Silky soft slave labour. It's illegal to ship in anything but raw form. #Size: 4 #Base Price: 50 #Rarity: UNCOMMON
 Type: Cargo #Name: Beaver Pelts #Description: Hunted by the Native Americans, bought from the Dutch. #Size: 1 #Base Price: 20 #Rarity: UNCOMMON
 Type: Cargo #Name: Corn #Description: Grown by the Native Americans. #Size: 2 #Base Price: 10 #Rarity: COMMON
-Type: Cargo #Name: Tools #Description: Manufactured by the Dutch! (Reduces the cost of repairing the ship by 25%) #Size: 3 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPECIAL #Stat Amount: 25 #Special Type: Repair 
+Type: Cargo #Name: Tools #Description: Manufactured by the Dutch! #Size: 3 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPECIAL #Stat Amount: 25
 Type: Cargo #Name: Silver #Description: Finest quality, I'm told. #Size: 1 #Base Price: 300 #Rarity: RARE
 Type: Cargo #Name: Tobacco #Description: Low-quality pipe filler. #Size: 2 #Base Price: 30 #Rarity: UNCOMMON
 Type: Cargo #Name: Rice #Description: Dried grains. #Size: 1 #Base Price: 20 #Rarity: COMMON
@@ -18,5 +18,6 @@ Type: Cargo #Name: Hard Tack #Description: Solid food for solid sailors. Dry and
 Type: Cargo #Name: Live Chickens #Description: Yippee kiyay, mother clucker. #Size: 3 #Base Price: 50 #Rarity: UNCOMMON #Stat: SPEED #Stat Amount: 2
 Type: Cargo #Name: Spices #Description: Ground paprika, chili and cinnamon. #Size: 1 #Base Price: 20 #Rarity: RARE
 Type: Cargo #Name: Whale Oil #Description: Used to light lanterns. #Size: 2 #Base Price: 30 #Rarity: UNCOMMON
+Type: Card #Name: Snake Eye Chef #Description: Knowing how to make something out of snake eyes is worth it. #Size: 1 #Base Price: 50 #Rarity: COMMON #Variety: multi-transform #Target: 1 #Result: 6 #Requirement: 2
 Type: Cargo #Name: Sail #Description: A triangular sail that the shopkeep swears will make you go faster than your current square one. #Size: 1 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPEED # Stat Amount: 3
-Type: Cargo #Name: Jar of Dirt #Description: I got a jar of dirt, I got a jar of dirt, and guess what's inside it!
+Type: Cargo #Name: Jar of Dirt #Description: I got a jar of dirt, I got a jar of dirt, and guess what's inside it! #Size: 1 #Base Price: 20 #Rarity: RARE

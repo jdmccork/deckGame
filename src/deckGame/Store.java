@@ -40,11 +40,13 @@ public class Store {
 	 */
 	private int storeModifier = 0;
 	
+	private Island location;
+	
 	/**
 	 * Creates a new store and generates its stock.
 	 */
-	public Store(String islandName){
-		;
+	public Store(Island island){
+		location = island;
 	}
 	
 	/**
@@ -78,11 +80,13 @@ public class Store {
 	 */
 	public void generateStock(Player player) {
 		int randomNum;
+		stock = new ArrayList<Item>();
 		while (stock.size() < 4) {
 			ArrayList<Item> items = Item.getRandomItems(storeModifier);
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
-			if (!stock.contains(item) & !player.getInventory().contains(item)) {
+			System.out.println(item.getName());
+			if (!stock.contains(item) & !player.getInventory().contains(item) & !player.getCards().contains(item)) {
 				addStock(item);
 			}
 		}
@@ -191,13 +195,15 @@ public class Store {
 				boolean complete = false;
 				while (complete == false) {
 					System.out.println(item);
-					System.out.println("1: Buy for $" + item.getPrice(buyModifier));
+					System.out.println("You currently have $" + player.getGold());
+					System.out.println("1: Buy for $" + item.getPrice(buyModifier, player.getLocation()));
 					System.out.println("2: Return");
 					switch (Game.getInt()) {
 					case 1:
 						complete = buyItem(item, player);
 						break;
 					case 2:
+						complete = true;
 						break;						
 					default:
 						System.out.println("Please enter a number between 1 and 2");
@@ -212,11 +218,11 @@ public class Store {
 	}
 	
 	public boolean buyItem(Item item, Player player) {
-		int price = item.getPrice(buyModifier);
+		int price = item.getPrice(buyModifier, player.getLocation());
 		if (player.getGold() >= price & player.getInventory().size() < player.getCapacity()) {
 			if (item instanceof Cargo) {
 				player.addItem((Cargo) item);
-				item.setDayPurchased(Game.getGame().getCurrentDay());
+				item.setLocationPurchased(location);
 			}else {
 				//player.addItem((Card) item);
 			}
@@ -245,41 +251,44 @@ public class Store {
 		if (selection == player.getInventory().size() + 1) {
 			return;
 		}else if (selection <= player.getInventory().size()) {
-			Item item = stock.get(selection - 1);
-			boolean complete = false;
-			while (complete == false) {
-				switch (Game.getInt()) {
-				case 1:
-					complete = sellItem(item, player);
-					break;
-				case 2:
-					complete = true;
-					break;
-				default:
-					System.out.println("Please enter a number between 1 and 2");
-					break;
-				}
-			}
+			sellConfirm(player.getInventory().get(selection - 1), player);
 		}else {
 			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
 		}
 	}
 	
-	public boolean sellItem(Item item, Player player) {
-		int price = item.getPrice(sellModifier);
-		if (player.getInventory().contains(item)) {
-			if (item instanceof Cargo) {
-				player.removeCargo((Cargo) item); //TODO change to removeItem then determine if it is a card or cargo
-				item.setDayPurchased(0);
-			}else {
-				System.out.println("Not implemented");
-				//player.removeItem((Card) item);
+	public void sellConfirm(Item item, Player player) {
+		boolean complete = false;
+		while (complete == false) {
+			System.out.println(item);
+			System.out.println("1: Sell.");
+			System.out.println("2: Return");
+			switch (Game.getInt()) {
+			case 1:
+				complete = sellItem(item, player);
+				break;
+			case 2:
+				complete = true;
+				break;
+			default:
+				System.out.println("Please enter 1 or 2.");
+				Game.pause();
+				break;
 			}
+		}
+	}
+	
+	public boolean sellItem(Item item, Player player) {
+		int price = item.getPrice(sellModifier, player.getLocation());
+		if (player.getInventory().contains(item)) {
+			player.removeItem(item);
 			player.modifyGold(price);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
-			item.setDayPurchased(-1);
+			item.setLocationPurchased(null);
 			Game.pause();
 			return true;
+		} else {
+			System.out.println("Something went wrong, you don't have this item.");
 		}
 		Game.pause();
 		return false;

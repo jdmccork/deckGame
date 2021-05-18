@@ -1,20 +1,14 @@
 package deckGame;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import enums.ItemType;
-import enums.Rarity;
-import enums.Stats;
-
 
 public class Game {
 	private static Game currentGame;
-	private static Scanner userInput = new Scanner(System.in);
+	private static Scanner userInput;
 	private Player player;
 	private ArrayList<Island> islands;
 	private int days;
@@ -31,7 +25,7 @@ public class Game {
 	}
 	
 	public void run() {
-		Display display = new Display();
+		//Display display = new Display();
 		boolean playing = true;
 		while(playing == true) {
 			playing = mainMenu();
@@ -42,8 +36,30 @@ public class Game {
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
-		Player player = new Player(names[0], names[1], 100, 2, 4, 3, 100, islands.get(0));
+		int[] ship = getShip();
+		Player player = new Player(names[0], names[1], ship[0], ship[1], ship[2], ship[3], ship[4], islands.get(0));
 		return player;
+	}
+	
+	public int[] getShip() {
+		System.out.println("Select a class:");
+		System.out.println("1: None. A ship which has a balance of all stats.");
+		System.out.println("2: Merchant. A slow moving ship with more cargo space.");
+		System.out.println("3: Warrior.  A slow moving ship with high health and damage.");
+		System.out.println("4: Rouge. A fast ship with lower heath and strength.");
+		switch (getInt()) {
+		//int health, int speed, int capacity, int power, int gold
+		case 1:
+			return new int[] {100, 10, 4, 3, 50};
+		case 2:
+			return new int[] {100, 7, 6, 3, 50};
+		case 3:
+			return new int[] {150, 7, 4, 5, 75};
+		case 4:
+			return new int[] {100, 14, 3, 4, 50};
+		default:
+			return new int[] {100, 10, 6, 3, 50};
+		}
 	}
 	
 	public String[] getNames() {
@@ -59,8 +75,14 @@ public class Game {
 			System.out.print("Enter username: Captain ");
 			userName = userInput.nextLine();
 		}while (userName.length() < 3 | userName.length() > 15 | hasSpecial(userName));
-		System.out.print("Enter your ship's name: ");
-		String shipName = userInput.nextLine();
+		String shipName;
+		do {
+			System.out.print("Enter your ship's name: ");
+			shipName = userInput.nextLine();
+			if (shipName.length() < 3 | shipName.length() > 15) {
+				System.out.println("Length of your ships name must be between 3 and 15 characters.");
+			}
+		} while (shipName.length() < 3 | shipName.length() > 15);
 		return new String[] {userName, shipName};
 	}
 	
@@ -115,6 +137,7 @@ public class Game {
 	}
 	
 	public void gameSetup() {
+		userInput = new Scanner(System.in);
 		currentGame = this;
 		Item.generateItems();
 		Store.readAdvice();
@@ -126,7 +149,7 @@ public class Game {
 		//temporary
 		priceModifier = 1; // difficulty
 		player = createPlayer();
-		generateStore(player.getLocation());
+		player.getLocation().getStore().generateStock(player);
 		days = getGameLength();
 	}
 	
@@ -183,7 +206,7 @@ public class Game {
 				selectRoute();
 				break;
 			case 3:
-				viewInventory();
+				player.viewInventory();
 				break;
 			case 4:
 				return;
@@ -286,9 +309,7 @@ public class Game {
 					event.selectEvent(route, player);
 				}
 				if (currentDay < days) {
-					System.out.println("----------------");
-					generateStore(player.getLocation()); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
-					System.out.println("+++++++++++++++++++++++++++");
+					player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
 					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
 					pause();
 				}else {
@@ -299,26 +320,9 @@ public class Game {
 		}
 	}
 	
-	public void viewInventory() {
-		player.printInventory();
-		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
-		int selection = getInt();
-		if (selection == player.getInventory().size() + 1) {
-			return;
-		}else if (selection <= player.getInventory().size()) {
-			player.getInventory().get(selection - 1).viewItem();
-		}else {
-			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
-		}
-	}
-	
 	public static void pause() {
 		System.out.println("Press enter to continue");
 		userInput.nextLine();
-	}
-	
-	public void generateStore(Island island) {
-		island.getStore().generateStock(player);
 	}
 	
 	public void endGame() {
@@ -332,33 +336,13 @@ public class Game {
 		int totalGold = 0;
 		totalGold += player.getGold();
 		for (Item item: player.getInventory()) {
-			totalGold += item.getPrice(1);
+			totalGold += item.getPrice(1, player.getLocation());
 		}
 		return totalGold;
 	}
 	
 	public void printResults(int gold) {
 		System.out.println("Total gold earned: " + gold);
-	}
-		
-	public void template() {
-		int selection;
-		while (currentDay <= days) {
-			System.out.println("Select an option to continue");
-			System.out.println("1: ");
-			try {
-				selection = userInput.nextInt();
-				userInput.nextLine();
-			}catch (java.util.InputMismatchException e) {
-				System.out.println("Invalid character, please enter the number of the option you want.");
-				continue;
-			}
-			
-			switch (selection) {
-			case 1:
-				break;
-			}
-		}
 	}
 	
 	public int getCurrentDay() {
@@ -374,7 +358,6 @@ public class Game {
 	}
 			
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Game game = new Game();
 		game.run();
 	}

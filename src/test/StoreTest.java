@@ -34,7 +34,6 @@ class StoreTest {
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		Item.generateItems();
-		
 		islands.add(new Island("Home", 0, 0));
 		islands.add(new Island("Golgolles", -10, 5));
 		islands.add(new Island("Cansburg", 5, 5));
@@ -47,7 +46,7 @@ class StoreTest {
 		testOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(testOut));
 		player = new Player("Tester", "Testing ship", 100, 2, 4, 3, 25, islands.get(0));
-		store = new Store("test store");
+		store = new Store(islands.get(0));
 	}
 
 	@Test

@@ -1,5 +1,7 @@
 package deckGame;
 
+import java.util.ArrayList;
+
 public class Player extends Ship {
 	
 	/**
@@ -15,7 +17,7 @@ public class Player extends Ship {
 	/**
 	 * The amount of cards the player can hold
 	 */
-	//private int deckSize;
+	private int deckSize;
 	
 	/**
 	 * The place where the player is.
@@ -25,12 +27,24 @@ public class Player extends Ship {
 	/**
 	 * The cards the player has
 	 */
-	//private ArrayList<Card> cards;
+	private ArrayList<Card> cards;
+	
+	/**
+	 * A list of cargo that is currently being transported
+	 */
+	private ArrayList<Cargo> inventory;
+	
+	/**
+	 * The number of item space that can be used on the ship
+	 */
+	private int capacity;
 	
 	/**
 	 * Alters the chance for item and card rarity 
 	 */
 	private int luck;
+	
+	private int cargoStored;
 	
 	/**
 	 * Creates a new player as an extension of the ship class.
@@ -42,27 +56,18 @@ public class Player extends Ship {
 	 * @param power the amount of damage this player's ship can do
 	 */
 	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold, Island location) {
-		super(shipName, health, speed, capacity, power);
+		super(shipName, health, speed, power);
+
+		this.capacity = capacity;
 		this.location = location;
 		this.gold = gold;
 		this.userName = userName;
 		luck = 0;
+		inventory = new ArrayList<Cargo>();
+		cards = new ArrayList<Card>();
+		cargoStored = 0;
 	}
-	
-	/**
-	 * Creates a default test player as an extension of the ship class.
-	 * @param name the name of this player's ship
-	 * @param health the amount of health this player's ship has
-	 * @param speed the speed at which this player's ship travels
-	 * @param capacity the amount of cargo this player's ship can hold
-	 * @param power the amount of damage this player's ship can do
-	 * @param luck the luck of the player
-	 */
-	public Player(String name, int health, int speed, int capacity, int power, int luck) {
-		super(name, health, speed, capacity, power);
-		this.luck = luck;
-	}
-	
+
 	/**
 	 * Gets this player's name.
 	 * @return this player's name
@@ -77,6 +82,22 @@ public class Player extends Ship {
 	 */
 	public Island getLocation() {
 		return location;
+	}
+	
+	/**
+	 * Gets the capacity of this ship
+	 * @return the capacity of the ship
+	 */
+	public int getCapacity() {
+		return capacity;
+	}
+	
+	public boolean modifyCapacity(int amount) {
+		if (capacity + amount >= inventory.size()) {
+			capacity += amount;
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -130,17 +151,85 @@ public class Player extends Ship {
 	*/
 	
 	/**
-	 * Adds a cargo item to this player's inventory using the ship method
+	 * Prints out the number of items in this ship's inventory, 
+	 * then prints each item in turn.
 	 */
-	public boolean addItem(Cargo cargo) {
-		return super.addItem(cargo);
+	public void printInventory() {
+		if(inventory.size() == 1) {
+			System.out.println("There is currently " + inventory.size() + " item on the ship:");
+		} else {
+			System.out.println("There are currently " + inventory.size() + " items on the ship:");
+		}
+		int i = 1;
+		for (Cargo cargo: inventory) {
+			System.out.println(i++ + ": " + cargo.getName());
+		}
 	}
 	
+	/**
+	 * Adds the given cargo to this ship's inventory and checks
+	 * if the capacity has not been exceeded.
+	 * @param cargo the cargo to add
+	 */
 	public boolean addItem(Item item) {
-		if (item instanceof Cargo){
-			return addItem((Cargo) item);
+		if (item instanceof Cargo) {
+			Cargo cargo = (Cargo) item;
+			if (cargoStored <= capacity) {
+				if (cargo.alterStat(this)) {
+					inventory.add(cargo);
+					return true;
+				}
+			}
+		} else if (item instanceof Card) {
+			Card card = (Card) item;
+			if (cards.size() < deckSize) {
+				cards.add(card);
+				return true;
+			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Removes the first instance of the given kind of cargo
+	 * from this ship's inventory.
+	 * @param cargo the cargo to remove
+	 */
+	public void removeItem(Item item) {
+		if (item instanceof Cargo) {
+			if (inventory.contains(item)) {
+				inventory.remove(item);
+				((Cargo) item).alterStat(this); //TODO Doesn't reduce
+			}
+		}else if (item instanceof Card) {
+			cards.remove(item);
+		}
+	}
+	
+	public ArrayList<Card> getCards(){
+		return cards;
+	}
+	
+	
+	public void viewInventory() {
+		printInventory();
+		System.out.println((getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		int selection = Game.getInt();
+		if (selection == getInventory().size() + 1) {
+			return;
+		}else if (selection <= getInventory().size()) {
+			getInventory().get(selection - 1).viewItem();
+		}else {
+			System.out.println("Please enter a number between 1 and " + getInventory().size() + 1 + ".");
+		}
+	}
+	
+	/**
+	 * Gets the inventory of the ship
+	 * @return the ArrayList of the items in the inventory
+	 */
+	public ArrayList<Cargo> getInventory() {
+		return inventory;
 	}
 
 }

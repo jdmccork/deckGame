@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import deckGame.Card;
 import deckGame.Cargo;
 import deckGame.Item;
 import enums.Rarity;
@@ -91,11 +92,7 @@ class ItemTest {
 		int legendaryCount = 0;
 		for (int i = 0; i<1000; i++) {
 			Item item = Item.getRandomItem();
-			if (item instanceof Cargo){
-				assertTrue(allItems.contains(item));
-			} else {
-				fail("Tests for other item types have not been implemented");
-			}
+			assertTrue(allItems.contains(item));
 			switch(item.getRarity()) {
 			case COMMON:
 				commonCount++;

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import deckGame.Item;
 
 class GenerateItemTest {
-	private int currentItemCount = 22;
+	private int currentItemCount = 23;
 	
 	@Test
 	void testGenerateItems() {
@@ -17,7 +17,6 @@ class GenerateItemTest {
 	@Test
 	void correctNumItems() {
 		Item.generateItems();
-		assertEquals(Item.getItems().size(), currentItemCount);
+		assertEquals(currentItemCount, Item.getItems().size());
 	}
-
 }
