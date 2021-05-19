@@ -23,6 +23,11 @@ public class ImagePanel extends JPanel {
 	    setLayout(null);
 	}
 	
+	public void setImage(Image img) {
+		this.background = img;
+		this.repaint();
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 	    g.drawImage(background, 0, 0, null);
