@@ -33,7 +33,12 @@ public class Game {
 		}
 		userInput.close();
 	}
-
+	
+	public ArrayList<Item> getLogItems() {
+		//TODO
+		return new ArrayList<Item>();
+	}
+	
 	public Player createPlayer() {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
