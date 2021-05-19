@@ -13,7 +13,7 @@ Type: Cargo #Name: Silver #Description: Finest quality, I'm told. #Size: 1 #Base
 Type: Cargo #Name: Tobacco #Description: Low-quality pipe filler. #Size: 2 #Base Price: 30 #Rarity: UNCOMMON
 Type: Cargo #Name: Rice #Description: Dried grains. #Size: 1 #Base Price: 20 #Rarity: COMMON
 Type: Cargo #Name: Tequila #Description: *buh duh buh duh bu-buh duh duh* Tequilaaaa! #Size: 1 #Base Price: 30 #Rarity: UNCOMMON
-Type: Cargo #Name: Gunpowder #Description: DO NOT let it ignite, unless you want to die a fiery death. #Size: 3 #Base Price: 50 #Rarity: UNCOMMON #Stat: RESISTANCE #Stat Amount: -1
+Type: Cargo #Name: Gunpowder #Description: DO NOT let it ignite, unless you want to die a fiery death. #Size: 3 #Base Price: 50 #Rarity: UNCOMMON
 Type: Cargo #Name: Hard Tack #Description: Solid food for solid sailors. Dry and boring. #Size: 2 #Base Price: 10 #Rarity: COMMON
 Type: Cargo #Name: Live Chickens #Description: Yippee kiyay, mother clucker. #Size: 3 #Base Price: 50 #Rarity: UNCOMMON #Stat: SPEED #Stat Amount: 2
 Type: Cargo #Name: Spices #Description: Ground paprika, chili and cinnamon. #Size: 1 #Base Price: 20 #Rarity: RARE

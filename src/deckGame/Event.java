@@ -73,12 +73,12 @@ public class Event {
 		}
 	}
 	
-	public void flee(Ship enemy, Ship player) {
+	public boolean flee(Ship enemy, Ship player) {
 		int d20 = (int)(Math.random() * 20) + 1;
 		int speedDifference = player.getSpeed() - enemy.getSpeed();
 		if (d20 + speedDifference > 10) {
 			System.out.println("You escaped the pirates.");
-			return;
+			return true;
 		}else {
 			System.out.println("While trying to escape the enemy attacks and harpons you.");
 			ArrayList<Integer> enemyDice = roll(enemy);
@@ -86,6 +86,7 @@ public class Event {
 			Game.pause();
 			
 			attack(enemy, player);
+			return false;
 		}
 	}
 	
@@ -113,7 +114,7 @@ public class Event {
 
 	//Item
 	
-	public void reward(Player player, int eventModifier) {
+	public boolean reward(Player player, int eventModifier) {
 		int randomNum;
 		int chance;
 		chance = (int) (Math.random() * 20) + player.getLuck() + eventModifier + 1;
@@ -134,9 +135,9 @@ public class Event {
 							System.out.println("You don't have enough space to take this item. Dump an item or leave it behind.");
 							continue;
 						}
-						return;
+						return true;
 					case 2:
-						return;
+						return true;
 					case 3:
 						dumpOptions(player);
 					default:
@@ -145,6 +146,7 @@ public class Event {
 				}
 			}
 		}
+		return false;
 	}
 	
 	public void dumpOptions(Player player) {

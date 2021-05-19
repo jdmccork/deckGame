@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import enums.Rarity;
 import enums.Stats;
 import enums.Statuses;
-import enums.Damages;
 
 public class Ship {
 	/**
@@ -35,21 +34,6 @@ public class Ship {
 	private int speed;
 	
 	/**
-	 * The damage types the ship has a resistance to
-	 */
-	private ArrayList<Damages> resistance = new ArrayList<Damages>();
-	
-	/**
-	 * The damage type the ship has a weakness too
-	 */
-	private Damages weakness;
-	
-	/**
-	 * A list of the crew currently hired
-	 */
-	private ArrayList<Crewmate> crew;
-	
-	/**
 	 * The number of dice that are available to roll
 	 */
 	private int strength;
@@ -67,9 +51,7 @@ public class Ship {
 		this.setMaxHealth(health);
 		this.health = health;
 		this.speed = speed;
-		crew = new ArrayList<Crewmate>();
 		this.strength = strength;
-		weakness = Damages.FIRE;
 	}
 	
 	/**
@@ -111,28 +93,6 @@ public class Ship {
 	}
 	
 	/**
-	 * Takes damage and alters the status of this ship, accounting for damage type.
-	 * @param damage the amount of damage this ship takes.
-	 * @param type the type of damage being dealt
-	 */
-	public void damage(int damage, Damages type) {
-		if (type == this.weakness) {
-			damage *= 1.5;
-		}
-		if(this.resistance.contains(type)) {
-			damage /= 1.5;
-		}
-		if (health >= damage) {
-            health -= damage;
-            if (health < maxHealth) {
-            	status = Statuses.DAMAGED;
-            }
-    	} else {
-    		getDestroyed();
-    	}
-    }
-	
-	/**
 	 * Gets the status of this ship.
 	 * @return the status of the ship: destroyed, damaged or repaired
 	 */
@@ -153,6 +113,7 @@ public class Ship {
 	 */
 	public void getDestroyed() {
 		status = Statuses.DESTROYED;
+		health = 0;
 	}
 	
 	/**
@@ -173,42 +134,17 @@ public class Ship {
 	}
 	
 	/**
-	 * Adds a type of damage that this ship can resist
-	 * @param damage the type of damage to add
-	 */
-	public void addResistance(Damages damage) {
-		if (!resistance.contains(damage)) {
-			resistance.add(damage);
-		}
-	}
-	
-	/**
-	 * Removes a type of damage that this ship can resist
-	 * @param damage the type of damage to remove
-	 */
-	public void removeResistance(Damages damage) {
-		resistance.remove(damage);
-	}
-	
-	/**
 	 * Gets the stats of the ship in string form
 	 * @return the string detailing all the stats of this ship
 	 */
-	public String getStats() {
+	public String toString() {
 		String output = "The " + shipName + " has the following stats:\n";
 		output += "Health: " + health + "/" + maxHealth + "\n";
 		output += "Speed: " + speed + "\n";
 		output += "Strength: " + strength + "\n";
 		if (this instanceof Player) {
 			output += "Capacity: " + ((Player) this).getCapacity() + "\n";
-		}else {
-			output += "Capacity: 4\n"; //TODO literally anything with this
 		}
-		String resistances = "";
-		for (Damages damage: resistance) {
-			resistances += damage + ", ";
-		}
-		output += "Resistance: " + resistances.substring(0, resistances.length() - 2) + "\n";
 		return output;
 	}
 	

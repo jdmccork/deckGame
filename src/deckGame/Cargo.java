@@ -3,7 +3,6 @@ package deckGame;
 import enums.ItemType;
 import enums.Rarity;
 import enums.Stats;
-import enums.Damages;
 
 /*
  * We can extend this further and have cargo categories such as animals, foods etc, this would allow us to 
@@ -19,11 +18,6 @@ public class Cargo extends Item{
 	 * The amount by which the cargo modifies a given stat
 	 */
 	private int modifyAmount;
-	
-	/**
-	 * The type of damage that is used when modifying weakness or resistance stats
-	 */
-	private Damages modifyType;
 	
 	/**
 	 * Creates a new instance of cargo which modifies a stat otehr than resistance or damage.
@@ -51,10 +45,9 @@ public class Cargo extends Item{
 	 * @param modifyStat the stat that the cargo will modify
 	 * @param type the type of damage that will be used
 	 */
-	Cargo(String name, String description, int size, int basePrice, Rarity rarity, Stats modifyStat, Damages type) {
+	Cargo(String name, String description, int size, int basePrice, Rarity rarity, Stats modifyStat) {
 		super(name, description, size, basePrice, rarity/*, ItemType.CARGO*/);
 		this.modifyStat = modifyStat;
-		this.modifyType = type;
 		this.modifyAmount = 0;
 	}
 	
@@ -87,10 +80,6 @@ public class Cargo extends Item{
 		if (modifyStat != Stats.NONE) {
 			if (modifyAmount != 0) {
 				output += "\nThis modifies your " + modifyStat + " stat by " + modifyAmount + ".";
-			} else if(modifyStat == Stats.WEAKNESS){
-				output += "\nThis makes " + modifyType + " your weakness.";
-			} else {
-				output += "\nThis adds " + modifyType + "to your resistance types.";
 			}
 		} else {
 			output += "\nThis does not affect any of your stats.";

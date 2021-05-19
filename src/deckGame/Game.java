@@ -17,7 +17,7 @@ public class Game {
 	private int currentDay;
 	private Display display;
 	
-	public void setTestInput() {
+	public static void setTestInput() {
 		userInput = new Scanner(System.in);
 	}
 	

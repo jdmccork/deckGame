@@ -148,11 +148,9 @@ public class Player extends Ship {
 		return luck;
 	}
 	
-	/*
-	public boolean addItem(Card card) {
-		return false;
+	public void modifyLuck(int amount) {
+		luck += amount;
 	}
-	*/
 	
 	/**
 	 * Prints out the number of items in this ship's inventory, 
