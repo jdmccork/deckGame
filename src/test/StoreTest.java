@@ -45,7 +45,7 @@ class StoreTest {
 	void setUp() throws Exception {
 		testOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(testOut));
-		player = new Player("Tester", "Testing ship", 100, 2, 4, 3, 25, islands.get(0));
+		player = new Player("Tester", "Testing ship", 100, 2, 4, 3, 25, 10, islands.get(0));
 		store = new Store(islands.get(0));
 	}
 

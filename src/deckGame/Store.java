@@ -260,7 +260,7 @@ public class Store {
 		boolean complete = false;
 		while (complete == false) {
 			System.out.println(item);
-			System.out.println("1: Sell.");
+			System.out.println("1: Sell for $" + item.getPrice(sellModifier, player.getLocation()));
 			System.out.println("2: Return");
 			switch (Game.getInt()) {
 			case 1:

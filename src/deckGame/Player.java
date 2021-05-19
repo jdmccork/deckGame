@@ -46,6 +46,8 @@ public class Player extends Ship {
 	
 	private int cargoStored;
 	
+	private int crew;
+	
 	/**
 	 * Creates a new player as an extension of the ship class.
 	 * @param userName this player's name
@@ -55,7 +57,7 @@ public class Player extends Ship {
 	 * @param capacity the amount of cargo this player's ship can hold
 	 * @param power the amount of damage this player's ship can do
 	 */
-	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold, Island location) {
+	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold, int crew, Island location) {
 		super(shipName, health, speed, power);
 
 		this.capacity = capacity;
@@ -66,6 +68,8 @@ public class Player extends Ship {
 		inventory = new ArrayList<Cargo>();
 		cards = new ArrayList<Card>();
 		cargoStored = 0;
+		
+		this.crew = crew;
 	}
 
 	/**
@@ -166,6 +170,18 @@ public class Player extends Ship {
 		}
 	}
 	
+	public void printCards() {
+		if(cards.size() == 1) {
+			System.out.println("There is currently " + cards.size() + " item on the ship:");
+		} else {
+			System.out.println("There are currently " + cards.size() + " items on the ship:");
+		}
+		int i = 1;
+		for (Card card: cards) {
+			System.out.println(i++ + ": " + card.getName());
+		}
+	}
+	
 	/**
 	 * Adds the given cargo to this ship's inventory and checks
 	 * if the capacity has not been exceeded.
@@ -213,14 +229,27 @@ public class Player extends Ship {
 	
 	public void viewInventory() {
 		printInventory();
-		System.out.println((getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		System.out.println((inventory.size() + 1) + ": Return\n" + "Select an item or return to continue.");
 		int selection = Game.getInt();
-		if (selection == getInventory().size() + 1) {
+		if (selection == inventory.size() + 1) {
 			return;
-		}else if (selection <= getInventory().size()) {
-			getInventory().get(selection - 1).viewItem();
+		}else if (selection <= inventory.size()) {
+			inventory.get(selection - 1).viewItem();
 		}else {
 			System.out.println("Please enter a number between 1 and " + getInventory().size() + 1 + ".");
+		}
+	}
+	
+	public void viewCards() {
+		printCards();
+		System.out.println((cards.size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		int selection = Game.getInt();
+		if (selection == cards.size() + 1) {
+			return;
+		}else if (selection <= cards.size()) {
+			cards.get(selection - 1).viewItem();
+		}else {
+			System.out.println("Please enter a number between 1 and " + inventory.size() + 1 + ".");
 		}
 	}
 	
@@ -230,6 +259,10 @@ public class Player extends Ship {
 	 */
 	public ArrayList<Cargo> getInventory() {
 		return inventory;
+	}
+	
+	public int getNumCrew() {
+		return crew;
 	}
 
 }

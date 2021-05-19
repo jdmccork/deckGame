@@ -21,3 +21,4 @@ Type: Cargo #Name: Whale Oil #Description: Used to light lanterns. #Size: 2 #Bas
 Type: Card #Name: Snake Eye Chef #Description: Knowing how to make something out of snake eyes is worth it. #Size: 1 #Base Price: 50 #Rarity: COMMON #Variety: multi-transform #Target: 1 #Result: 6 #Requirement: 2
 Type: Cargo #Name: Sail #Description: A triangular sail that the shopkeep swears will make you go faster than your current square one. #Size: 1 #Base Price: 100 #Rarity: UNCOMMON #Stat: SPEED # Stat Amount: 3
 Type: Cargo #Name: Jar of Dirt #Description: I got a jar of dirt, I got a jar of dirt, and guess what's inside it! #Size: 1 #Base Price: 20 #Rarity: RARE
+Type: Card #Name: Cannon #Description: This should help scare off those pesky pirates. Rolling a 1 will give an extra dice. #Size: 1 #Base Price: 50 #Rarity: UNCOMMON #Variety: moreDice #Target: 1 #Result: 1 #Requirement: 1

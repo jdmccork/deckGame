@@ -5,6 +5,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import enums.Statuses;
+
 
 public class Game {
 	private static Game currentGame;
@@ -13,9 +15,7 @@ public class Game {
 	private ArrayList<Island> islands;
 	private int days;
 	private int currentDay;
-	private double priceModifier; //We can add a difficulty setting that will increase this making it harder
-	private Display display = new Display(this);
-	//private ArrayList<Cards> allCards;
+	private Display display;
 	
 	public void setTestInput() {
 		userInput = new Scanner(System.in);
@@ -26,7 +26,7 @@ public class Game {
 	}
 	
 	public void run() {
-		//Display display = new Display();
+		display = new Display(this);
 		boolean playing = true;
 		while(playing == true) {
 			playing = mainMenu();
@@ -38,28 +38,30 @@ public class Game {
 		String[] names = getNames();
 		//select ship to insert into the final 4 values
 		int[] ship = getShip();
-		Player player = new Player(names[0], names[1], ship[0], ship[1], ship[2], ship[3], ship[4], islands.get(0));
+		Player player = new Player(names[0], names[1], ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], islands.get(0));
 		return player;
 	}
 	
 	public int[] getShip() {
-		System.out.println("Select a class:");
-		System.out.println("1: None. A ship which has a balance of all stats.");
-		System.out.println("2: Merchant. A slow moving ship with more cargo space.");
-		System.out.println("3: Warrior.  A slow moving ship with high health and damage.");
-		System.out.println("4: Rouge. A fast ship with lower heath and strength.");
-		switch (getInt()) {
-		//int health, int speed, int capacity, int power, int gold
-		case 1:
-			return new int[] {100, 10, 4, 3, 50};
-		case 2:
-			return new int[] {100, 7, 6, 3, 50};
-		case 3:
-			return new int[] {150, 7, 4, 5, 75};
-		case 4:
-			return new int[] {100, 14, 3, 4, 50};
-		default:
-			return new int[] {100, 10, 6, 3, 50};
+		while (true) {
+			System.out.println("Select a class:");
+			System.out.println("1: None. A ship with 10 crew which has a balance of all stats.");
+			System.out.println("2: Merchant. A slow moving ship with 10 crew that has more cargo space.");
+			System.out.println("3: Warrior.  A slow moving ship with 20 crew that has high health and damage.");
+			System.out.println("4: Rouge. A fast ship with 15 crew that has lower heath and strength.");
+			switch (getInt()) {
+			//int health, int speed, int capacity, int power, int gold, int crew
+			case 1:
+				return new int[] {100, 10, 4, 4, 250, 10};
+			case 2:
+				return new int[] {100, 7, 6, 3, 350, 10};
+			case 3:
+				return new int[] {150, 7, 4, 5, 250, 20};
+			case 4:
+				return new int[] {75, 14, 3, 2, 250, 15};
+			default:
+				System.out.println("Please select a number between 1 and 4.");
+			}
 		}
 	}
 	
@@ -97,17 +99,16 @@ public class Game {
 	        return false;
 	}
 	
-	public ArrayList<Island> generateIslands() {
-		ArrayList<Island> islands = new ArrayList<Island>();
+	public void generateIslands() {
+		islands = new ArrayList<Island>();
 		islands.add(new Island("Home", 0, 0));
 		islands.add(new Island("Golgolles", -10, 5));
 		islands.add(new Island("Cansburg", 5, 5));
 		islands.add(new Island("Tisjour", -5, -5));
 		islands.add(new Island("Brighdown", 5, -5));
-		return islands;
 	}
 	
-	public void generateRoutes(ArrayList<Island> islands) {
+	public void generateAllRoutes(ArrayList<Island> islands) {
 		for (Island island : islands) {
 			island.generateRoutes(islands);
 		}
@@ -142,14 +143,13 @@ public class Game {
 		currentGame = this;
 		Item.generateItems();
 		Store.readAdvice();
-		islands = generateIslands();
-		generateRoutes(islands);
+		generateIslands();
+		generateAllRoutes(islands);
 	}
 	
 	public void sessionSetup() {
-		//temporary
-		priceModifier = 1; // difficulty
 		player = createPlayer();
+		player.addItem(Item.getItem("Snake Eye Chef"));
 		player.getLocation().getStore().generateStock(player);
 		days = getGameLength();
 	}
@@ -196,7 +196,8 @@ public class Game {
 			System.out.println("1: Interact with store");
 			System.out.println("2: Set sail");
 			System.out.println("3: See inventory");
-			System.out.println("4: Return to main menu");
+			System.out.println("4: See deck");
+			System.out.println("5: Return to main menu");
 			
 			switch (getInt()) {
 			case 1:
@@ -210,7 +211,13 @@ public class Game {
 				player.viewInventory();
 				break;
 			case 4:
+				player.viewCards();
+				break;
+			case 5:
 				return;
+			default:
+				System.out.println("Please enter a number between 1 and 5");
+				break;
 			}
 		}
 	}
@@ -257,14 +264,61 @@ public class Game {
 		}
 	}
 	
-	public void selectRoute() {
-		
-		/* 
-		 * Might change this to be similar to the store, you select where you want to go then select the route.
-		 * Should also probably separate it more as it is one of the longest methods
-		 */
-		
+	public boolean chargeRepair() {
+		int healthLost = player.getMaxHealth()-player.getHealth();
+		int cost = (int) (healthLost / 5) + 1;
+		if (player.getGold() < cost & player.getInventory().size() == 0 & player.getCards().size() == 0) {
+			System.out.println("You don't have enough money and no items to sell for the repairs.");
+			throw new EndGameException();
+		}
+		while (true) {
+			System.out.println(
+					"Your ship has sustained " + healthLost + " damage. This will cost $" + cost + " to repair.");
+			System.out.println("1: Pay\n2: Return");
+			switch (Game.getInt()) {
+			case 1:
+				if (player.getGold() >= cost) {
+					player.repair();
+					player.modifyGold(-cost);
+					return true;
+				} else {
+					System.out.println(
+							"You don't have enough money to repair your ship. Sell an item to make some more cash.");
+					return false;
+				}
+			case 2:
+				return false;
+			}
+		}
+	}
+	
+	public boolean payCrew(int time) {
+		int cost = player.getNumCrew() * time;
+
+		while (true) {
+			System.out.println("You must pay your crew $" + cost + " for this route.");
+			System.out.println("You currently have $" + player.getGold() + ".");
+			System.out.println("1: Pay\n2: Return");
+			switch (Game.getInt()) {
+			case 1:
+				if (cost <= player.getGold()) {
+					player.modifyGold(-cost);
+					return true;
+				}else {
+					System.out.println("You don't have enough money to pay your crew for this route. Get more money or select a different route.");
+					return false;
+				}
+			case 2:
+				return false;
+			}
+		}
+	}
+	
+	public void selectRoute() {		
 		int selection;
+		if (player.getStatus() == Statuses.DAMAGED) {
+			chargeRepair();
+		}
 		ArrayList<Route> routes = player.getLocation().getRoutes();
 		while (true) {
 			int index = 1;
@@ -302,6 +356,9 @@ public class Game {
 					default:
 						System.out.println("Please enter the number 1 or 2.");
 					}
+				}
+				if (!payCrew(time)) {
+					return;
 				}
 				player.sail(route);
 				for (int i = 0; i != time & currentDay < days; i++) {
@@ -356,6 +413,10 @@ public class Game {
 	
 	public static Game getGame() {
 		return currentGame;
+	}
+	
+	public ArrayList<Island> getIslands(){
+		return islands;
 	}
 			
 	public static void main(String[] args) {

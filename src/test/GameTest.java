@@ -129,8 +129,8 @@ class GameTest {
 	
 	@Test
 	void testGenerateIslands() {
-		ArrayList<Island> islands = game.generateIslands();
-		assertEquals(islands.size(), 5);
+		game.generateIslands();
+		assertEquals(game.getIslands().size(), 5);
 	}
 
 	@Test
@@ -147,13 +147,13 @@ class GameTest {
 		islands.add(test4);
 		islands.add(test5);
 		
-		game.generateRoutes(islands);
+		game.generateAllRoutes(islands);
 		
 		ArrayList<Route> island1routes = test1.getRoutes();
 		for (Route route: island1routes) {
 			assertTrue(islands.contains(route.getDestination()));
 		}
-		assertEquals(island1routes.size(), 4);
+		assertEquals(4, island1routes.size());
 	}
 
 /*

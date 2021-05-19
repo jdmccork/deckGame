@@ -171,6 +171,10 @@ public abstract class Item {
 							((Card) item).makeMultiTransform(Integer.parseInt(parts.get(index + 3)),
 									Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
 							index += 8;
+						} else if (parts.get(index + 1).equals("moreDice")) {
+							((Card) item).makeDiceAdder(Integer.parseInt(parts.get(index + 3)),
+									Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
+							index += 8;
 						}
 					}
 				}else {
@@ -286,6 +290,15 @@ public abstract class Item {
 		default:
 			return getPrice();
 		}
+	}
+	
+	public static Item getItem(String itemName) {
+		for (Item item: getItems()) {
+			if (item.getName() == itemName) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 }
