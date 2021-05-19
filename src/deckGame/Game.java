@@ -36,8 +36,23 @@ public class Game {
 		userInput.close();
 	}
 	
+	public ArrayList<Island> getIslands() {
+		return this.islands;
+	}
+	
+	public ArrayList<Item> getLogItems() {
+		//TODO
+		return new ArrayList<Item>();
+	}
+	
 	public Game(int testNum) {
-		generateItems();
+		display.updateMainDisplay(5, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(6, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(7, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(8, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(9, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(10, "Bananas", true, true);
+		display.changeBackground("./src/resources/Images/Shop-background.png");
 		userInput = new Scanner(System.in);
 		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
 		generateStore(player.getLocation());
@@ -382,7 +397,7 @@ public class Game {
 			}else if (selection > index | selection < 0) {
 				System.out.println("Please enter a number between 1 and " + index);
 			}else {
-				selection++; // accounts for the index's starting at 0 and not 1
+				selection--; // accounts for the index's starting at 0 and not 1
 				int time = routes.get(selection).getTime(player.getSpeed());
 				if (currentDay + time >= days) {
 					System.out.println("Note, this trip will exceed your remaining time, all items will"
@@ -401,6 +416,7 @@ public class Game {
 				player.sail(routes.get(selection));
 				for (int i = 0; i != time & currentDay < days; i++) {
 					currentDay += 1;
+					display.updateDay(String.valueOf(currentDay));
 					//event()
 				}
 				if (currentDay < days) {

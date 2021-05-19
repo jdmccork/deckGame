@@ -8,6 +8,8 @@ public class Island {
 	 */
 	private Store store;
 	
+	private int displayLocation = 0;
+	
 	/**
 	 * The name of this island.
 	 */
@@ -39,6 +41,10 @@ public class Island {
 		routes = new ArrayList<Route>();
 		locationX = x;
 		locationY = y;
+	}
+	
+	public void setDisplay(int location) {
+		this.displayLocation = location;
 	}
 	
 	/**
@@ -93,6 +99,10 @@ public class Island {
 	
 	public void generateStore(ArrayList<Item> possibleStock, Player player) {
 		store = new Store(islandName, possibleStock, player);
+	}
+	
+	public int getDisplayLocation() {
+		return this.displayLocation;
 	}
 	
 	/**

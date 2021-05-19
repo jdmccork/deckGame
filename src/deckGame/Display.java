@@ -41,9 +41,13 @@ public class Display {
 	private JLabel lblWeaknessStat = new JLabel("Error ");
 	private JLabel lblCapacityStat = new JLabel("Error ");
 	private JTextArea lblResistances = new JTextArea("E \nr \nr \no \nr ");
+	private ImagePanel displayPanel = new ImagePanel(new ImageIcon("./src/resources/Images/sea-background.png").getImage());
 	private JPanel mainDisplayPanel = new JPanel();
-	private ArrayList<JButton> mainDisplays = new ArrayList<JButton>();
+	private ArrayList<ChangingButton> mainDisplays = new ArrayList<ChangingButton>();
 	private Game game;
+	private JPanel dialogPanel = new JPanel();
+	private boolean logOpen = false;
+	private String currentState = "Island";
 
 	/**
 	 * Create the application.
@@ -75,6 +79,11 @@ public class Display {
 	 */
 	public void updateDialogue(String message) {
 		this.outputArea.setText(message);
+	}
+	
+	public void changeBackground(String source) {
+		this.displayPanel.setImage(new ImageIcon(source).getImage());
+		this.dialogPanel.repaint();
 	}
 	
 	/**
@@ -133,48 +142,40 @@ public class Display {
 		updateCapacity(capacity);
 	}
 	
-	/**
-	 * Updates a panel in the main area of the game
-	 * @param index the panel to update (0-14)
-	 * @param image the filename (including path) of the image to input
-	 * @param enabled whether the button should be displayed or not
-	 */
-	public void updateMainDisplay(int index, String image, boolean enabled) {
-		ImageIcon img = new ImageIcon(image); 
-		this.mainDisplays.get(index).setIcon(img);
+	public void updateMainDisplay(int index, String input, boolean enabled, boolean show) {
+		if(input.length() > 0 && input.substring(0,1).equals(".")) {
+			ImageIcon img = new ImageIcon(input);
+			this.mainDisplays.get(index).setIcon(img);
+		} else {
+			this.mainDisplays.get(index).setText(input);
+		}
 		this.mainDisplays.get(index).setEnabled(enabled);
-		this.mainDisplays.get(index).setVisible(enabled);
+		this.mainDisplays.get(index).setVisible(show);
 	}
 	
 	public void updateDisplayFunction(int index, Actions action) {
-		switch(action) {
-		case BUY:
-			this.mainDisplays.get(index).addActionListener(new ActionListener() { 
-				public void actionPerformed(ActionEvent e) { 
-					//This will run a function in game
-				} 
-			} );
+		this.mainDisplays.get(index).setAction(action);
+	}
+	
+	public void setGameState(String s) {
+		this.currentState = s;
+		for (int i = 0; i < 15; i++) {
+			updateMainDisplay(i, "", false, false);
+		}
+		switch(s) {
+		case "Island":
+			changeBackground("./src/resources/Images/IslandBackground.png");
 			break;
-		case SELL:
-			this.mainDisplays.get(index).addActionListener(new ActionListener() { 
-				public void actionPerformed(ActionEvent e) { 
-					//This will run a function in game
-				} 
-			} );
+		case "Sea":
+			changeBackground("./src/resources/Images/ShopBackground.png");
+			ArrayList<Island> islands = new ArrayList<Island>();
+			islands.addAll(game.getIslands());
+			for(Island island : islands) {
+				updateMainDisplay(island.getDisplayLocation(), "./src/resources/Images/Island_2.png", true, true);
+			}
 			break;
-		case SAIL:
-			this.mainDisplays.get(index).addActionListener(new ActionListener() { 
-				public void actionPerformed(ActionEvent e) { 
-					//This will run a function in game
-				} 
-			} );
-			break;
-		case OPEN_LOG:
-			this.mainDisplays.get(index).addActionListener(new ActionListener() { 
-				public void actionPerformed(ActionEvent e) { 
-					//This will run a function in game
-				} 
-			} );
+		case "Store":
+			//openStore();
 			break;
 		}
 	}
@@ -239,7 +240,6 @@ public class Display {
 	 * Creates the dialogue panel at the bottom of the screen
 	 */
 	private void createDialogPanel() {
-		JPanel dialogPanel = new JPanel();
 		dialogPanel.setBounds(0, 700, 1540, 122);
 		dialogPanel.setOpaque(false);
 		dialogPanel.setBorder(BorderFactory.createMatteBorder(15, 0, 0, 0, new ImageIcon("./src/resources/Images/parchment-top.png")));
@@ -271,72 +271,51 @@ public class Display {
 		outputPanel.add(outputArea);
 	}
 	
+	private void openLog() {
+		this.logOpen = true;
+		showLog(0);
+	}
+	
+	private void showLog(int index) {
+		for (int i = 0; i < 15; i++) {
+			updateMainDisplay(i, "", false, false);
+		}
+		ArrayList<Item> items = new ArrayList<Item>();
+		items.addAll(game.getLogItems());
+		for (int reference = 0; reference < 10; reference++) {
+			if(index + reference < items.size()) {
+				updateMainDisplay(reference, items.get(reference).toString(), true, true);
+			}
+			reference++;
+		}
+		if (index == 0) {
+			updateMainDisplay(11, "Previous Page", false, true);
+		} else {
+			updateMainDisplay(11, "Previous Page", true, true);
+		}
+		if (items.size() > index + 10) {
+			updateMainDisplay(13, "Next Page", true, true);
+		} else {
+			updateMainDisplay(13, "Next Page", false, true);
+		}
+	}
+	
+	private void closeLog() {
+		this.logOpen = false;
+		setGameState(currentState);
+	}
+	
 	/**
 	 * Fills in the main display area of the game
 	 */
 	private void fillMainDisplay() {
-		JButton btnShow0_0 = new JButton("");
-		mainDisplayPanel.add(btnShow0_0);
-		mainDisplays.add(btnShow0_0);
+		for(int i=0; i < 15; i++) {
+			ChangingButton temp_button = new ChangingButton("", this.game);
+			mainDisplayPanel.add(temp_button);
+			mainDisplays.add(temp_button);
+		}
 		
-		
-		JButton btnShow0_1 = new JButton("");
-		mainDisplayPanel.add(btnShow0_1);
-		mainDisplays.add(btnShow0_1);
-		
-		JButton btnShow0_2 = new JButton("");
-		mainDisplayPanel.add(btnShow0_2);
-		mainDisplays.add(btnShow0_2);
-		
-		JButton btnShow0_3 = new JButton("");
-		mainDisplayPanel.add(btnShow0_3);
-		mainDisplays.add(btnShow0_3);
-		
-		JButton btnShow0_4 = new JButton("");
-		mainDisplayPanel.add(btnShow0_4);
-		mainDisplays.add(btnShow0_4);
-		
-		JButton btnShow1_0 = new JButton("");
-		mainDisplayPanel.add(btnShow1_0);
-		mainDisplays.add(btnShow1_0);
-		
-		JButton btnShow1_1 = new JButton("");
-		mainDisplayPanel.add(btnShow1_1);
-		mainDisplays.add(btnShow1_1);
-		
-		JButton btnShow1_2 = new JButton("");
-		mainDisplayPanel.add(btnShow1_2);
-		mainDisplays.add(btnShow1_2);
-		
-		JButton btnShow1_3 = new JButton("");
-		mainDisplayPanel.add(btnShow1_3);
-		mainDisplays.add(btnShow1_3);
-		
-		JButton btnShow1_4 = new JButton("");
-		mainDisplayPanel.add(btnShow1_4);
-		mainDisplays.add(btnShow1_4);
-		
-		JButton btnShow2_0 = new JButton("");
-		mainDisplayPanel.add(btnShow2_0);
-		mainDisplays.add(btnShow2_0);
-		
-		JButton btnShow2_1 = new JButton("");
-		mainDisplayPanel.add(btnShow2_1);
-		mainDisplays.add(btnShow2_1);
-		
-		JButton btnShow2_2 = new JButton("");
-		mainDisplayPanel.add(btnShow2_2);
-		mainDisplays.add(btnShow2_2);
-		
-		JButton btnShow2_3 = new JButton("");
-		mainDisplayPanel.add(btnShow2_3);
-		mainDisplays.add(btnShow2_3);
-		
-		JButton btnShow2_4 = new JButton("");
-		mainDisplayPanel.add(btnShow2_4);
-		mainDisplays.add(btnShow2_4);
-		
-		for(JButton display : mainDisplays) {
+		for(ChangingButton display : mainDisplays) {
 			display.setFocusPainted(false);
 			display.setMargin(new Insets(0, 0, 0, 0));
 			display.setContentAreaFilled(false);
@@ -363,7 +342,6 @@ public class Display {
 		
 		createDialogPanel();
 		
-		JPanel displayPanel = new ImagePanel(new ImageIcon("./src/resources/Images/sea-background.png").getImage());
 		displayPanel.setBounds(0, 0, 1540, 715);
 		displayPanel.setBackground(Color.decode("#A2E2F2"));
 		frmDeckgame.getContentPane().add(displayPanel);
@@ -396,7 +374,23 @@ public class Display {
 		
 		displayPanel.setLayout(gl_displayPanel);
 		
-		JLabel openLog = new JLabel(new ImageIcon("./src/resources/Images/captains_log.png"));
+		JButton openLog = new JButton(new ImageIcon("./src/resources/Images/captains_log.png"));
+		openLog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				if (!logOpen) {
+					openLog();
+				} else {
+					closeLog();
+				}
+			} 
+		});
+		openLog.setFocusPainted(false);
+		openLog.setMargin(new Insets(0, 0, 0, 0));
+		openLog.setContentAreaFilled(false);
+		openLog.setBorderPainted(false);
+		openLog.setOpaque(false);
+		openLog.setBorder(new EmptyBorder(0,0,0,0));
+		openLog.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 		statsPanel.setBackground(Color.decode("#F0DD8D"));
 		statsPanel.setBounds(0, 0, 300, 300);
