@@ -41,13 +41,14 @@ public class Display {
 	private JLabel lblWeaknessStat = new JLabel("Error ");
 	private JLabel lblCapacityStat = new JLabel("Error ");
 	private JTextArea lblResistances = new JTextArea("E \nr \nr \no \nr ");
-	private ImagePanel displayPanel = new ImagePanel(new ImageIcon("./src/resources/Images/sea-background.png").getImage());
+	private ImagePanel displayPanel = new ImagePanel(new ImageIcon("./src/resources/Images/SeaBackground.png").getImage());
 	private JPanel mainDisplayPanel = new JPanel();
 	private ArrayList<ChangingButton> mainDisplays = new ArrayList<ChangingButton>();
 	private Game game;
 	private JPanel dialogPanel = new JPanel();
 	private boolean logOpen = false;
 	private String currentState = "Island";
+	private int currentPage = 0;
 
 	/**
 	 * Create the application.
@@ -157,6 +158,10 @@ public class Display {
 		this.mainDisplays.get(index).setAction(action);
 	}
 	
+	public void openStore() {
+		
+	}
+	
 	public void setGameState(String s) {
 		this.currentState = s;
 		for (int i = 0; i < 15; i++) {
@@ -165,16 +170,18 @@ public class Display {
 		switch(s) {
 		case "Island":
 			changeBackground("./src/resources/Images/IslandBackground.png");
+			//Implement Island button creation
 			break;
 		case "Sea":
-			changeBackground("./src/resources/Images/ShopBackground.png");
+			changeBackground("./src/resources/Images/SeaBackground.png");
 			ArrayList<Island> islands = new ArrayList<Island>();
 			islands.addAll(game.getIslands());
 			for(Island island : islands) {
-				updateMainDisplay(island.getDisplayLocation(), "./src/resources/Images/Island_2.png", true, true);
+				updateMainDisplay(island.getDisplayLocation(), "./src/resources/Images/Island.png", true, true);
 			}
 			break;
 		case "Store":
+			changeBackground("./src/resources/Images/ShopBackground.png");
 			//openStore();
 			break;
 		}
@@ -189,7 +196,7 @@ public class Display {
 		statsPanel.add(lblPanelTitle, "cell 2 0 2 1, alignx center, aligny center");
 		
 		JLabel lblStatsDivider = new JLabel();
-		lblStatsDivider.setIcon(new ImageIcon(new ImageIcon("./src/resources/Images/parchment-divider-horizontal.png").getImage().getScaledInstance(90, 15, Image.SCALE_DEFAULT)));
+		lblStatsDivider.setIcon(new ImageIcon(new ImageIcon("./src/resources/Images/ParchmentDividerHorizontal.png").getImage().getScaledInstance(90, 15, Image.SCALE_DEFAULT)));
 		statsPanel.add(lblStatsDivider, "cell 2 1 2 1,alignx center,aligny center");
 		
 		JLabel lblAnnounceHealth = new JLabel("Health:");
@@ -242,7 +249,7 @@ public class Display {
 	private void createDialogPanel() {
 		dialogPanel.setBounds(0, 700, 1540, 122);
 		dialogPanel.setOpaque(false);
-		dialogPanel.setBorder(BorderFactory.createMatteBorder(15, 0, 0, 0, new ImageIcon("./src/resources/Images/parchment-top.png")));
+		dialogPanel.setBorder(BorderFactory.createMatteBorder(15, 0, 0, 0, new ImageIcon("./src/resources/Images/ParchmentTop.png")));
 		frmDeckgame.getContentPane().add(dialogPanel);
 		dialogPanel.setLayout(null);
 		
@@ -261,7 +268,7 @@ public class Display {
 		JPanel outputPanel = new JPanel();
 		outputPanel.setBackground(Color.decode("#F0DD8D"));
 		outputPanel.setBounds(200, 15, 1340, 107);
-		outputPanel.setBorder(BorderFactory.createMatteBorder(0, 15, 0, 0, new ImageIcon("./src/resources/Images/parchment-divider-vertical.png")));
+		outputPanel.setBorder(BorderFactory.createMatteBorder(0, 15, 0, 0, new ImageIcon("./src/resources/Images/ParchmentDividerVertical.png")));
 		dialogPanel.add(outputPanel);
 			
 		outputArea.setFont(new Font("Lucida Handwriting", Font.PLAIN, 18));
@@ -273,27 +280,36 @@ public class Display {
 	
 	private void openLog() {
 		this.logOpen = true;
-		showLog(0);
+		changeBackground("./src/resources/Images/LogBackground.png");
+		//TODO update background sprite for log
+		this.statsPanel.setVisible(false);
+		showLog();
 	}
 	
-	private void showLog(int index) {
+	public void changeCurrentPage(int change) {
+		this.currentPage += change;
+	}
+	
+	public void showLog() {
 		for (int i = 0; i < 15; i++) {
 			updateMainDisplay(i, "", false, false);
 		}
 		ArrayList<Item> items = new ArrayList<Item>();
 		items.addAll(game.getLogItems());
 		for (int reference = 0; reference < 10; reference++) {
-			if(index + reference < items.size()) {
+			if(this.currentPage * 10 + reference < items.size()) {
 				updateMainDisplay(reference, items.get(reference).toString(), true, true);
 			}
 			reference++;
 		}
-		if (index == 0) {
+		updateDisplayFunction(11, Actions.LOG_PREV);
+		updateDisplayFunction(13, Actions.LOG_NEXT);
+		if (this.currentPage == 0) {
 			updateMainDisplay(11, "Previous Page", false, true);
 		} else {
 			updateMainDisplay(11, "Previous Page", true, true);
 		}
-		if (items.size() > index + 10) {
+		if (items.size() > this.currentPage * 10 + 10) {
 			updateMainDisplay(13, "Next Page", true, true);
 		} else {
 			updateMainDisplay(13, "Next Page", false, true);
@@ -303,6 +319,8 @@ public class Display {
 	private void closeLog() {
 		this.logOpen = false;
 		setGameState(currentState);
+		this.statsPanel.setVisible(true);
+		this.currentPage = 0;
 	}
 	
 	/**
@@ -310,7 +328,7 @@ public class Display {
 	 */
 	private void fillMainDisplay() {
 		for(int i=0; i < 15; i++) {
-			ChangingButton temp_button = new ChangingButton("", this.game);
+			ChangingButton temp_button = new ChangingButton("", this);
 			mainDisplayPanel.add(temp_button);
 			mainDisplays.add(temp_button);
 		}
@@ -324,6 +342,8 @@ public class Display {
 			display.setBorder(new EmptyBorder(0,0,0,0));
 			display.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			display.setEnabled(false);
+			display.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+			display.setForeground(Color.WHITE);
 		}
 	}
 	
@@ -374,7 +394,7 @@ public class Display {
 		
 		displayPanel.setLayout(gl_displayPanel);
 		
-		JButton openLog = new JButton(new ImageIcon("./src/resources/Images/captains_log.png"));
+		JButton openLog = new JButton(new ImageIcon("./src/resources/Images/CaptainsLog.png"));
 		openLog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				if (!logOpen) {

@@ -10,20 +10,28 @@ import enums.Actions;
 public class ChangingButton extends JButton {
 	private Actions action;
 	private int value;
-	ChangingButton(String s, Game game) {
+	ChangingButton(String s, Display display) {
 		super(s);
 		this.action = Actions.NONE;
 		this.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) { 
 				switch(action) {
 				case SELL:
-					//game.sellItem(this.value);
+					//display.game.sellItem(this.value);
 					break;
 				case BUY:
-					//game.buyItem(this.value);
+					//display.game.buyItem(this.value);
 					break;
 				case SAIL:
-					//game.selectRoute(this.value);
+					//display.game.selectRoute(this.value);
+					break;
+				case LOG_NEXT:
+					display.changeCurrentPage(1);
+					display.showLog();
+					break;
+				case LOG_PREV:
+					display.changeCurrentPage(-1);
+					display.showLog();
 					break;
 				case NONE:
 					break;

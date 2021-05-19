@@ -52,7 +52,7 @@ public class Game {
 		display.updateMainDisplay(8, "./src/resources/Images/Crate.png", true, true);
 		display.updateMainDisplay(9, "./src/resources/Images/Crate.png", true, true);
 		display.updateMainDisplay(10, "Bananas", true, true);
-		display.changeBackground("./src/resources/Images/Shop-background.png");
+		display.setGameState("Sea");
 		userInput = new Scanner(System.in);
 		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
 		generateStore(player.getLocation());
