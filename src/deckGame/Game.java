@@ -39,59 +39,60 @@ public class Game {
 		return new ArrayList<Item>();
 	}
 	
-	public Player createPlayer() {
-		String[] names = getNames();
+	public Game(int testNum) {
+		display.updateMainDisplay(5, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(6, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(7, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(8, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(9, "./src/resources/Images/Crate.png", true, true);
+		display.updateMainDisplay(10, "Bananas", true, true);
+		display.setGameState("Sea");
+		userInput = new Scanner(System.in);
+		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
+		generateStore(player.getLocation());
+		priceModifier = 1;
+		islands = generateIslands();
+		generateRoutes(islands);
+		days = 25;
+		play();
+		userInput.close();	
+	}
+
+	public Player createPlayer(String userName, String shipName, String shipType) {
 		//select ship to insert into the final 4 values
-		int[] ship = getShip();
-		Player player = new Player(names[0], names[1], ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], islands.get(0));
+		int[] ship = getShip(shipType);
+		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], islands.get(0));
 		return player;
 	}
 	
-	public int[] getShip() {
-		while (true) {
-			System.out.println("Select a class:");
-			System.out.println("1: None. A ship with 10 crew which has a balance of all stats.");
-			System.out.println("2: Merchant. A slow moving ship with 10 crew that has more cargo space.");
-			System.out.println("3: Warrior.  A slow moving ship with 20 crew that has high health and damage.");
-			System.out.println("4: Rouge. A fast ship with 15 crew that has lower heath and strength.");
-			switch (getInt()) {
-			//int health, int speed, int capacity, int power, int gold, int crew
-			case 1:
-				return new int[] {100, 10, 4, 4, 250, 10};
-			case 2:
-				return new int[] {100, 7, 6, 3, 350, 10};
-			case 3:
-				return new int[] {150, 7, 4, 5, 250, 20};
-			case 4:
-				return new int[] {75, 14, 3, 2, 250, 15};
-			default:
-				System.out.println("Please select a number between 1 and 4.");
-			}
+	public int[] getShip(String shipType) {
+		int[] output;
+		switch (shipType) {
+		//int health, int speed, int capacity, int power, int gold, int crew
+		case "2":
+			output = new int[] {100, 7, 6, 3, 350, 10};
+		case "3":
+			output = new int[] {150, 7, 4, 5, 250, 20};
+		case "4":
+			output = new int[] {75, 14, 3, 2, 250, 15};
+		default:
+			output = new int[] {100, 10, 4, 4, 250, 10};
 		}
+		return output;
 	}
 	
-	public String[] getNames() {
-		String userName = null;
-		do {
-			if (userName != null) {
-				if (hasSpecial(userName)) {
-					System.out.println("Username must not contain digits or special characters.");
-				}else {
-					System.out.println("Length of username must be between 3 and 15 characters.");
-				}
+	public boolean getNames(String userName, String shipName) {
+		if (userName != null) {
+			if (hasSpecial(userName)) {
+				return false;
+			}else if (userName.length() < 3 | userName.length() > 15){
+				return false;
 			}
-			System.out.print("Enter username: Captain ");
-			userName = userInput.nextLine();
-		}while (userName.length() < 3 | userName.length() > 15 | hasSpecial(userName));
-		String shipName;
-		do {
-			System.out.print("Enter your ship's name: ");
-			shipName = userInput.nextLine();
-			if (shipName.length() < 3 | shipName.length() > 15) {
-				System.out.println("Length of your ships name must be between 3 and 15 characters.");
-			}
-		} while (shipName.length() < 3 | shipName.length() > 15);
-		return new String[] {userName, shipName};
+		}
+		if (shipName.length() < 3 | shipName.length() > 15) {
+			return false;
+		}
+		return true;
 	}
 	
 	public boolean hasSpecial(String string) {
@@ -106,11 +107,11 @@ public class Game {
 	
 	public void generateIslands() {
 		islands = new ArrayList<Island>();
-		islands.add(new Island("Home", 0, 0));
-		islands.add(new Island("Golgolles", -10, 5));
-		islands.add(new Island("Cansburg", 5, 5));
-		islands.add(new Island("Tisjour", -5, -5));
-		islands.add(new Island("Brighdown", 5, -5));
+		islands.add(new Island("Home", 0, 0, 7));
+		islands.add(new Island("Golgolles", -10, 5, 0));
+		islands.add(new Island("Cansburg", 5, 5, 3));
+		islands.add(new Island("Tisjour", -5, -5, 11));
+		islands.add(new Island("Brighdown", 5, -5, 13));
 	}
 	
 	public void generateAllRoutes(ArrayList<Island> islands) {
@@ -152,11 +153,11 @@ public class Game {
 		generateAllRoutes(islands);
 	}
 	
-	public void sessionSetup() {
-		player = createPlayer();
+	public void sessionSetup(String userName, String shipName, int duration, String ship) {
+		player = createPlayer(userName, shipName, ship);
 		player.addItem(Item.getItem("Snake Eye Chef"));
 		player.getLocation().getStore().generateStock(player);
-		days = getGameLength();
+		days = duration;
 	}
 	
 	public boolean mainMenu(){
@@ -168,8 +169,6 @@ public class Game {
 				System.out.println("2: Quit");
 				selection = getInt();
 				if (selection == 1) {
-					sessionSetup();
-					welcome(player);
 					play();
 				} else if (selection == 2) {
 					System.out.println("Thanks for playing. Goodbye.");

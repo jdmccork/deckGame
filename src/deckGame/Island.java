@@ -36,16 +36,21 @@ public class Island {
 	 * @param x the x co-ordinate of this island's position
 	 * @param y the y co-ordinate of this island's position
 	 */
-	public Island(String name, int x, int y) {
+	public Island(String name, int x, int y, int location) {
 		this.islandName = name;
 		routes = new ArrayList<Route>();
 		locationX = x;
 		locationY = y;
+		setDisplay(location);
 		generateStore();
 	}
 	
 	public void setDisplay(int location) {
 		this.displayLocation = location;
+	}
+	
+	public int getDisplay() {
+		return this.displayLocation;
 	}
 	
 	/**
@@ -103,10 +108,6 @@ public class Island {
 	
 	public void generateStore() {
 		store = new Store(this);
-	}
-	
-	public int getDisplayLocation() {
-		return this.displayLocation;
 	}
 	
 	/**
