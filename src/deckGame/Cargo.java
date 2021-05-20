@@ -71,6 +71,10 @@ public class Cargo extends Item{
 	public Stats getModifyStat(){
 		return modifyStat;
 	}
+	
+	public ItemType getType() {
+		return ItemType.CARGO;
+	}
 
 	/**
 	 * Gets the amount by which this cargo modifies a stat
