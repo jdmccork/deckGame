@@ -112,11 +112,13 @@ public abstract class Item {
 		return basePrice;
 	}
 	
+	public abstract ItemType getType();
+	
 	/**
 	 * Gets the description of this item
 	 * @return this item's description
 	 */
-	public String getDesription() {
+	public String getDescription() {
 		return description;
 	}
 	

@@ -3,6 +3,7 @@ package deckGame;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import enums.ItemType;
 import enums.Rarity;
 
 public class Card extends Item {
@@ -16,6 +17,10 @@ public class Card extends Item {
 	public Card(String tempName, String tempDescription, int tempSize, int tempBasePrice, Rarity tempRarity) {
 		// TODO Auto-generated constructor stub
 		super(tempName, tempDescription, tempSize, tempBasePrice, tempRarity);
+	}
+	
+	public ItemType getType() {
+		return ItemType.CARD;
 	}
 	
 	public void makeTransform(int target, int result) {

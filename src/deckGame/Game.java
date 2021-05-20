@@ -38,25 +38,6 @@ public class Game {
 		//TODO
 		return new ArrayList<Item>();
 	}
-	
-	public Game(int testNum) {
-		display.updateMainDisplay(5, "./src/resources/Images/Crate.png", true, true);
-		display.updateMainDisplay(6, "./src/resources/Images/Crate.png", true, true);
-		display.updateMainDisplay(7, "./src/resources/Images/Crate.png", true, true);
-		display.updateMainDisplay(8, "./src/resources/Images/Crate.png", true, true);
-		display.updateMainDisplay(9, "./src/resources/Images/Crate.png", true, true);
-		display.updateMainDisplay(10, "Bananas", true, true);
-		display.setGameState("Sea");
-		userInput = new Scanner(System.in);
-		player = new Player("Tester", "The void", 100, 2, 4, 3, 25);
-		generateStore(player.getLocation());
-		priceModifier = 1;
-		islands = generateIslands();
-		generateRoutes(islands);
-		days = 25;
-		play();
-		userInput.close();	
-	}
 
 	public Player createPlayer(String userName, String shipName, String shipType) {
 		//select ship to insert into the final 4 values
