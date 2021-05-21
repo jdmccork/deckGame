@@ -62,18 +62,18 @@ public class Game {
 		return output;
 	}
 	
-	public boolean getNames(String userName, String shipName) {
+	public String getNames(String userName, String shipName) {
 		if (userName != null) {
 			if (hasSpecial(userName)) {
-				return false;
+				return "Special";
 			}else if (userName.length() < 3 | userName.length() > 15){
-				return false;
+				return "Length";
 			}
 		}
 		if (shipName.length() < 3 | shipName.length() > 15) {
-			return false;
+			return "Length";
 		}
-		return true;
+		return "Good";
 	}
 	
 	public boolean hasSpecial(String string) {

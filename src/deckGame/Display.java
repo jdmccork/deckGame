@@ -496,12 +496,12 @@ public class Display {
 		frmMenu.getContentPane().setLayout(null);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(108, 10, 378, 453);
+		panel.setBounds(10, 10, 476, 453);
 		frmMenu.getContentPane().add(panel);
 		panel.setLayout(null);
 		
 		JLabel lblTitle = new JLabel("Welcome to DeckGame");
-		lblTitle.setBounds(90, 10, 134, 20);
+		lblTitle.setBounds(193, 10, 131, 20);
 		panel.add(lblTitle);
 		
 		JTextField userName = new JTextField();
@@ -527,24 +527,26 @@ public class Display {
 		info.add(lblShipName);
 		
 		JSlider duration = new JSlider(JSlider.HORIZONTAL, 20, 50, 20);
-		duration.setBounds(78, 188, 137, 20);
+		duration.setBounds(187, 188, 137, 44);
 		duration.setMajorTickSpacing(10);
 		duration.setMinorTickSpacing(1);
+		duration.setPaintTicks(true);
+		duration.setPaintLabels(true);
 		panel.add(duration);
 		info.add(duration);
 		
-		JLabel lblDuration = new JLabel("Duration:");
-		lblDuration.setBounds(126, 165, 89, 13);
+		JLabel lblDuration = new JLabel("Duration (Days):");
+		lblDuration.setBounds(214, 167, 89, 13);
 		panel.add(lblDuration);
 		info.add(lblDuration);
 		
 		JLabel lblShipType = new JLabel("Ship Class:");
-		lblShipType.setBounds(119, 218, 74, 13);
+		lblShipType.setBounds(229, 242, 74, 13);
 		panel.add(lblShipType);
 		info.add(lblShipType);
 		
 		JRadioButton rdbtnShip1 = new JRadioButton("Sloop");
-		rdbtnShip1.setBounds(90, 247, 103, 21);
+		rdbtnShip1.setBounds(200, 261, 103, 21);
 		rdbtnShip1.setActionCommand("1");
 		rdbtnShip1.setToolTipText("A ship with 10 crew which has a balance of all stats.");
 		rdbtnShip1.setSelected(true);
@@ -552,21 +554,21 @@ public class Display {
 		info.add(rdbtnShip1);
 		
 		JRadioButton rdbtnShip2 = new JRadioButton("Brig");
-		rdbtnShip2.setBounds(90, 270, 103, 21);
+		rdbtnShip2.setBounds(200, 284, 103, 21);
 		rdbtnShip2.setActionCommand("2");
 		rdbtnShip2.setToolTipText("A slow moving ship with 10 crew that has more cargo space.");
 		panel.add(rdbtnShip2);
 		info.add(rdbtnShip2);
 		
 		JRadioButton rdbtnShip3 = new JRadioButton("Frigate");
-		rdbtnShip3.setBounds(90, 293, 103, 21);
+		rdbtnShip3.setBounds(200, 307, 103, 21);
 		rdbtnShip3.setActionCommand("3");
 		rdbtnShip3.setToolTipText("A slow moving ship with 20 crew that has high health and damage.");
 		panel.add(rdbtnShip3);
 		info.add(rdbtnShip3);
 		
 		JRadioButton rdbtnShip4 = new JRadioButton("Clipper");
-		rdbtnShip4.setBounds(90, 316, 103, 21);
+		rdbtnShip4.setBounds(200, 330, 103, 21);
 		rdbtnShip4.setActionCommand("4");
 		rdbtnShip4.setToolTipText("A fast ship with 15 crew that has lower heath and strength.");
 		panel.add(rdbtnShip4);
@@ -579,29 +581,33 @@ public class Display {
 		group.add(rdbtnShip4);
 		
 		JLabel lblError1 = new JLabel("No special symbols.");
-		lblError1.setBounds(242, 112, 126, 13);
+		lblError1.setBounds(242, 126, 126, 13);
 		panel.add(lblError1);
 		lblError1.setVisible(false);
 		
 		JLabel lblError2 = new JLabel("Must be between 3 and 15 characters.");
-		lblError2.setBounds(242, 141, 126, 13);
+		lblError2.setBounds(242, 126, 224, 13);
 		panel.add(lblError2);
 		lblError2.setVisible(false);
 		
 		JButton btnSubmit = new JButton("Submit");
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(game.getNames(userName.getText(), shipName.getText())) {
+				String result = game.getNames(userName.getText(), shipName.getText());
+				if(result == "Good") {
 					game.sessionSetup(userName.getText(), shipName.getText(), duration.getValue(), group.getSelection().getActionCommand());
 					initialize();
 					frmMenu.dispose();
-				}else {
+				}else if(result == "Special") {
 					lblError1.setVisible(true);
+					lblError2.setVisible(false);
+				}else {
+					lblError1.setVisible(false);
 					lblError2.setVisible(true);
 				}
 			}
 		});
-		btnSubmit.setBounds(93, 369, 100, 21);
+		btnSubmit.setBounds(203, 385, 100, 21);
 		panel.add(btnSubmit);
 		info.add(btnSubmit);
 		
@@ -610,7 +616,7 @@ public class Display {
 		}
 		
 		JButton btnNewGame = new JButton("New Game");
-		btnNewGame.setBounds(97, 58, 96, 21);
+		btnNewGame.setBounds(200, 58, 96, 21);
 		btnNewGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(JComponent component : info) {
