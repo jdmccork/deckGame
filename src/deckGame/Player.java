@@ -48,6 +48,8 @@ public class Player extends Ship {
 	
 	private int crew;
 	
+	private Logbook logbook;
+	
 	/**
 	 * Creates a new player as an extension of the ship class.
 	 * @param userName this player's name
@@ -64,12 +66,12 @@ public class Player extends Ship {
 		this.location = location;
 		this.gold = gold;
 		this.userName = userName;
+		this.crew = crew;
 		luck = 0;
 		inventory = new ArrayList<Cargo>();
 		cards = new ArrayList<Card>();
 		cargoStored = 0;
-		
-		this.crew = crew;
+		logbook = new Logbook();
 	}
 
 	/**
@@ -170,9 +172,9 @@ public class Player extends Ship {
 	
 	public void printCards() {
 		if(cards.size() == 1) {
-			System.out.println("There is currently " + cards.size() + " item on the ship:");
+			System.out.println("There is currently " + cards.size() + " card in your deck:");
 		} else {
-			System.out.println("There are currently " + cards.size() + " items on the ship:");
+			System.out.println("There are currently " + cards.size() + " cards in your deck:");
 		}
 		int i = 1;
 		for (Card card: cards) {
@@ -261,6 +263,14 @@ public class Player extends Ship {
 	
 	public int getNumCrew() {
 		return crew;
+	}
+	
+	public Logbook getLogbook() {
+		return logbook;
+	}
+	
+	public int getCargoStored() {
+		return cargoStored;
 	}
 
 }

@@ -432,11 +432,11 @@ public class Display {
 	
 	public void showLog() {
 		clearButtons();
-		ArrayList<Item> items = new ArrayList<Item>();
-		items.addAll(game.getLogItems());
+		ArrayList<Entry> entries = new ArrayList<Entry>();
+		entries.addAll(game.getLogItems());
 		for (int reference = 0; reference < 10; reference++) {
-			if(this.currentLogPage * 10 + reference < items.size()) {
-				updateMainDisplay(reference, items.get(reference).toString(), true, true);
+			if(this.currentLogPage * 10 + reference < entries.size()) {
+				updateMainDisplay(reference, entries.get(reference).toString(), true, true);
 			}
 			reference++;
 		}
@@ -447,7 +447,7 @@ public class Display {
 		} else {
 			updateMainDisplay(11, "Previous Page", true, true);
 		}
-		if (items.size() > this.currentLogPage * 10 + 10) {
+		if (entries.size() > this.currentLogPage * 10 + 10) {
 			updateMainDisplay(13, "Next Page", true, true);
 		} else {
 			updateMainDisplay(13, "Next Page", false, true);

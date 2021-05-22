@@ -17,7 +17,7 @@ import deckGame.Player;
 import deckGame.Store;
 
 class StoreTest {
-	private int expectedAdviceCount = 5;
+	private int expectedAdviceCount = 6;
 	static ArrayList<Island> islands = new ArrayList<Island>();
 	private Player player;
 	private Store store;
@@ -34,11 +34,11 @@ class StoreTest {
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		Item.generateItems();
-		islands.add(new Island("Home", 0, 0));
-		islands.add(new Island("Golgolles", -10, 5));
-		islands.add(new Island("Cansburg", 5, 5));
-		islands.add(new Island("Tisjour", -5, -5));
-		islands.add(new Island("Brighdown", 5, -5));
+		islands.add(new Island("Home", 0, 0, 0));
+		islands.add(new Island("Golgolles", -10, 5, 0));
+		islands.add(new Island("Cansburg", 5, 5, 0));
+		islands.add(new Island("Tisjour", -5, -5, 0));
+		islands.add(new Island("Brighdown", 5, -5, 0));
 	}
 
 	@BeforeEach
@@ -84,6 +84,6 @@ class StoreTest {
 	@Test
 	void getAdviceTest() {
 		Store.readAdvice();
-		assertEquals(Store.getAdvice().size(), expectedAdviceCount);
+		assertEquals(expectedAdviceCount, Store.getAdvice().size());
 	}
 }

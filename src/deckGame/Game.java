@@ -34,9 +34,9 @@ public class Game {
 		userInput.close();
 	}
 	
-	public ArrayList<Item> getLogItems() {
+	public ArrayList<Entry> getLogItems() {
 		//TODO
-		return new ArrayList<Item>();
+		return player.getLogbook().getEntries();
 	}
 
 	public Player createPlayer(String userName, String shipName, String shipType) {
@@ -129,7 +129,7 @@ public class Game {
 		userInput = new Scanner(System.in);
 		currentGame = this;
 		Item.generateItems();
-		Store.readAdvice();
+		//Store.readAdvice();
 		generateIslands();
 		generateAllRoutes(islands);
 	}
@@ -206,36 +206,7 @@ public class Game {
 			}
 		}
 	}
-/*
-	public void viewItem(Item item, double priceModifier, String option) {
-		System.out.println(item);
-		if (option == "Buy") {
-			System.out.println("The " + item.getName() + " will cost $" + item.getPrice(priceModifier));
-		} else {
-			System.out.println("You will recive $" + item.getPrice(priceModifier) + " for the " + item.getName() + ".");
-		}
-		System.out.println("You currently have $" + player.getGold());
-		System.out.println("Select an option to continue");
-		System.out.println("1: " + option);
-		System.out.println("2: Return to shop");
-		while (true) {
-			switch (getInt()) {
-			case 1:
-				if (option == "Buy") {
-					purchaseItem(item, priceModifier);
-				}else {
-					sellItem(item, priceModifier);
-				}
-				return;
-			case 2:
-				return;
-			default:
-				System.out.println("Please enter a number between 1 and 2");
-				break;
-			}
-		}
-	}
-*/
+
 	public static int getInt(){
 		while(true) {
 			try {
@@ -265,6 +236,11 @@ public class Game {
 				if (player.getGold() >= cost) {
 					player.repair();
 					player.modifyGold(-cost);
+					Entry entry = new Entry();
+					entry.addDamage(-healthLost);
+					entry.makeEvent("Repaired ship");
+					entry.addCost(cost);
+					player.getLogbook().addEntry(entry);
 					return true;
 				} else {
 					System.out.println(
@@ -288,6 +264,10 @@ public class Game {
 			case 1:
 				if (cost <= player.getGold()) {
 					player.modifyGold(-cost);
+					Entry entry = new Entry();
+					entry.makeEvent("Payed crew");
+					entry.addCost(cost);
+					player.getLogbook().addEntry(entry);
 					return true;
 				}else {
 					System.out.println("You don't have enough money to pay your crew for this route. Get more money or select a different route.");

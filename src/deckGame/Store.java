@@ -218,16 +218,19 @@ public class Store {
 	
 	public boolean buyItem(Item item, Player player) {
 		int price = item.getPrice(buyModifier, player.getLocation());
-		if (player.getGold() >= price & player.getInventory().size() < player.getCapacity()) {
-			if (item instanceof Cargo) {
-				player.addItem((Cargo) item);
-				item.setLocationPurchased(location);
-			}else {
-				//player.addItem((Card) item);
+		if (player.getGold() >= price) {
+			if (!player.addItem(item)) {
+				System.out.println("Your ship currently has " + player.getCargoStored() + "/" + player.getCapacity()   
+				+ " items. Upgrade your ship or sell an item to purchace this item.");
+				return false;
 			}
 			player.modifyGold(-price);
 			removeStock(item);
 			System.out.println("Purchase successful. " + item.getName() + " has been added to your ship");
+			Entry entry = new Entry();
+			entry.makeTransaction(item, "Bought ");
+			entry.addCost(price);
+			player.getLogbook().addEntry(entry);
 			Game.pause();
 			return true;
 		}else if (player.getGold() < price){
@@ -235,8 +238,7 @@ public class Store {
 			Game.pause();
 			return false;
 		}else {
-			System.out.println("Your ship currently has " + player.getInventory().size() + "/" + player.getCapacity()   
-					+ " items. Upgrade your ship or sell an item to purchace this item.");
+			
 			Game.pause();
 			return false;
 		}
@@ -284,6 +286,10 @@ public class Store {
 			player.modifyGold(price);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
 			item.setLocationPurchased(null);
+			Entry entry = new Entry();
+			entry.makeTransaction(item, "Sold ");
+			entry.addCost(-price);
+			player.getLogbook().addEntry(entry);
 			Game.pause();
 			return true;
 		} else {

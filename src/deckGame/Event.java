@@ -14,7 +14,7 @@ public class Event {
 	private int numEvents = 4;
 	
 	public void selectEvent(Route route, Player player) {
-		switch (Math.min((int) (Math.random() * numEvents), numEvents) + 1) { //For now it's just going to be random with no modifier
+		switch (Math.min((int) (Math.random() * numEvents), numEvents) + 1) {
 		case 1: //nothing happens
 			System.out.println("The day passes uneventfully");
 			break;
@@ -23,6 +23,7 @@ public class Event {
 			break;
 		case 3: //Storm
 			storm(player);
+			reward(player, -5);
 			break;
 		case 4: //rescue sailors
 			rescue(player);
@@ -108,8 +109,12 @@ public class Event {
 	
 	public void storm(Player player){
 		System.out.println("Storm");
-		reward(player, -5);
-		player.damage((int) (Math.random() * 20));
+		int damage = ((int) (Math.random() * 20));
+		player.damage(damage);
+		Entry entry = new Entry();
+		entry.addDamage(damage);
+		entry.makeEvent("Encountered a storm");
+		player.getLogbook().addEntry(entry);
 	}
 
 	//Item
@@ -131,12 +136,18 @@ public class Event {
 						item.setLocationPurchased(player.getLocation());
 						if (player.addItem(item)) {
 							System.out.println("You aquired " + item.getName() + " and it has been added to your ship.");
+							Entry entry = new Entry();
+							entry.makeTransaction(item, "Aquired ");
+							player.getLogbook().addEntry(entry);
 						}else {
 							System.out.println("You don't have enough space to take this item. Dump an item or leave it behind.");
 							continue;
 						}
 						return true;
 					case 2:
+						Entry entry = new Entry();
+						entry.makeTransaction(item, "Found ");
+						player.getLogbook().addEntry(entry);
 						return true;
 					case 3:
 						dumpOptions(player);
@@ -150,7 +161,7 @@ public class Event {
 	}
 	
 	public void dumpOptions(Player player) {
-		System.out.println("Select an item to sell.");
+		System.out.println("Select an item to dump.");
 		player.printInventory();
 		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
 		int selection = Game.getInt();
@@ -189,6 +200,9 @@ public class Event {
 			player.removeItem(item);
 			System.out.println("Dump successful. " + item.getName() + " has been removed from your ship.");
 			item.setLocationPurchased(null);
+			Entry entry = new Entry();
+			entry.makeTransaction(item, "Dumped ");;
+			player.getLogbook().addEntry(entry);
 			Game.pause();
 			return true;
 		} else {
@@ -202,5 +216,9 @@ public class Event {
 		int amount = Math.max((int) (Math.random() * 25), 10);
 		System.out.println("You come across a shipwreck and help the survivors onboard.\nThey reward you with $" + amount + ".");
 		player.modifyGold(amount);
+		Entry entry = new Entry();
+		entry.makeEvent("Rescued sailors");
+		entry.addCost(-amount);
+		player.getLogbook().addEntry(entry);
 	}
 }

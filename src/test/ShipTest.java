@@ -26,11 +26,11 @@ class ShipTest {
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		Item.generateItems();
-		islands.add(new Island("Home", 0, 0));
-		islands.add(new Island("Golgolles", -10, 5));
-		islands.add(new Island("Cansburg", 5, 5));
-		islands.add(new Island("Tisjour", -5, -5));
-		islands.add(new Island("Brighdown", 5, -5));
+		islands.add(new Island("Home", 0, 0, 0));
+		islands.add(new Island("Golgolles", -10, 5, 0));
+		islands.add(new Island("Cansburg", 5, 5, 0));
+		islands.add(new Island("Tisjour", -5, -5, 0));
+		islands.add(new Island("Brighdown", 5, -5, 0));
 	}
 	
 	@BeforeEach

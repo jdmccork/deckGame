@@ -42,12 +42,12 @@ class EventTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		//testOut = new ByteArrayOutputStream();
-		//System.setOut(new PrintStream(testOut));
+		testOut = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(testOut));
 		islands = new ArrayList<Island>();
 		event = new Event();
-		Island island1 = new Island("island1", 0, 0);
-		Island island2 = new Island("Island2", 5, 5);
+		Island island1 = new Island("island1", 0, 0, 0);
+		Island island2 = new Island("Island2", 5, 5, 0);
 		player = new Player("Test", "Tester", 100, 1, 1, 5, 1, 1, island1);
 		enemy = new Ship("Jolly Rodgers", 1, 10, 3);
 		islands.add(island1);
@@ -93,7 +93,8 @@ class EventTest {
 
 	@Test
 	void testStorm() {
-		fail("Not yet implemented");
+		event.storm(player);
+		assertTrue(player.getHealth() < player.getMaxHealth());
 	}
 
 	@Test

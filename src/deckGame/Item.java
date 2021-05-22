@@ -24,7 +24,8 @@ public abstract class Item {
 	private String description;
 	
 	/**
-	 * The amount of space this item requires to store.
+	 * The amount of space this item requires to store. NOTE: all cards will be regarded as having a size of
+	 * 1 in the current implementation.
 	 */
 	private int size;
 	
