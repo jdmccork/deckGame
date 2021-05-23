@@ -164,6 +164,10 @@ public class Display {
 		this.mainDisplays.get(index).setValue(value);
 	}
 	
+	public void updateDisplayToolTip(int index, String tip) {
+		this.mainDisplays.get(index).setToolTipText(tip);
+	}
+	
 	public void updateDisplayFunction(int index, Actions action) {
 		this.mainDisplays.get(index).setAction(action);
 	}
@@ -206,7 +210,9 @@ public class Display {
 	
 	private void clearButtons() {
 		for (int i = 0; i < 15; i++) {
+			updateDisplayToolTip(i, null);
 			updateMainDisplay(i, "", false, false);
+			updateDisplayFunction(i, Actions.NONE);
 		}
 	}
 	
@@ -225,7 +231,7 @@ public class Display {
 		updateMainDisplay(13, "See Deck", true, true);
 		updateDisplayFunction(13, Actions.OPEN_DECK);
 		updateMainDisplay(14, "Return to Main Menu", true, true);
-		updateDisplayFunction(14, Actions.MAIN_MENU);
+		updateDisplayFunction(14, Actions.CONFIRM_MENU);
 	}
 	
 	public int getCurrentPage() {
@@ -259,6 +265,45 @@ public class Display {
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
+	public void openSell() {
+		this.statsPanel.setVisible(false);
+		clearButtons();
+		//Create an exit button
+		updateMainDisplay(2, "Close Sell Menu", true, true);
+		updateDisplayFunction(2, Actions.CLOSE_BUY_SELL);
+		//Create lists
+		ArrayList<Cargo> inventory = game.getPlayer().getInventory();
+		ArrayList<Card> deck = game.getPlayer().getCards();
+		//Create prev/next buttons
+		updateDisplayFunction(1, Actions.NEXT_SELL);
+		updateDisplayFunction(3, Actions.PREV_SELL);
+		if (this.currentPage == 0) {
+			updateMainDisplay(1, "Previous Page", false, true);
+		} else {
+			updateMainDisplay(1, "Previous Page", true, true);
+		}
+		if(this.currentPage * 5 + 5 < inventory.size() + deck.size()) {
+			updateMainDisplay(3, "Next Page", true, true);
+		} else {
+			updateMainDisplay(3, "Next Page", false, true);
+		}
+		//Create an icon and label for each item in inventory
+		
+		for(int i = 0; i < 5; i++) {
+			if(this.currentPage * 5 + i < inventory.size()) {
+				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
+				updateDisplayFunction(i + 5, Actions.SELL);
+				updateDisplayValue(i + 5, i + 1);
+			} else if (this.currentPage * 5 - inventory.size() + i < deck.size()) {
+				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
+				updateDisplayFunction(i + 5, Actions.SELL);
+				updateDisplayValue(i + 5, i + 1);
+			}
+		}
+	}
+	
 	public void showDeck() {
 		clearButtons();
 		ArrayList<Item> items = new ArrayList<Item>();
@@ -286,6 +331,31 @@ public class Display {
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
+	public void talk() {
+		this.outputArea.setText(this.game.getPlayer().getLocation().getStore().talkToShopKeep());
+	}
+	
+	public void repairShip(int button) {
+		this.game.executeRepair(button);
+	}
+	
+	public void payCrew(int value) {
+		this.game.executePay(value);
+	}
+	
+	public void sailShip(int value) {
+		this.game.executeRoute(value);
+	}
+	
+	public void showConfirm() {
+		updateMainDisplay(11, "Yes", true, true);
+		updateMainDisplay(13, "No", true, true);
+	}
+	
+	public void setIsland() {
+		this.game.executeSail();
+	}
+	
 	public void setGameState(String s) {
 		this.currentState = s;
 		clearButtons();
@@ -300,11 +370,23 @@ public class Display {
 			changeForegroundColour(Color.BLACK);
 			updateMainDisplay(10, "Return to Island", true, true);
 			updateDisplayFunction(10, Actions.CLOSE_STORE);
+			game.selectRoute();
 			ArrayList<Island> islands = new ArrayList<Island>();
 			islands.addAll(game.getIslands());
+			ArrayList<Route> routes = new ArrayList<Route>();
+			routes.addAll(game.getPlayer().getLocation().getRoutes());
 			for(Island island : islands) {
-				updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", true, true);
-				updateDisplayFunction(island.getDisplay(), Actions.SAIL);
+				if (island == game.getPlayer().getLocation()) {
+					updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", false, true);
+				} else {
+					updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", true, true);
+					updateDisplayFunction(island.getDisplay(), Actions.SAIL);
+				}
+				for (Route route : routes) {
+					if (route.getDestination() == island) {
+						updateDisplayValue(island.getDisplay(), routes.indexOf(route));
+					}
+				}
 			}
 			break;
 		case "Store":
@@ -320,6 +402,24 @@ public class Display {
 		case "Deck":
 			changeForegroundColour(Color.BLACK);
 			changeBackground("./src/resources/Images/InventoryBackground.png");
+			showDeck();
+			break;
+		case "Repair":
+			changeBackground("./src/resources/Image/ShopBackground.png");
+			updateMainDisplay(11, "Repair Ship", true, true);
+			updateDisplayFunction(11, Actions.REPAIR);
+			updateDisplayValue(11, 1);
+			updateMainDisplay(12, "Cancel Repairs", true, true);
+			updateDisplayFunction(12, Actions.CLOSE_STORE);
+			updateDisplayValue(12, 2);
+			break;
+		case "Pirates":
+			changeBackground("./src/resources/Images/SeaBackground.png");
+			break;
+		case "Confirm":
+			changeForegroundColour(Color.WHITE);
+			changeBackground("./src/resources/Images/ShopBackground.png");
+			showConfirm();
 			break;
 		case "Menu":
 			welcome(game);

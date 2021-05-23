@@ -26,7 +26,10 @@ public class ChangingButton extends JButton {
 					//display.game.buyItem(this.value);
 					break;
 				case SAIL:
-					//display.game.selectRoute(this.value);
+					display.sailShip(value);
+					break;
+				case GO_TO_ISLAND:
+					display.setIsland();
 					break;
 				case CHOOSE_ROUTE:
 					display.setGameState("Sea");
@@ -47,6 +50,14 @@ public class ChangingButton extends JButton {
 					display.changeCurrentPage(-1);
 					display.showInventory();
 					break;
+				case NEXT_SELL:
+					display.changeCurrentPage(1);
+					display.openSell();
+					break;
+				case PREV_SELL:
+					display.changeCurrentPage(-1);
+					display.openSell();
+					break;
 				case OPEN_STORE:
 					display.setGameState("Store");
 					break;
@@ -64,14 +75,30 @@ public class ChangingButton extends JButton {
 					display.setGameState("Island");
 					break;
 				case TALK:
+					display.talk();
+					break;
+				case CONFIRM_MENU:
+					display.setGameState("Confirm");
+					display.updateDialogue("Are you sure you wish to return to the main menu? All progress will be lost.");
+					display.updateDisplayFunction(11, Actions.MAIN_MENU);
+					display.updateDisplayFunction(13, Actions.CLOSE_STORE);
 					break;
 				case OPEN_BUY:
 					display.openBuy();
+					break;
 				case OPEN_SELL:
+					display.openSell();
 					break;
 				case CLOSE_BUY_SELL:
 					display.changeCurrentPage(-display.getCurrentPage());
 					display.setGameState("Store");
+					break;
+				case REPAIR:
+					display.repairShip(value);
+					break;
+				case PAY:
+					display.payCrew(value);
+					break;
 				case NONE:
 					break;
 				}
