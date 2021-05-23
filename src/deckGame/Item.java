@@ -160,7 +160,7 @@ public abstract class Item {
 					item = new Cargo(name, description, size, basePrice, rarity);
 					while (index < parts.size()-1) {
 						if (parts.get(index).equals("Stat")) {
-							((Cargo) item).addModifier(Stats.valueOf(parts.get(index + 1)), Integer.parseInt(parts.get(index + 3)));
+							((Cargo) item).changeModifier(Stats.valueOf(parts.get(index + 1)), Integer.parseInt(parts.get(index + 3)));
 							index += 4;
 						} else {
 							throw new Exception("Variable doesn't exist");

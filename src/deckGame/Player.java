@@ -59,7 +59,7 @@ public class Player extends Ship {
 	 * @param capacity the amount of cargo this player's ship can hold
 	 * @param power the amount of damage this player's ship can do
 	 */
-	public Player(String userName, String shipName, int health, int speed, int capacity, int power, int gold, int crew, Island location) {
+	public Player(String userName, String shipName, int health, int speed, int capacity, int deckSize, int power, int gold, int crew, Island location) {
 		super(shipName, health, speed, power);
 
 		this.capacity = capacity;
@@ -67,6 +67,7 @@ public class Player extends Ship {
 		this.gold = gold;
 		this.userName = userName;
 		this.crew = crew;
+		this.deckSize = deckSize;
 		luck = 0;
 		inventory = new ArrayList<Cargo>();
 		cards = new ArrayList<Card>();
@@ -190,15 +191,22 @@ public class Player extends Ship {
 	public boolean addItem(Item item) {
 		if (item instanceof Cargo) {
 			Cargo cargo = (Cargo) item;
-			if (cargoStored <= capacity) {
-				if (cargo.alterStat(this)) {
+			if (cargoStored + cargo.getSize() <= capacity) {
+				if (cargo.alterStat(this, 1)) {
 					inventory.add(cargo);
+					cargoStored += item.getSize();
 					return true;
 				}
 			}
 		} else if (item instanceof Card) {
 			Card card = (Card) item;
 			if (cards.size() < deckSize) {
+				for (int i = 0; i < cards.size(); i++) {
+					if (card.getPriority() < cards.get(i).getPriority() | cards.size() == 0) {
+						cards.add(i, card);
+						return true;
+					}
+				}
 				cards.add(card);
 				return true;
 			}
@@ -214,8 +222,10 @@ public class Player extends Ship {
 	public void removeItem(Item item) {
 		if (item instanceof Cargo) {
 			if (inventory.contains(item)) {
-				inventory.remove(item);
-				((Cargo) item).alterStat(this); //TODO Doesn't reduce
+				if (((Cargo) item).alterStat(this, -1)) { //TODO Doesn't reduce
+					inventory.remove(item);
+					cargoStored -= item.getSize();
+				}
 			}
 		}else if (item instanceof Card) {
 			cards.remove(item);

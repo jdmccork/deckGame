@@ -151,7 +151,7 @@ public class Store {
 		return adviceList;
 	}
 	
-	public void interact(Player player) {
+	public void interact(Player player, int currentDay) {
 		while (true) {
 			talkToShopKeep();
 			System.out.println("Select an option to continue");
@@ -161,11 +161,11 @@ public class Store {
 			
 			switch (Game.getInt()) {
 			case 1:
-				buyOptions(player);
+				buyOptions(player, currentDay);
 				//see what's for sale
 				break;
 			case 2:
-				sellOptions(player);
+				sellOptions(player, currentDay);
 				//see the price that you can sell your items for
 				break;
 			case 3:
@@ -177,7 +177,7 @@ public class Store {
 		}
 	}
 	
-	public void buyOptions(Player player) {
+	public void buyOptions(Player player, int currentDay) {
 		while (true) {
 			printStock();
 			if (stock.size() == 0) {
@@ -199,7 +199,7 @@ public class Store {
 					System.out.println("2: Return");
 					switch (Game.getInt()) {
 					case 1:
-						complete = buyItem(item, player);
+						complete = buyItem(item, player, currentDay);
 						break;
 					case 2:
 						complete = true;
@@ -216,7 +216,7 @@ public class Store {
 		}
 	}
 	
-	public boolean buyItem(Item item, Player player) {
+	public boolean buyItem(Item item, Player player, int currentDay) {
 		int price = item.getPrice(buyModifier, player.getLocation());
 		if (player.getGold() >= price) {
 			if (!player.addItem(item)) {
@@ -227,7 +227,7 @@ public class Store {
 			player.modifyGold(-price);
 			removeStock(item);
 			System.out.println("Purchase successful. " + item.getName() + " has been added to your ship");
-			Entry entry = new Entry();
+			Entry entry = new Entry(currentDay);
 			entry.makeTransaction(item, "Bought ");
 			entry.addCost(price);
 			player.getLogbook().addEntry(entry);
@@ -244,7 +244,7 @@ public class Store {
 		}
 	}
 	
-	public void sellOptions(Player player) {
+	public void sellOptions(Player player, int currentDay) {
 		System.out.println("Select an item to sell.");
 		player.printInventory();
 		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
@@ -252,13 +252,13 @@ public class Store {
 		if (selection == player.getInventory().size() + 1) {
 			return;
 		}else if (selection <= player.getInventory().size()) {
-			sellConfirm(player.getInventory().get(selection - 1), player);
+			sellConfirm(player.getInventory().get(selection - 1), player, currentDay);
 		}else {
 			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
 		}
 	}
 	
-	public void sellConfirm(Item item, Player player) {
+	public void sellConfirm(Item item, Player player, int currentDay) {
 		boolean complete = false;
 		while (complete == false) {
 			System.out.println(item);
@@ -266,7 +266,7 @@ public class Store {
 			System.out.println("2: Return");
 			switch (Game.getInt()) {
 			case 1:
-				complete = sellItem(item, player);
+				complete = sellItem(item, player, currentDay);
 				break;
 			case 2:
 				complete = true;
@@ -279,14 +279,14 @@ public class Store {
 		}
 	}
 	
-	public boolean sellItem(Item item, Player player) {
+	public boolean sellItem(Item item, Player player, int currentDay) {
 		int price = item.getPrice(sellModifier, player.getLocation());
 		if (player.getInventory().contains(item)) {
 			player.removeItem(item);
 			player.modifyGold(price);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
 			item.setLocationPurchased(null);
-			Entry entry = new Entry();
+			Entry entry = new Entry(currentDay);
 			entry.makeTransaction(item, "Sold ");
 			entry.addCost(-price);
 			player.getLogbook().addEntry(entry);

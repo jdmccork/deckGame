@@ -1,6 +1,7 @@
 package deckGame;
 
 public class Entry extends Logbook {
+	private int day;
 	private Item item = null;
 	private String transactionType = null;
 	private String eventName = null;
@@ -8,8 +9,8 @@ public class Entry extends Logbook {
 	private int cost = 0;
 	private Island location = null;
 
-	public Entry() {
-		
+	public Entry(int day) {
+		this.day = day;
 	}
 	
 	public void makeTransaction(Item item, String type) {
@@ -30,7 +31,7 @@ public class Entry extends Logbook {
 	}
 	
 	public String toString() {
-		String output = "";
+		String output = "Day " + day + ": ";
 		if (transactionType != null) {
 			output += item.getName() + " " + transactionType;
 		}
@@ -42,6 +43,7 @@ public class Entry extends Logbook {
 				output += " taking ";
 			}else {
 				output += " repairing ";
+				damage *= -1;
 			}
 			output += damage + " damage";
 		}
@@ -50,6 +52,7 @@ public class Entry extends Logbook {
 				output += " costing $";
 			} else {
 				output += " reciving $";
+				cost *= -1;
 			}
 			output += cost;
 		}

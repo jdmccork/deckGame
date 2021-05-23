@@ -48,7 +48,7 @@ class EventTest {
 		event = new Event();
 		Island island1 = new Island("island1", 0, 0, 0);
 		Island island2 = new Island("Island2", 5, 5, 0);
-		player = new Player("Test", "Tester", 100, 1, 1, 5, 1, 1, island1);
+		player = new Player("Test", "Tester", 100, 1, 1, 5, 4, 1, 1, island1);
 		enemy = new Ship("Jolly Rodgers", 1, 10, 3);
 		islands.add(island1);
 		islands.add(island2);
@@ -67,7 +67,7 @@ class EventTest {
 	@Test
 	void testFleeSuccess() {
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 25, 1, 0, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 25, 1, 4, 0, 1, 1, islands.get(0));
 			enemy = new Ship("Jolly Rodgers", 1, 0, 3);
 			
 			assertTrue(event.flee(enemy, player));
@@ -84,7 +84,7 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 1, 0, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 0, 1, 0, 4, 1, 1, islands.get(0));
 			enemy = new Ship("Jolly Rodgers", 1, 25, 3);
 			
 			assertFalse(event.flee(enemy, player));
@@ -93,7 +93,7 @@ class EventTest {
 
 	@Test
 	void testStorm() {
-		event.storm(player);
+		event.storm(player, 1);
 		assertTrue(player.getHealth() < player.getMaxHealth());
 	}
 
@@ -111,10 +111,10 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 10, 0, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 0, 10, 4, 0, 1, 1, islands.get(0));
 			player.modifyLuck(20);
 			
-			assertTrue(event.reward(player, 0));
+			assertTrue(event.reward(player, 0, 1));
 		}
 	}
 	
@@ -132,10 +132,10 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 10, 0, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 1, 1, islands.get(0));
 			player.modifyLuck(-20);
 			
-			assertFalse(event.reward(player, 0));
+			assertFalse(event.reward(player, 0, 1));
 		}
 	}
 

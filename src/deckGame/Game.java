@@ -42,22 +42,22 @@ public class Game {
 	public Player createPlayer(String userName, String shipName, String shipType) {
 		//select ship to insert into the final 4 values
 		int[] ship = getShip(shipType);
-		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], islands.get(0));
+		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], ship[5], islands.get(0));
 		return player;
 	}
 	
 	public int[] getShip(String shipType) {
 		int[] output;
 		switch (shipType) {
-		//int health, int speed, int capacity, int power, int gold, int crew
+		//int health, int speed, int capacity, int deckSize, int power, int gold, int crew
 		case "2":
-			output = new int[] {100, 7, 6, 3, 350, 10};
+			output = new int[] {100, 7, 6, 4, 3, 350, 10};
 		case "3":
-			output = new int[] {150, 7, 4, 5, 250, 20};
+			output = new int[] {150, 7, 4, 4, 5, 250, 20};
 		case "4":
-			output = new int[] {75, 14, 3, 2, 250, 15};
+			output = new int[] {75, 14, 3, 4, 2, 250, 15};
 		default:
-			output = new int[] {100, 10, 4, 4, 250, 10};
+			output = new int[] {100, 10, 4, 4, 4, 250, 10};
 		}
 		return output;
 	}
@@ -187,7 +187,7 @@ public class Game {
 			switch (getInt()) {
 			case 1:
 				//interact with shop
-				player.getLocation().getStore().interact(player);
+				player.getLocation().getStore().interact(player, currentDay);
 				break;
 			case 2:
 				selectRoute();
@@ -236,7 +236,7 @@ public class Game {
 				if (player.getGold() >= cost) {
 					player.repair();
 					player.modifyGold(-cost);
-					Entry entry = new Entry();
+					Entry entry = new Entry(currentDay);
 					entry.addDamage(-healthLost);
 					entry.makeEvent("Repaired ship");
 					entry.addCost(cost);
@@ -264,7 +264,7 @@ public class Game {
 			case 1:
 				if (cost <= player.getGold()) {
 					player.modifyGold(-cost);
-					Entry entry = new Entry();
+					Entry entry = new Entry(currentDay);
 					entry.makeEvent("Payed crew");
 					entry.addCost(cost);
 					player.getLogbook().addEntry(entry);
@@ -329,7 +329,7 @@ public class Game {
 				for (int i = 0; i != time & currentDay < days; i++) {
 					currentDay += 1;
 					Event event = new Event();
-					event.selectEvent(route, player);
+					event.selectEvent(route, player, currentDay);
 				}
 				if (currentDay < days) {
 					player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
