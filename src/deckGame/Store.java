@@ -302,15 +302,17 @@ public class Store {
 	/**
 	 * Prints a piece of advice and increments an advice counter.
 	 */
-	public void talkToShopKeep() {
+	public String talkToShopKeep() {
+		String output;
 		try {
-			System.out.println(adviceList.get(adviceCount));
+			output = adviceList.get(adviceCount);
 		    adviceCount += 1;
 		    if(adviceCount == adviceList.size()) {
 		    	adviceCount = 0;
 		    }
 		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("*The shopkeeper seems like he's had a bit too much to drink to give advice*");
+			output = "*The shopkeeper seems like he's had a bit too much to drink to give advice*";
 		}
+		return output;
 	}
 }

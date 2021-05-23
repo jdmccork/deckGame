@@ -164,6 +164,10 @@ public class Display {
 		this.mainDisplays.get(index).setValue(value);
 	}
 	
+	public void updateDisplayToolTip(int index, String tip) {
+		this.mainDisplays.get(index).setToolTipText(tip);
+	}
+	
 	public void updateDisplayFunction(int index, Actions action) {
 		this.mainDisplays.get(index).setAction(action);
 	}
@@ -206,7 +210,9 @@ public class Display {
 	
 	private void clearButtons() {
 		for (int i = 0; i < 15; i++) {
+			updateDisplayToolTip(i, null);
 			updateMainDisplay(i, "", false, false);
+			updateDisplayFunction(i, Actions.NONE);
 		}
 	}
 	
@@ -225,7 +231,7 @@ public class Display {
 		updateMainDisplay(13, "See Deck", true, true);
 		updateDisplayFunction(13, Actions.OPEN_DECK);
 		updateMainDisplay(14, "Return to Main Menu", true, true);
-		updateDisplayFunction(14, Actions.MAIN_MENU);
+		updateDisplayFunction(14, Actions.CONFIRM_MENU);
 	}
 	
 	public int getCurrentPage() {
@@ -259,6 +265,45 @@ public class Display {
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
+	public void openSell() {
+		this.statsPanel.setVisible(false);
+		clearButtons();
+		//Create an exit button
+		updateMainDisplay(2, "Close Sell Menu", true, true);
+		updateDisplayFunction(2, Actions.CLOSE_BUY_SELL);
+		//Create lists
+		ArrayList<Cargo> inventory = game.getPlayer().getInventory();
+		ArrayList<Card> deck = game.getPlayer().getCards();
+		//Create prev/next buttons
+		updateDisplayFunction(1, Actions.NEXT_SELL);
+		updateDisplayFunction(3, Actions.PREV_SELL);
+		if (this.currentPage == 0) {
+			updateMainDisplay(1, "Previous Page", false, true);
+		} else {
+			updateMainDisplay(1, "Previous Page", true, true);
+		}
+		if(this.currentPage * 5 + 5 < inventory.size() + deck.size()) {
+			updateMainDisplay(3, "Next Page", true, true);
+		} else {
+			updateMainDisplay(3, "Next Page", false, true);
+		}
+		//Create an icon and label for each item in inventory
+		
+		for(int i = 0; i < 5; i++) {
+			if(this.currentPage * 5 + i < inventory.size()) {
+				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
+				updateDisplayFunction(i + 5, Actions.SELL);
+				updateDisplayValue(i + 5, i + 1);
+			} else if (this.currentPage * 5 - inventory.size() + i < deck.size()) {
+				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
+				updateDisplayFunction(i + 5, Actions.SELL);
+				updateDisplayValue(i + 5, i + 1);
+			}
+		}
+	}
+	
 	public void showDeck() {
 		clearButtons();
 		ArrayList<Item> items = new ArrayList<Item>();
@@ -286,6 +331,31 @@ public class Display {
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
+	public void talk() {
+		this.outputArea.setText(this.game.getPlayer().getLocation().getStore().talkToShopKeep());
+	}
+	
+	public void repairShip(int button) {
+		this.game.executeRepair(button);
+	}
+	
+	public void payCrew(int value) {
+		this.game.executePay(value);
+	}
+	
+	public void sailShip(int value) {
+		this.game.executeRoute(value);
+	}
+	
+	public void showConfirm() {
+		updateMainDisplay(11, "Yes", true, true);
+		updateMainDisplay(13, "No", true, true);
+	}
+	
+	public void setIsland() {
+		this.game.executeSail();
+	}
+	
 	public void setGameState(String s) {
 		this.currentState = s;
 		clearButtons();
@@ -300,11 +370,23 @@ public class Display {
 			changeForegroundColour(Color.BLACK);
 			updateMainDisplay(10, "Return to Island", true, true);
 			updateDisplayFunction(10, Actions.CLOSE_STORE);
+			game.selectRoute();
 			ArrayList<Island> islands = new ArrayList<Island>();
 			islands.addAll(game.getIslands());
+			ArrayList<Route> routes = new ArrayList<Route>();
+			routes.addAll(game.getPlayer().getLocation().getRoutes());
 			for(Island island : islands) {
-				updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", true, true);
-				updateDisplayFunction(island.getDisplay(), Actions.SAIL);
+				if (island == game.getPlayer().getLocation()) {
+					updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", false, true);
+				} else {
+					updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", true, true);
+					updateDisplayFunction(island.getDisplay(), Actions.SAIL);
+				}
+				for (Route route : routes) {
+					if (route.getDestination() == island) {
+						updateDisplayValue(island.getDisplay(), routes.indexOf(route));
+					}
+				}
 			}
 			break;
 		case "Store":
@@ -320,6 +402,24 @@ public class Display {
 		case "Deck":
 			changeForegroundColour(Color.BLACK);
 			changeBackground("./src/resources/Images/InventoryBackground.png");
+			showDeck();
+			break;
+		case "Repair":
+			changeBackground("./src/resources/Image/ShopBackground.png");
+			updateMainDisplay(11, "Repair Ship", true, true);
+			updateDisplayFunction(11, Actions.REPAIR);
+			updateDisplayValue(11, 1);
+			updateMainDisplay(12, "Cancel Repairs", true, true);
+			updateDisplayFunction(12, Actions.CLOSE_STORE);
+			updateDisplayValue(12, 2);
+			break;
+		case "Pirates":
+			changeBackground("./src/resources/Images/SeaBackground.png");
+			break;
+		case "Confirm":
+			changeForegroundColour(Color.WHITE);
+			changeBackground("./src/resources/Images/ShopBackground.png");
+			showConfirm();
 			break;
 		case "Menu":
 			welcome(game);
@@ -496,12 +596,12 @@ public class Display {
 		frmMenu.getContentPane().setLayout(null);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(108, 10, 378, 453);
+		panel.setBounds(10, 10, 476, 453);
 		frmMenu.getContentPane().add(panel);
 		panel.setLayout(null);
 		
 		JLabel lblTitle = new JLabel("Welcome to DeckGame");
-		lblTitle.setBounds(90, 10, 134, 20);
+		lblTitle.setBounds(193, 10, 131, 20);
 		panel.add(lblTitle);
 		
 		JTextField userName = new JTextField();
@@ -527,24 +627,26 @@ public class Display {
 		info.add(lblShipName);
 		
 		JSlider duration = new JSlider(JSlider.HORIZONTAL, 20, 50, 20);
-		duration.setBounds(78, 188, 137, 20);
+		duration.setBounds(187, 188, 137, 44);
 		duration.setMajorTickSpacing(10);
 		duration.setMinorTickSpacing(1);
+		duration.setPaintTicks(true);
+		duration.setPaintLabels(true);
 		panel.add(duration);
 		info.add(duration);
 		
-		JLabel lblDuration = new JLabel("Duration:");
-		lblDuration.setBounds(126, 165, 89, 13);
+		JLabel lblDuration = new JLabel("Duration (Days):");
+		lblDuration.setBounds(214, 167, 89, 13);
 		panel.add(lblDuration);
 		info.add(lblDuration);
 		
 		JLabel lblShipType = new JLabel("Ship Class:");
-		lblShipType.setBounds(119, 218, 74, 13);
+		lblShipType.setBounds(229, 242, 74, 13);
 		panel.add(lblShipType);
 		info.add(lblShipType);
 		
 		JRadioButton rdbtnShip1 = new JRadioButton("Sloop");
-		rdbtnShip1.setBounds(90, 247, 103, 21);
+		rdbtnShip1.setBounds(200, 261, 103, 21);
 		rdbtnShip1.setActionCommand("1");
 		rdbtnShip1.setToolTipText("A ship with 10 crew which has a balance of all stats.");
 		rdbtnShip1.setSelected(true);
@@ -552,21 +654,21 @@ public class Display {
 		info.add(rdbtnShip1);
 		
 		JRadioButton rdbtnShip2 = new JRadioButton("Brig");
-		rdbtnShip2.setBounds(90, 270, 103, 21);
+		rdbtnShip2.setBounds(200, 284, 103, 21);
 		rdbtnShip2.setActionCommand("2");
 		rdbtnShip2.setToolTipText("A slow moving ship with 10 crew that has more cargo space.");
 		panel.add(rdbtnShip2);
 		info.add(rdbtnShip2);
 		
 		JRadioButton rdbtnShip3 = new JRadioButton("Frigate");
-		rdbtnShip3.setBounds(90, 293, 103, 21);
+		rdbtnShip3.setBounds(200, 307, 103, 21);
 		rdbtnShip3.setActionCommand("3");
 		rdbtnShip3.setToolTipText("A slow moving ship with 20 crew that has high health and damage.");
 		panel.add(rdbtnShip3);
 		info.add(rdbtnShip3);
 		
 		JRadioButton rdbtnShip4 = new JRadioButton("Clipper");
-		rdbtnShip4.setBounds(90, 316, 103, 21);
+		rdbtnShip4.setBounds(200, 330, 103, 21);
 		rdbtnShip4.setActionCommand("4");
 		rdbtnShip4.setToolTipText("A fast ship with 15 crew that has lower heath and strength.");
 		panel.add(rdbtnShip4);
@@ -579,29 +681,33 @@ public class Display {
 		group.add(rdbtnShip4);
 		
 		JLabel lblError1 = new JLabel("No special symbols.");
-		lblError1.setBounds(242, 112, 126, 13);
+		lblError1.setBounds(242, 126, 126, 13);
 		panel.add(lblError1);
 		lblError1.setVisible(false);
 		
 		JLabel lblError2 = new JLabel("Must be between 3 and 15 characters.");
-		lblError2.setBounds(242, 141, 126, 13);
+		lblError2.setBounds(242, 126, 224, 13);
 		panel.add(lblError2);
 		lblError2.setVisible(false);
 		
 		JButton btnSubmit = new JButton("Submit");
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(game.getNames(userName.getText(), shipName.getText())) {
+				String result = game.getNames(userName.getText(), shipName.getText());
+				if(result == "Good") {
 					game.sessionSetup(userName.getText(), shipName.getText(), duration.getValue(), group.getSelection().getActionCommand());
 					initialize();
 					frmMenu.dispose();
-				}else {
+				}else if(result == "Special") {
 					lblError1.setVisible(true);
+					lblError2.setVisible(false);
+				}else {
+					lblError1.setVisible(false);
 					lblError2.setVisible(true);
 				}
 			}
 		});
-		btnSubmit.setBounds(93, 369, 100, 21);
+		btnSubmit.setBounds(203, 385, 100, 21);
 		panel.add(btnSubmit);
 		info.add(btnSubmit);
 		
@@ -610,7 +716,7 @@ public class Display {
 		}
 		
 		JButton btnNewGame = new JButton("New Game");
-		btnNewGame.setBounds(97, 58, 96, 21);
+		btnNewGame.setBounds(200, 58, 96, 21);
 		btnNewGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(JComponent component : info) {

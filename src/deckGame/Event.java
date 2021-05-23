@@ -12,11 +12,12 @@ public class Event {
 	 */
 	
 	private int numEvents = 4;
+	private Display display;
 	
 	public void selectEvent(Route route, Player player, int currentDay) {
 		switch (Math.min((int) (Math.random() * numEvents), numEvents) + 1) {
 		case 1: //nothing happens
-			System.out.println("The day passes uneventfully");
+			display.updateDialogue("The day passes uneventfully");
 			break;
 		case 2: //Fight
 			fight(player, currentDay);
@@ -34,7 +35,8 @@ public class Event {
 	
 	public void fight(Player player, int currentDay){
 		Ship enemy = new Ship("Enemy", 50, 4, 2);
-		System.out.println("You are attacked by a ship full of pirates. Choose and option to continue");
+		display.updateDialogue("You are attacked by a ship full of pirates. Choose an option to continue");
+		display.setGameState("Pirates");
 		while (true) {
 			System.out.println("1: Fight");
 			System.out.println("2: Attempt to flee");
@@ -129,8 +131,8 @@ public class Event {
 			Item item = items.get(randomNum);
 			if (!player.getInventory().contains(item)) {
 				while (true) {
-					System.out.println("You found " + item.getName() + " among the wreakage.");
-					System.out.println("Bring it aboard?\n1: Yes\n2: No\n3: View inventory");
+					display.updateDialogue("You found " + item.getName() + " among the wreckage.");
+					display.updateDialogue("Bring it aboard?\n1: Yes\n2: No\n3: View inventory");
 					switch (Game.getInt()) {
 					case 1:
 						item.setLocationPurchased(player.getLocation());
