@@ -24,7 +24,8 @@ public abstract class Item {
 	private String description;
 	
 	/**
-	 * The amount of space this item requires to store.
+	 * The amount of space this item requires to store. NOTE: all cards will be regarded as having a size of
+	 * 1 in the current implementation.
 	 */
 	private int size;
 	
@@ -159,7 +160,7 @@ public abstract class Item {
 					item = new Cargo(name, description, size, basePrice, rarity);
 					while (index < parts.size()-1) {
 						if (parts.get(index).equals("Stat")) {
-							((Cargo) item).addModifier(Stats.valueOf(parts.get(index + 1)), Integer.parseInt(parts.get(index + 3)));
+							((Cargo) item).changeModifier(Stats.valueOf(parts.get(index + 1)), Integer.parseInt(parts.get(index + 3)));
 							index += 4;
 						} else {
 							throw new Exception("Variable doesn't exist");

@@ -38,6 +38,7 @@ class GameTest {
 		assertTrue(Item.getItems().size() > 0);
 	}
 	
+	/*
 	@Test
 	void testGetNameNormal() {
 		String input = "Test" + System.lineSeparator() + "Tester";
@@ -115,7 +116,7 @@ class GameTest {
 		String expected = "Length of username must be between 3 and 15 characters."; 
 		assertFalse(testOut.toString().contains(expected));
 	}
-
+*/
 	@Test
 	void testMainMenuQuit() {
 		String input = "2" + System.lineSeparator();
@@ -136,11 +137,11 @@ class GameTest {
 	@Test
 	void testGenerateRoutes() {
 		ArrayList<Island> islands = new ArrayList<Island>();
-		Island test1 = new Island("Test1", 0, 0);
-		Island test2 = new Island("Test2", 0, 0);
-		Island test3 = new Island("Test3", 0, 0);
-		Island test4 = new Island("Test4", 0, 0);
-		Island test5 = new Island("Test5", 0, 0);
+		Island test1 = new Island("Test1", 0, 0, 0);
+		Island test2 = new Island("Test2", 0, 0, 0);
+		Island test3 = new Island("Test3", 0, 0, 0);
+		Island test4 = new Island("Test4", 0, 0, 0);
+		Island test5 = new Island("Test5", 0, 0, 0);
 		islands.add(test1);
 		islands.add(test2);
 		islands.add(test3);

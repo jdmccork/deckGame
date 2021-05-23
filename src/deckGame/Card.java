@@ -140,5 +140,9 @@ public class Card extends Item {
 		}
 		return dice;
 	}
+	
+	public int getPriority() {
+		return priority;
+	}
 
 }

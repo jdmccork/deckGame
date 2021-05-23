@@ -70,7 +70,7 @@ public class Ship {
 	 * @param damage the amount of damage this ship takes.
 	 */
 	public void damage(int damage) {
-		if (health >= damage) {
+		if (health > damage) {
             health -= damage;
             status = Statuses.DAMAGED;
     	} else {
