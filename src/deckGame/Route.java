@@ -60,7 +60,7 @@ public class Route {
 	 * @return the time to sail the entire route
 	 */
 	public int getTime(int speed) {
-		int time = distance/speed;
+		int time = (distance*5)/speed;
 		if (time <= 0) {
 			return 1;
 		} else {

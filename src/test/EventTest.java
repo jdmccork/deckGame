@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import deckGame.Display;
 import deckGame.Event;
 import deckGame.Game;
 import deckGame.Island;
@@ -48,26 +49,21 @@ class EventTest {
 		event = new Event();
 		Island island1 = new Island("island1", 0, 0, 0);
 		Island island2 = new Island("Island2", 5, 5, 0);
-		player = new Player("Test", "Tester", 100, 1, 1, 5, 4, 1, 1, island1);
+		player = new Player("Test", "Tester", 100, 1, 1, 5, 4, 1, 1, island1, new Display());
 		enemy = new Ship("Jolly Rodgers", 1, 10, 3);
 		islands.add(island1);
 		islands.add(island2);
 	}
 
 	@Test
-	void testFightLogic() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	void testFight() {
-		fail("Not yet implemented");
+		String input = "1" + System.lineSeparator();
 	}
 	
 	@Test
 	void testFleeSuccess() {
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 25, 1, 4, 0, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 25, 1, 4, 0, 1, 1, islands.get(0), new Display());
 			enemy = new Ship("Jolly Rodgers", 1, 0, 3);
 			
 			assertTrue(event.flee(enemy, player));
@@ -84,7 +80,7 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 1, 0, 4, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 0, 1, 0, 4, 1, 1, islands.get(0), new Display());
 			enemy = new Ship("Jolly Rodgers", 1, 25, 3);
 			
 			assertFalse(event.flee(enemy, player));
@@ -111,7 +107,7 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 10, 4, 0, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 0, 10, 4, 0, 1, 1, islands.get(0), new Display());
 			player.modifyLuck(20);
 			
 			assertTrue(event.reward(player, 0, 1));
@@ -132,11 +128,23 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 1, 1, islands.get(0));
+			player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 1, 1, islands.get(0), new Display());
 			player.modifyLuck(-20);
 			
 			assertFalse(event.reward(player, 0, 1));
 		}
 	}
+	
+	@Test
+	void testRescue() {
+		player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 100, 1, islands.get(0), new Display());
+		event.rescue(player, 1);
+		String expected = "1: Rescued sailors reciving $";
+		
+		assertTrue(player.getGold() > 100);
+		player.getLogbook().viewEntries();
+		
+		assertTrue(testOut.toString().contains(expected));
+		}
 
 }

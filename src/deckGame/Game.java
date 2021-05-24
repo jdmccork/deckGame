@@ -27,8 +27,17 @@ public class Game {
 		gameSetup();
 	}
 	
-	public void run() {
-		display = new Display(this);
+	public void runGUI() {
+		display = new Display();
+		display.run(this);
+		boolean playing = true;
+		while(playing == true) {
+			playing = mainMenu();
+		}
+		userInput.close();
+	}
+	
+	public void runCMD() {
 		boolean playing = true;
 		while(playing == true) {
 			playing = mainMenu();
@@ -42,9 +51,8 @@ public class Game {
 	}
 
 	public Player createPlayer(String userName, String shipName, String shipType) {
-		//select ship to insert into the final 4 values
 		int[] ship = getShip(shipType);
-		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], ship[5], islands.get(0));
+		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], ship[6], islands.get(0), display);
 		return player;
 	}
 	
@@ -64,6 +72,29 @@ public class Game {
 		return output;
 	}
 	
+	public String getShipCMD() {
+		while (true) {
+			System.out.println("Select a class:");
+			System.out.println("1: None. A ship with 10 crew which has a balance of all stats.");
+			System.out.println("2: Merchant. A slow moving ship with 10 crew that has more cargo space.");
+			System.out.println("3: Warrior.  A slow moving ship with 20 crew that has high health and damage.");
+			System.out.println("4: Rouge. A fast ship with 15 crew that has lower heath and strength.");
+			switch (getInt()) {
+			//int health, int speed, int capacity, int power, int gold, int crew
+			case 1:
+				return "1";
+			case 2:
+				return "2";
+			case 3:
+				return "3";
+			case 4:
+				return "4";
+			default:
+				System.out.println("Please select a number between 1 and 4.");
+			}
+		}
+	}
+	
 	public String getNames(String userName, String shipName) {
 		if (userName != null) {
 			if (hasSpecial(userName)) {
@@ -76,6 +107,24 @@ public class Game {
 			return "Length";
 		}
 		return "Good";
+	}
+	
+	public String[] getNamesCMD() {
+		String userName = null;
+		do {
+			if (userName != null) {
+				if (hasSpecial(userName)) {
+					System.out.println("Username must not contain digits or special characters.");
+				}else {
+					System.out.println("Length of username must be between 3 and 15 characters.");
+				}
+			}
+			System.out.print("Enter username: Captain ");
+			userName = userInput.nextLine();
+		}while (userName.length() < 3 | userName.length() > 15 | hasSpecial(userName));
+		System.out.print("Enter your ship's name: The ");
+		String shipName = userInput.nextLine();
+		return new String[] {userName, shipName};
 	}
 	
 	public boolean hasSpecial(String string) {
@@ -152,6 +201,10 @@ public class Game {
 				System.out.println("2: Quit");
 				selection = getInt();
 				if (selection == 1) {
+					gameSetup();
+					String[] names = getNamesCMD();
+					sessionSetup(names[0], names[1], getGameLength(), getShipCMD());
+					welcome(player);
 					play();
 				} else if (selection == 2) {
 					System.out.println("Thanks for playing. Goodbye.");
@@ -184,7 +237,8 @@ public class Game {
 			System.out.println("2: Set sail");
 			System.out.println("3: See inventory");
 			System.out.println("4: See deck");
-			System.out.println("5: Return to main menu");
+			System.out.println("5: View Captain's log");
+			System.out.println("6: Return to main menu");
 			
 			switch (getInt()) {
 			case 1:
@@ -201,6 +255,9 @@ public class Game {
 				player.viewCards();
 				break;
 			case 5:
+				player.viewLogbook();
+				break;
+			case 6:
 				return;
 			default:
 				System.out.println("Please enter a number between 1 and 5");
@@ -208,6 +265,7 @@ public class Game {
 			}
 		}
 	}
+	
 	public static int getInt(){
 		while(true) {
 			try {
@@ -221,16 +279,50 @@ public class Game {
 		}
 	}
 	
-	public void chargeRepair() {
+	public boolean chargeRepair() {
+		if (player.getStatus() == Statuses.REPAIRED) {
+			return true;
+		}
 		int healthLost = player.getMaxHealth()-player.getHealth();
 		int cost = (int) (healthLost / 5) + 1;
 		if (player.getGold() < cost & player.getInventory().size() == 0 & player.getCards().size() == 0) {
-			this.display.updateDialogue("You don't have enough money and no items to sell for the repairs.");
+			if (display != null) {
+				this.display.updateDialogue("You don't have enough money and no items to sell for the repairs.");
+			} else {
+				System.out.println("You don't have enough money and no items to sell for the repairs.");
+			}
 			throw new EndGameException();
 		}
-		this.display.updateDialogue(
-				"Your ship has sustained " + healthLost + " damage. This will cost $" + cost + " to repair.");
-		this.display.setGameState("Repairs");
+		if (display != null) {
+			this.display.updateDialogue(
+					"Your ship has sustained " + healthLost + " damage. This will cost $" + cost + " to repair.");
+			this.display.setGameState("Repairs");
+			return true;
+		}else {
+			return chargeRepairCMD(cost, healthLost);
+		}
+	}
+	
+	public boolean chargeRepairCMD(int cost, int healthLost) {
+		while (true) {
+			System.out.println(
+					"Your ship has sustained " + healthLost + " damage. This will cost $" + cost + " to repair.");
+			System.out.println("1: Pay\n2: Return");
+			switch (Game.getInt()) {
+			case 1:
+				if (player.getGold() >= cost) {
+					player.repair();
+					player.modifyGold(-cost);
+					return true;
+				} else {
+					System.out.println(
+							"You don't have enough money to repair your ship. Sell an item to make some more cash.");
+					return false;
+				}
+			case 2:
+				return false;
+			}
+		}
 	}
 	
 	public boolean executeRepair(int selection) {
@@ -256,17 +348,6 @@ public class Game {
 		}
 	}
 	
-	public void payCrew(int time) {
-		int cost = player.getNumCrew() * time;
-
-		display.updateDialogue("You must pay your crew $" + cost + " for this route.\n"
-				+ "You currently have $" + player.getGold() + ". Do you still wish to sail?");
-		display.setGameState("Confirm");
-		display.updateDisplayFunction(11, Actions.PAY);
-		display.updateDisplayValue(11, cost);
-		display.updateDisplayFunction(13, Actions.CHOOSE_ROUTE);
-	}
-	
 	public void executePay(int cost) {
 		if (cost <= player.getGold()) {
 			player.modifyGold(-cost);
@@ -281,14 +362,77 @@ public class Game {
 	}
 	
 	public void selectRoute() {
-		if (player.getStatus() == Statuses.DAMAGED) {
-			chargeRepair();
-		} else {
-			ArrayList<Route> routes = player.getLocation().getRoutes();
+		if (chargeRepair()) {
+			if (display != null) {
+				ArrayList<Route> routes = player.getLocation().getRoutes();
+				for (Route route: routes) {
+					display.updateDisplayToolTip(route.getDestination().getDisplay(), "The journey to " 
+							+ route.getDestination().getName() + " will take " + route.getTime(player.getSpeed())
+							+ " days to complete.");
+				}
+			}else {
+				selectRouteCMD();
+			}
+		}
+	}
+	
+	public void selectRouteCMD() {
+		int selection;
+		ArrayList<Route> routes = player.getLocation().getRoutes();
+		while (true) {
+			int index = 1;
+			System.out.println("Select an option to continue");
 			for (Route route: routes) {
-				display.updateDisplayToolTip(route.getDestination().getDisplay(), "The journey to " 
-						+ route.getDestination().getName() + " will take " + route.getTime(player.getSpeed())
-						+ " days to complete.");
+				System.out.println(index++ + ": The journey to " + route.getDestination().getName() 
+						+ " will take " + route.getTime(player.getSpeed()) + " days to complete");
+			}
+			System.out.println(index + ": Return to island");
+			try {
+				selection = getInt();
+			}catch (java.util.InputMismatchException e) {
+				System.out.println("Invalid character, please enter the number of the option you want.");
+				userInput.nextLine();
+				continue;
+			}
+			if (selection == index) {
+				return;
+			}else if (selection > index | selection < 0) {
+				System.out.println("Please enter a number between 1 and " + index);
+			}else {
+				selection--; // accounts for the index's starting at 0 and not 1
+				Route route = routes.get(selection);
+				int time = route.getTime(player.getSpeed());
+				if (currentDay + time >= days) {
+					System.out.println("Note, this trip will exceed your remaining time, all items will"
+							+ " be sold on day " + days + ".\nContinue?");
+					System.out.println("1: Yes");
+					System.out.println("2: No");
+					switch (getInt()) {
+					case 1:
+						break;
+					case 2:
+						return;
+					default:
+						System.out.println("Please enter the number 1 or 2.");
+					}
+				}
+				if (!player.payCrewCMD(time)) {
+					return;
+				}
+				player.sail(route);
+				for (int i = 0; i != time & currentDay < days; i++) {
+					currentDay += 1;
+					Event event = new Event();
+					event.selectEvent(route, player, currentDay, null);
+				}
+				if (currentDay < days) {
+					player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
+					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+					pause();
+				}else {
+					throw new EndGameException();
+				}
+				return;
 			}
 		}
 	}
@@ -304,7 +448,7 @@ public class Game {
 			display.updateDisplayFunction(11, Actions.GO_TO_ISLAND);
 			display.updateDisplayFunction(13, Actions.CLOSE_STORE);
 		}
-		payCrew(time);
+		player.payCrew(time);
 		this.chosenRoute = route;
 	}
 	
@@ -315,7 +459,7 @@ public class Game {
 			currentDay += 1;
 			display.updateDay(String.valueOf(currentDay));
 			Event event = new Event();
-			event.selectEvent(chosenRoute, player, display);
+			event.selectEvent(chosenRoute, player, currentDay, display);
 		}
 		if (currentDay < days) {
 			player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
@@ -369,6 +513,6 @@ public class Game {
 			
 	public static void main(String[] args) {
 		Game game = new Game();
-		game.run();
+		game.runCMD();
 	}
 }

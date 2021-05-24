@@ -59,9 +59,13 @@ public class Display {
 	/**
 	 * Create the application.
 	 */
-	public Display(Game game) {
-		welcome(game);
+	public Display() {
+		//welcome(game);
 		//initialize();
+	}
+	
+	public void run(Game game) {
+		welcome(game);
 	}
 	
 	/**

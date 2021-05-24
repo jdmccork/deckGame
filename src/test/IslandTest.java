@@ -15,7 +15,7 @@ class IslandTest {
 	@BeforeEach
 	void setUp() throws Exception {
 	}
-
+/*
 	@Test
 	void testIsland() {
 		fail("Not yet implemented");
@@ -60,5 +60,5 @@ class IslandTest {
 	void testGetName() {
 		fail("Not yet implemented");
 	}
-
+*/
 }

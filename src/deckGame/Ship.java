@@ -70,14 +70,14 @@ public class Ship {
 	 * @param damage the amount of damage this ship takes.
 	 */
 	public void damage(int damage) {
+		System.out.println("The " + shipName + " took " + damage + " damage.");
 		if (health > damage) {
             health -= damage;
             status = Statuses.DAMAGED;
+            System.out.println("It currently has " + health + " health remaining.");
     	} else {
     		getDestroyed();
     	}
-		System.out.println("The " + shipName + " took " + damage + " damage."
-				+ "\nIt currently has " + health + " health remaining.");
     }
 	
 	public void damage(ArrayList<Integer> dice) {
@@ -114,6 +114,9 @@ public class Ship {
 	public void getDestroyed() {
 		status = Statuses.DESTROYED;
 		health = 0;
+		if (!(this instanceof Player)) {
+			System.out.println("The enemy has been sunk");
+		}
 	}
 	
 	/**

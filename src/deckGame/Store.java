@@ -153,7 +153,7 @@ public class Store {
 	
 	public void interact(Player player, int currentDay) {
 		while (true) {
-			talkToShopKeep();
+			//talkToShopKeep();
 			System.out.println("Select an option to continue");
 			System.out.println("1: Buy");
 			System.out.println("2: Sell");
@@ -222,6 +222,7 @@ public class Store {
 			if (!player.addItem(item)) {
 				System.out.println("Your ship currently has " + player.getCargoStored() + "/" + player.getCapacity()   
 				+ " items. Upgrade your ship or sell an item to purchace this item.");
+				Game.pause();
 				return false;
 			}
 			player.modifyGold(-price);
@@ -247,13 +248,16 @@ public class Store {
 	public void sellOptions(Player player, int currentDay) {
 		System.out.println("Select an item to sell.");
 		player.printInventory();
-		System.out.println((player.getInventory().size() + 1) + ": Return\n" + "Select an item or return to continue.");
+		player.printCards();
+		System.out.println((player.getInventory().size() + player.getCards().size() + 1) + ": Return\n" + "Select an item or return to continue.");
 		int selection = Game.getInt();
-		if (selection == player.getInventory().size() + 1) {
+		if (selection == player.getInventory().size() + player.getCards().size() + 1) {
 			return;
 		}else if (selection <= player.getInventory().size()) {
 			sellConfirm(player.getInventory().get(selection - 1), player, currentDay);
-		}else {
+		}else if (selection <= player.getInventory().size() + player.getCards().size() ) {
+			sellConfirm(player.getCards().get(selection - player.getInventory().size() - 1), player, currentDay);
+		} else {
 			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
 		}
 	}

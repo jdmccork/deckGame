@@ -16,6 +16,7 @@ import deckGame.Item;
 import deckGame.Player;
 import deckGame.Card;
 import deckGame.Cargo;
+import deckGame.Display;
 import deckGame.EndGameException;
 import deckGame.Game;
 import enums.Rarity;
@@ -41,7 +42,7 @@ class PlayerTest {
 		
 		island = new Island("Island1", 5, 5, 0);
 		//userName, shipName, health, speed, capacity, power, gold, crew, location
-		player = new Player("Tester", "Test ship", 100, 10, 4, 4, 3, 75, 10, island);
+		player = new Player("Tester", "Test ship", 100, 10, 4, 4, 3, 75, 10, island, new Display());
 	}
 
 	@Test
@@ -168,5 +169,10 @@ class PlayerTest {
 		player.viewInventory();
 		System.out.println(testOut);
 		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testPayCrewCMD() {
+		player.payCrewCMD(5);
 	}
 }
