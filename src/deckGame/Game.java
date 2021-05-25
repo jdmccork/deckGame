@@ -461,8 +461,7 @@ public class Game {
 			if (display != null) {
 				display.updateDay(String.valueOf(currentDay));
 			}
-			Event event = new Event(new int[] {0, 1, 0, 0});
-			event.selectEvent(player, currentDay, display);
+			chosenRoute.getEvent().selectEvent(player, currentDay, display);
 		}
 		if (currentDay < days) {
 			player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops

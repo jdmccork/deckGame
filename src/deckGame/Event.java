@@ -26,6 +26,10 @@ public class Event {
 		}
 	}
 	
+	public void setChance(ArrayList<Integer> eventChance) {
+		this.eventChance = eventChance;
+	}
+	
 	public void selectEvent(Player player, int currentDay, Display display) {
 		this.display = display;
 		switch (eventChance.get((int) (Math.random() * eventChance.size()))) {
@@ -124,10 +128,14 @@ public class Event {
 				int itemIndex = (int) (Math.random() * player.getInventory().size());
 				
 				Item item = player.getInventory().get(itemIndex);
+				player.removeItem(item);
+				
 				Entry entry = new Entry(currentDay);
 				entry.makeTransaction(item, "Surrendered ");
 				player.getLogbook().addEntry(entry);
-				break;
+				
+				System.out.println("The pirates took your " + item.getName() + " and allowed you to escape with your lives.");
+				return true;
 			case 2:
 				return false;
 			default:
