@@ -33,6 +33,11 @@ public class Cargo extends Item{
 		this.modifyAmount = 0;
 	}
 	
+	/**
+	 * Changes the stat the cargo alters and the amount by
+	 * @param modifyStat
+	 * @param modifyAmount
+	 */
 	public void changeModifier(Stats modifyStat, int modifyAmount) {
 		this.modifyStat = modifyStat;
 		this.modifyAmount = modifyAmount;
@@ -63,6 +68,9 @@ public class Cargo extends Item{
 		return modifyStat;
 	}
 	
+	/**
+	 * Cargo
+	 */
 	public ItemType getType() {
 		return ItemType.CARGO;
 	}
@@ -81,7 +89,6 @@ public class Cargo extends Item{
 	 * @param amount the amount to change the stat by
 	 */
 	public boolean alterStat(Player player, int modifier) {
-		//TODO add checks to ensure values are positive
 		switch (modifyStat) {
 			case MAXHEALTH:
 				player.setMaxHealth(player.getMaxHealth() + modifyAmount * modifier);

@@ -6,16 +6,13 @@ import enums.ItemType;
 import enums.Statuses;
 
 public class Event {
-	
-	/*Plan for this, each event has a number associated with it, the higher the number the more dangerous/rewarding
-	 * the event it. This allows for a modifier for each route which will multiply the random number, 
-	 * more dangerous routes can have a number such as 2, while safe routes have a number 0.5	 
-	 */
-	
-	private int numEvents = 4;
 	private Display display;
 	private ArrayList<Integer> eventChance = new ArrayList<Integer>();
-	
+	/**
+	 * Takes a list of 4 integers (more or less will not break it) where each entry corresponds the the number
+	 * of chances that the event has of happening.
+	 * @param eventChance
+	 */
 	public Event(int[] eventChance) {
 		int eventCounter = 1;
 		for (int event: eventChance) {
@@ -26,10 +23,22 @@ public class Event {
 		}
 	}
 	
+	/**
+	 * Allows the manual setting of the event chance if an item were 
+	 * to increase/decrease the chance of something.
+	 * happening or for testing
+	 * @param eventChance
+	 */
 	public void setChance(ArrayList<Integer> eventChance) {
 		this.eventChance = eventChance;
 	}
 	
+	/**
+	 * Selects a random integer that is in the eventChance list and runs the logic behind that event .
+	 * @param player
+	 * @param currentDay
+	 * @param display
+	 */
 	public void selectEvent(Player player, int currentDay, Display display) {
 		this.display = display;
 		switch (eventChance.get((int) (Math.random() * eventChance.size()))) {
@@ -52,9 +61,18 @@ public class Event {
 		}
 	}
 	
+	/**
+	 * Creates an enemy pirate and allows the user to select an option to continue the fight and
+	 * select the correct logic to continue.
+	 * @param player
+	 * @param currentDay
+	 */
 	public void fight(Player player, int currentDay){
 		boolean fleeAttempt = false;
-		Ship enemy = new Ship("Enemy", 50, 4, 2);
+		Ship enemy = new Ship("Enemy", 
+				(Math.max(50, (int) Math.random() * 100)), 
+				Math.max(5, (int) (Math.random() * 15)), 
+				Math.max(1, (int) (Math.random() * 5)));
 		int startHealth = player.getHealth();
 		if (display != null) {
 			display.updateDialogue("You are attacked by a ship full of pirates. Choose an option to continue");
@@ -112,9 +130,15 @@ public class Event {
 		reward(player, 0, currentDay);
 	}
 	
+	/**
+	 * Allows the player to leave the fight by surrendering one of their items to the pirates.
+	 * @param player
+	 * @param currentDay
+	 * @return if an item was surrendered
+	 */
 	public boolean surrenderItems(Player player, int currentDay) {
 		if (player.getInventory().size() == 0) {
-			System.out.println("You have no cargo to surrender.");
+			System.out.println("You have no cargo? Then pay with your life!");
 			return false;
 		}
 		while (true) {
@@ -144,6 +168,11 @@ public class Event {
 		}
 	}
 	
+	/**
+	 * Simulates a turn by rolling dice and deals damage to both the player and the pirate.
+	 * @param enemy
+	 * @param player
+	 */
 	public void attack(Ship enemy, Ship player) {
 		ArrayList<Integer> playerDice = roll(player);
 		enemy.damage(playerDice);
@@ -155,6 +184,13 @@ public class Event {
 		player.damage(enemyDice);
 	}
 	
+	/**
+	 * Determines if the player can escape from the pirates.
+	 * The ship with more speed has a greater chance of success.
+	 * @param enemy
+	 * @param player
+	 * @return if the player was successful
+	 */
 	public boolean flee(Ship enemy, Ship player) {
 		int d20 = (int)(Math.random() * 20) + 1;
 		int speedDifference = player.getSpeed() - enemy.getSpeed();
@@ -172,25 +208,38 @@ public class Event {
 		}
 	}
 	
-	
+	/**
+	 * Simulates a dice roll using the attackers strength and cards to determine how many dice to roll
+	 * and the results of the dice.
+	 * @param attacker
+	 * @return the dice that were rolled
+	 */
 	private ArrayList<Integer> roll(Ship attacker){
 		ArrayList<Integer> dice = new ArrayList<>();
 		do {
 			dice.add((int) (Math.random() * 6) + 1);
-		} while (dice.size() < attacker.getStrength());
+		} while (dice.size() < attacker.getStrength());		
+		System.out.println(attacker.getShipName() + " rolled " + dice);
 		if (attacker instanceof Player) {
 			for (Card card: ((Player) attacker).getCards()) {
 				dice = card.doSpecial(dice);
 			}
+			if (((Player) attacker).getCards().size() > 0){
+				System.out.println("Your " + ((Player) attacker).getCards().size() + 
+						" cards modified the dice to produce " + dice);
+			}
 		}
-		System.out.println(dice);
 		return dice;
-		
 	}
 	
+	/**
+	 * Simulates a storm damaging the player and rewarding the player if they are lucky
+	 * @param player
+	 * @param currentDay
+	 */
 	public void storm(Player player, int currentDay){
 		System.out.println("You encounter a storm.");
-		int damage = ((int) (Math.random() * 20) + 1);
+		int damage = ((int) (Math.random() * 15) + 1);
 		player.damage(damage);
 		Entry entry = new Entry(currentDay);
 		entry.addDamage(damage);
@@ -198,15 +247,21 @@ public class Event {
 		player.getLogbook().addEntry(entry);
 		reward(player, -5, currentDay);
 	}
-
-	//Item
 	
+	/**
+	 * Gets a random item if the dice roll + players luck + the modifier is over 15 and allows inventory
+	 * management to allow them to pick it up if they have too much stock
+	 * @param player
+	 * @param eventModifier
+	 * @param currentDay
+	 * @return if the player is rewarded for testing purposes
+	 */
 	public boolean reward(Player player, int eventModifier, int currentDay) {
 		int randomNum;
 		int chance;
 		chance = (int) (Math.random() * 20) + player.getLuck() + eventModifier + 1;
 		ArrayList<Item> items = Item.getRandomItems(player.getLuck());
-		while (chance > 10) {
+		while (chance > 14) {
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
 			if (!player.getInventory().contains(item) & item.getType() == ItemType.CARGO) {
@@ -249,6 +304,11 @@ public class Event {
 		return false;
 	}
 	
+	/**
+	 * Allows the player to select an item to dump
+	 * @param player
+	 * @param currentDay
+	 */
 	public void dumpOptions(Player player, int currentDay) {
 		System.out.println("Select an item to dump.");
 		player.printInventory();
@@ -263,6 +323,12 @@ public class Event {
 		}
 	}
 	
+	/**
+	 * Confirms with the player if they want to dump an item
+	 * @param item
+	 * @param player
+	 * @param currentDay
+	 */
 	public void confirmDump(Item item, Player player, int currentDay){
 		boolean complete = false;
 		while (complete == false) {
@@ -284,6 +350,11 @@ public class Event {
 		}
 	}
 	
+	/**
+	 * Simulates the player rescuing some sailor getting some money
+	 * @param player
+	 * @param currentDay
+	 */
 	public void rescue(Player player, int currentDay) {
 		int amount = Math.max((int) (Math.random() * 25) + 1, 10);
 		System.out.println("You come across a shipwreck and help the survivors onboard.\nThey reward you with $" + amount + ".");
@@ -295,6 +366,10 @@ public class Event {
 		Game.pause();
 	}
 	
+	/**
+	 * Gets the event chance to allow the player to know what events each route will have
+	 * @return
+	 */
 	public ArrayList<Integer> getEventChance() {
 		return eventChance;
 	}

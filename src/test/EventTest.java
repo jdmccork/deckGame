@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,32 +59,17 @@ class EventTest {
 	
 	@Test
 	void testEventCreation() {
-		ArrayList<Integer> expected = new ArrayList<Integer>();
+		ArrayList<Integer> expected = new ArrayList<>(Arrays.asList(1, 1, 1, 1, 2, 2, 2, 3, 3, 4));
 		
 		int [] eventArray = new int[] {4, 3, 2, 1};
 		event = new Event(eventArray);
-		
-		expected.add(1);
-		expected.add(1);
-		expected.add(1);
-		expected.add(1);
-		
-		expected.add(2);
-		expected.add(2);
-		expected.add(2);
-		
-		expected.add(3);
-		expected.add(3);
-		
-		expected.add(4);
 		
 		assertEquals(event.getEventChance(), expected);
 	}
 	
 	@Test
 	void testNothing() {
-		int [] eventArray = new int[] {1, 0, 0, 0};
-		event = new Event(eventArray);
+		event.setChance(new ArrayList<>(Arrays.asList(1)));
 		String input = System.lineSeparator();
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
@@ -100,10 +86,21 @@ class EventTest {
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
 		Game.setTestInput();
-		
-		int [] eventArray = new int[] {0, 0, 1, 0};
+	
+		event.setChance(new ArrayList<>(Arrays.asList(1)));
 		player.modifyLuck(-50);
-		event = new Event(eventArray);
+		event.selectEvent(player, 0, null);
+	}
+	
+	@Test
+	void testRescueSelection() {
+		String input = System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+	
+		event.setChance(new ArrayList<>(Arrays.asList(1)));
+		player.modifyLuck(-50);
 		event.selectEvent(player, 0, null);
 	}
 

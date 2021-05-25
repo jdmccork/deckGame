@@ -114,7 +114,7 @@ class CardTest {
 
 	@Test
 	void testMakeDamageMultiplier() {
-		card.makeDamageMultiplier(5, 1.2);
+		card.makeDamageMultiplier(5, 1.2, 1);
 		
 		dice.add(1);
 		dice.add(5);

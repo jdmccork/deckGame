@@ -11,6 +11,9 @@ import enums.Stats;
 
 public abstract class Item {
 	
+	/**
+	 * All of the items that are used in the game sorted into rarity classes.
+	 */
 	private static ArrayList<ArrayList<Item>> allItems = new ArrayList<ArrayList<Item>>();
 
 	/**
@@ -39,8 +42,14 @@ public abstract class Item {
 	 */
 	private Rarity rarity;
 	
+	/**
+	 * The location that the item was purchased.
+	 */
 	private Island locationPurchased;
 	
+	/**
+	 * The amount of money paid for the item.
+	 */
 	private int purchaseCost;
 	
 	/**
@@ -119,6 +128,10 @@ public abstract class Item {
 		return basePrice;
 	}
 	
+	/**
+	 * 
+	 * @return The type of item that the child is.
+	 */
 	public abstract ItemType getType();
 	
 	/**
@@ -137,8 +150,10 @@ public abstract class Item {
 		return rarity;
 	}
 	
+	/**
+	 * Creates the items from a text file and stores them into the allItems ArrayList
+	 */
 	public static void generateItems() {
-		//TODO This can be changed to conform with the builder patterns we are currently doing in the lectures
 		ArrayList<Item> common = new ArrayList<Item>();
 		ArrayList<Item> uncommon = new ArrayList<Item>();
 		ArrayList<Item> rare = new ArrayList<Item>();
@@ -163,29 +178,9 @@ public abstract class Item {
 				Rarity rarity = Rarity.valueOf(parts.get(11));
 				int index = 12;
 				if(parts.get(1).equals("Cargo")) {
-					item = new Cargo(name, description, size, basePrice, rarity);
-					while (index < parts.size()-1) {
-						if (parts.get(index).equals("Stat")) {
-							((Cargo) item).changeModifier(Stats.valueOf(parts.get(index + 1)), Integer.parseInt(parts.get(index + 3)));
-							index += 4;
-						} else {
-							throw new Exception("Variable doesn't exist");
-						}
-					}
-				}
-				else if(parts.get(1).equals("Card")){ 
-					item = new Card(name, description, size, basePrice, rarity);
-					while (index < parts.size()-1) {
-						if (parts.get(index + 1).equals("multi-transform")) {
-							((Card) item).makeMultiTransform(Integer.parseInt(parts.get(index + 3)),
-									Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
-							index += 8;
-						} else if (parts.get(index + 1).equals("moreDice")) {
-							((Card) item).makeDiceAdder(Integer.parseInt(parts.get(index + 3)),
-									Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
-							index += 8;
-						}
-					}
+					item = generateCargo(index, parts, name, description, size, basePrice, rarity);
+				} else if(parts.get(1).equals("Card")) {
+					item = generateCard(index, parts, name, description, size, basePrice, rarity);
 				}else {
 					throw new Exception("Item Type doesn't exist");
 				}
@@ -213,6 +208,71 @@ public abstract class Item {
 		allItems.add(rare);
 		allItems.add(legendary);
 	}
+	
+	/**
+	 * Creates an instance of Cargo and applies the builder to add the stats it changes
+	 * <p>
+	 * This was originally planned to have more that one possible outcome but time constraints prevented this
+	 * @param index
+	 * @param parts
+	 * @param name
+	 * @param description
+	 * @param size
+	 * @param basePrice
+	 * @param rarity
+	 * @return
+	 * @throws Exception
+	 */
+	private static Item generateCargo(int index, ArrayList<String> parts,
+			String name, String description, int size, int basePrice, Rarity rarity) throws Exception {
+		Item item = new Cargo(name, description, size, basePrice, rarity);
+		while (index < parts.size()-1) {
+			if (parts.get(index).equals("Stat")) {
+				((Cargo) item).changeModifier(Stats.valueOf(parts.get(index + 1)),
+						Integer.parseInt(parts.get(index + 3)));
+				index += 4;
+			} else {
+				throw new Exception("Variable doesn't exist");
+			}
+		}
+		return item;
+	}
+	
+	/**
+	 * Creates an instance of Card and applies the builder to add the stats it changes
+	 * <p>
+	 * This was originally planned to have more that one possible outcome but time constraints prevented this
+	 * @param index
+	 * @param parts
+	 * @param name
+	 * @param description
+	 * @param size
+	 * @param basePrice
+	 * @param rarity
+	 * @return
+	 * @throws Exception
+	 */
+	private static Item generateCard(int index, ArrayList<String> parts,
+			String name, String description, int size, int basePrice, Rarity rarity) throws Exception {
+		Item item = new Card(name, description, size, basePrice, rarity);
+		while (index < parts.size()-1) {
+			if (parts.get(index + 1).equals("multi-transform")) {
+				((Card) item).makeMultiTransform(Integer.parseInt(parts.get(index + 3)),
+						Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
+				index += 8;
+			} else if (parts.get(index + 1).equals("moreDice")) {
+				((Card) item).makeDiceAdder(Integer.parseInt(parts.get(index + 3)),
+						Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
+				index += 8;
+			}
+		}
+		return item;
+	}
+		
+	/**
+	 * Gets all the items from the text file to be generated using the generate items function
+	 * @return
+	 */
 	private static ArrayList<String> readItems() {
 		ArrayList<String> items = new ArrayList<String>();
 		try {
@@ -233,31 +293,57 @@ public abstract class Item {
 		return items;
 	}
 	
+	/**
+	 * @return All common items that have been generated
+	 */
 	public static ArrayList<Item> getCommonItems() {
 		return allItems.get(0);
 	}
 	
+	/**
+	 * @return All uncommon items that have been generated
+	 */
 	public static ArrayList<Item> getUncommonItems() {
 		return allItems.get(1);
 	}
 	
+	/**
+	 * @return All rare items that have been generated
+	 */
 	public static ArrayList<Item> getRareItems() {
 		return allItems.get(2);
 	}
 	
+	/**
+	 * @return All legendary items that have been generated
+	 */
 	public static ArrayList<Item> getLegendaryItems() {
 		return allItems.get(3);
 	}
 	
+	/**
+	 * 
+	 * @return A completely random item from the items that have been generated
+	 */
 	public static Item getRandomItem() {
 		return getRandomItem(0);
 	}
 	
+	/**
+	 * Finds a rarity based on luck and then returns an item within that rarity 
+	 * @param luck
+	 * @return Item
+	 */
 	public static Item getRandomItem(int luck) {
 		ArrayList<Item> itemList = getRandomItems(luck);
 		return itemList.get((int) (Math.random() * itemList.size()));
 	}
 	
+	/**
+	 * Finds the rarity of item to be returned based on the luck value that is passed in
+	 * @param luck
+	 * @return An ArrayList of items with a certain rarity
+	 */
 	public static ArrayList<Item> getRandomItems(int luck){
 		int chance = (int) (Math.random() * 20) + luck + 1;
 		if (chance >= Rarity.LEGENDARY.getChanceModifier()) {
@@ -271,6 +357,10 @@ public abstract class Item {
 		}
 	}
 	
+	/**
+	 * Combines all the items into one ArrayList
+	 * @return ArrayList of all items
+	 */
 	public static ArrayList<Item> getItems() {
 		ArrayList<Item> items = new ArrayList<Item>();
 		items.addAll(getCommonItems());
@@ -280,11 +370,21 @@ public abstract class Item {
 		return items;
 	}
 	
+	/**
+	 * Prints the items and waits for the player to continue
+	 */
 	public void viewItem() {
 		System.out.println(this);
 		Game.pause();
 	}
 	
+	/**
+	 * Gets the price of an item when buying or selling depending on where the item 
+	 * was bought and the stores personal modifier
+	 * @param priceModifier
+	 * @param currentLocation
+	 * @return The integer price of an item
+	 */
 	public int getPrice(double priceModifier, Island currentLocation) {
 		double distanceModifier = (Island.getDistance(locationPurchased, currentLocation) * 0.2) + 1;
 		switch(getRarity()) {
@@ -301,6 +401,14 @@ public abstract class Item {
 		}
 	}
 	
+	/**
+	 * Allows you to search for an item that has been generated based on name.
+	 * <p>
+	 * This was not used in the current implementation but was designed so that events could 
+	 * give you a specific item eg. having live chickens gives you a chance to get eggs
+	 * @param itemName
+	 * @return
+	 */
 	public static Item getItem(String itemName) {
 		for (Item item: getItems()) {
 			if (item.getName() == itemName) {
@@ -310,10 +418,17 @@ public abstract class Item {
 		return null;
 	}
 	
+	/**
+	 * Saves the amount that you bought the item for.
+	 * @param cost
+	 */
 	public void setPurchaseCost(int cost) {
 		purchaseCost = cost;
 	}
 	
+	/**
+	 * @return The amount of money that the item cost
+	 */
 	public int getPurchaseCost() {
 		return purchaseCost;
 	}
