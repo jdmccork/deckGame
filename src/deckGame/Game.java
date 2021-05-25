@@ -18,6 +18,7 @@ public class Game {
 	private int currentDay;
 	private Display display;
 	private Route chosenRoute;
+	private boolean paused = false;
 	
 	public static void setTestInput() {
 		userInput = new Scanner(System.in);
@@ -312,10 +313,13 @@ public class Game {
 		int time = chosenRoute.getTime(player.getSpeed());
 		player.sail(chosenRoute);
 		for (int i = 0; i != time & currentDay < days; i++) {
+			while (paused) {
+				//An infinite loop that relies on external change of the paused variable.
+			}
 			currentDay += 1;
 			display.updateDay(String.valueOf(currentDay));
 			Event event = new Event();
-			event.selectEvent(chosenRoute, player, display);
+			display.setGameState(event.eventForGUI());
 		}
 		if (currentDay < days) {
 			player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
@@ -324,6 +328,10 @@ public class Game {
 		}else {
 			throw new EndGameException();
 		}
+	}
+	
+	public void setPause(boolean setting) {
+		this.paused = setting;
 	}
 	
 	public static void pause() {

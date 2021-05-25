@@ -33,10 +33,24 @@ public class Event {
 		Game.pause();
 	}
 	
+	public String eventForGUI() {
+		switch (Math.min((int) (Math.random() * numEvents), numEvents) + 1) {
+		case 1: //nothing happens
+			return "Sea";
+		case 2: //Fight
+			return "Pirates";
+		case 3: //Storm
+			return "Storm";
+		case 4: //rescue sailors
+			return "Rescue";
+		default:
+			return "Error";
+		}
+	}
+	
 	public void fight(Player player, int currentDay){
 		Ship enemy = new Ship("Enemy", 50, 4, 2);
-		display.updateDialogue("You are attacked by a ship full of pirates. Choose an option to continue");
-		display.setGameState("Pirates");
+		System.out.println("You are attacked by a ship full of pirates. Choose an option to continue");
 		while (true) {
 			System.out.println("1: Fight");
 			System.out.println("2: Attempt to flee");
@@ -60,7 +74,6 @@ public class Event {
 		}
 	}
 	
-	
 	public void attack(Ship enemy, Ship player) {
 		while (enemy.getStatus() != Statuses.DESTROYED) {
 			ArrayList<Integer> playerDice = roll(player);
@@ -74,6 +87,21 @@ public class Event {
 			player.damage(enemyDice);
 			Game.pause();
 		}
+	}
+	
+	public String attackGUI(Ship enemy, Ship player) {
+		while (enemy.getStatus() != Statuses.DESTROYED) {
+			ArrayList<Integer> playerDice = roll(player);
+			enemy.damage(playerDice);
+			
+			if (enemy.getStatus() == Statuses.DESTROYED) {
+				return "The enemy has been sunk";
+			}
+			
+			ArrayList<Integer> enemyDice = roll(enemy);
+			return player.damageGUI(enemyDice);
+		}
+		return "An error occurred. The enemy claims to be destroyed before you even fight them";
 	}
 	
 	public boolean flee(Ship enemy, Ship player) {
@@ -117,6 +145,15 @@ public class Event {
 		entry.addDamage(damage);
 		entry.makeEvent("Encountered a storm");
 		player.getLogbook().addEntry(entry);
+	}
+	
+	public String stormGUI(Player player, int currentDay) {
+		int damage = ((int) (Math.random() * 20));
+		Entry entry = new Entry(currentDay);
+		entry.addDamage(damage);
+		entry.makeEvent("Encountered a storm");
+		player.getLogbook().addEntry(entry);
+		return player.damageGUI(damage);
 	}
 
 	//Item

@@ -80,12 +80,31 @@ public class Ship {
 				+ "\nIt currently has " + health + " health remaining.");
     }
 	
+	public String damageGUI(int damage) {
+		if (health > damage) {
+            health -= damage;
+            status = Statuses.DAMAGED;
+    	} else {
+    		getDestroyed();
+    	}
+		return "The " + shipName + " took " + damage + " damage."
+				+ "\nIt currently has " + health + " health remaining.";
+    }
+	
 	public void damage(ArrayList<Integer> dice) {
 		int damage = 0;
 		for (int die:dice) {
 			damage += die;
 		}
 		damage(damage);
+	}
+	
+	public String damageGUI(ArrayList<Integer> dice) {
+		int damage = 0;
+		for (int die:dice) {
+			damage += die;
+		}
+		return damageGUI(damage);
 	}
 	
 	public int getHealth() {

@@ -23,6 +23,7 @@ import javax.swing.border.EmptyBorder;
 
 import enums.Actions;
 import enums.ItemType;
+import enums.Statuses;
 
 import java.awt.Image;
 import java.awt.Insets;
@@ -55,6 +56,7 @@ public class Display {
 	private int currentLogPage;
 	private int currentPage;
 	private JButton openLog;
+	private Ship enemy;
 
 	/**
 	 * Create the application.
@@ -200,12 +202,68 @@ public class Display {
 				}
 				updateMainDisplay(i + 5, source, true, true);
 				updateMainDisplay(i + 10, stock.get(i).getName(), true, true);
-				updateDisplayFunction(i + 5, Actions.BUY);
-				updateDisplayValue(i + 5, i + 1);
+				updateDisplayFunction(i + 5, Actions.VIEW);
+				updateDisplayValue(i + 5, i);
 			} else {
 				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", false, true);
 			}
 		}
+	}
+	
+	public void buyItem(int value) {
+		ArrayList<Item> stock = game.getPlayer().getLocation().getStore().getStock();
+		Item item = stock.get(value);
+		double buyModifier = game.getPlayer().getLocation().getStore().getBuyModifier();
+		int price = item.getPrice(buyModifier, game.getPlayer().getLocation());
+		if (game.getPlayer().getGold() >= price) {
+			if (!game.getPlayer().addItem(item)) {
+				updateDialogue("Your ship currently has " + game.getPlayer().getCargoStored() + "/" + game.getPlayer().getCapacity()   
+				+ " items. Upgrade your ship or sell an item to purchace this item.");
+			} else {
+				game.getPlayer().modifyGold(-price);
+				updateGold(String.valueOf(game.getPlayer().getGold()));
+				game.getPlayer().getLocation().getStore().removeStock(item);
+				updateDialogue("Purchase successful. " + item.getName() + " has been added to your ship");
+				Entry entry = new Entry(game.getCurrentDay());
+				entry.makeTransaction(item, "Bought ");
+				entry.addCost(price);
+				game.getPlayer().getLogbook().addEntry(entry);
+			}
+		}else{
+			updateDialogue("You don't have enough money to buy this item.");
+		}
+		openBuy();
+	}
+	
+	public void viewItem(int value) {
+		clearButtons();
+		//Create an exit button
+		updateMainDisplay(0, "Return to Buy Menu", true, true);
+		updateDisplayFunction(0, Actions.OPEN_BUY);
+		ArrayList<Item> stock = game.getPlayer().getLocation().getStore().getStock();	
+		//Create greyed-out displays of other items for aesthetics
+		for(int i = 0; i < stock.size(); i++) {
+			if(stock.get(i).getType() == ItemType.CARGO) {
+				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", false, true);
+			} else {
+				updateMainDisplay(i + 5, "./src/resources/Images/Card.png", false, true);
+			}
+		}
+		//Create a display of the item, with some information
+		Item item = stock.get(value);
+		String source;
+		if (item.getType() == ItemType.CARGO) {
+			source = "./src/resources/Images/Crate.png";
+		} else {
+			source = "./src/resources/Images/Card.png";
+		}
+		updateMainDisplay(value + 5, source, true, true);
+		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getPrice()) + "</html>", true, true);
+		updateDialogue(item.getDescription());
+		//Create a button to purchase the item
+		updateMainDisplay(4, "Purchase", true, true);
+		updateDisplayFunction(4, Actions.BUY);
+		updateDisplayValue(4, value);
 	}
 	
 	private void clearButtons() {
@@ -238,6 +296,41 @@ public class Display {
 		return this.currentPage;
 	}
 	
+	public void sellItem(int value) {
+		clearButtons();
+		Player player = game.getPlayer();
+		ArrayList<Item> inventory = new ArrayList<Item>();
+		inventory.addAll(player.getInventory());
+		inventory.addAll(player.getCards());
+		Item item =  inventory.get(value + (game.getCurrentDay() * 5));
+		int price = item.getPrice(player.getLocation().getStore().getSellModifier(), player.getLocation());
+		if (player.getInventory().contains(item)) {
+			player.removeItem(item);
+			player.modifyGold(price);
+			updateGold(String.valueOf(player.getGold()));
+			updateDialogue("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
+			item.setLocationPurchased(null);
+			Entry entry = new Entry(game.getCurrentDay());
+			entry.makeTransaction(item, "Sold ");
+			entry.addCost(-price);
+			player.getLogbook().addEntry(entry);
+			openSell();
+		} else {
+			updateDialogue("Something went wrong, you don't have this item.");
+		}
+	}
+	
+	private String wrapButtonText(String message) {
+		int buttonSize = 30;
+		if (message.length() > buttonSize) {
+			int splitPlace = message.substring(0, buttonSize).lastIndexOf(" ");
+			String smaller = wrapButtonText(message.substring(splitPlace + 1));
+			return message.substring(0, splitPlace) + "<br>" + smaller;
+		} else {
+			return message;
+		}
+	}
+	
 	public void showInventory() {
 		clearButtons();
 		ArrayList<Item> items = new ArrayList<Item>();
@@ -245,9 +338,8 @@ public class Display {
 		for (int reference = 0; reference < 5; reference++) {
 			if(this.currentPage * 5 + reference < items.size()) {
 				updateMainDisplay(reference, items.get(reference).getName(), true, true);
-				updateMainDisplay(reference + 5, items.get(reference).getDescription(), true, true);
+				updateMainDisplay(reference + 5, "<html>" + wrapButtonText(items.get(reference).getDescription()) + "</html>", true, true);
 			}
-			reference++;
 		}
 		updateDisplayFunction(11, Actions.PREV_INV);
 		updateDisplayFunction(13, Actions.NEXT_INV);
@@ -263,6 +355,46 @@ public class Display {
 		}
 		updateMainDisplay(12, "Close Inventory", true, true);
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
+	}
+	
+	public void viewSell(int value) {
+		clearButtons();
+		//Create an exit button
+		updateMainDisplay(0, "Return to Sell Menu", true, true);
+		updateDisplayFunction(0, Actions.OPEN_SELL);
+		//Create a sell button
+		updateMainDisplay(4, "Sell Item", true, true);
+		updateDisplayFunction(4, Actions.SELL);
+		updateDisplayValue(4, value);
+		//Create a grey icon for non-selected items
+		ArrayList<Item> inventory = new ArrayList<Item>();
+		inventory.addAll(game.getPlayer().getInventory());
+		inventory.addAll(game.getPlayer().getCards());
+		int pageShift = currentPage * 5;
+		for(int i = 0; i < 5; i++) {
+			try {
+				Item item = inventory.get(i + pageShift);
+				String source;
+				if(item.getType() == ItemType.CARGO) {
+					source = "./src/resources/Images/Crate.png";
+				} else {
+					source = "./src/resources/Images/Card.png";
+				}
+				updateMainDisplay(i + 5, source, false, true);
+			} catch(IndexOutOfBoundsException e) {
+				break;
+			}
+		}
+		//Create an icon for selected item
+		Item item = inventory.get(value);
+		if (item.getType() == ItemType.CARGO) {
+			updateMainDisplay(value + 5, "./src/resources/Images/Crate.png", true, true);
+		} else {
+			updateMainDisplay(value + 5, "./src/resources.Images/Card.png", true, true);
+		}
+		double modifier = game.getPlayer().getLocation().getStore().getSellModifier();
+		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Price: $" + item.getPrice(modifier, game.getPlayer().getLocation())) + "</html>", true, true);
+		updateDialogue(item.getDescription());
 	}
 	
 	public void openSell() {
@@ -292,14 +424,15 @@ public class Display {
 		for(int i = 0; i < 5; i++) {
 			if(this.currentPage * 5 + i < inventory.size()) {
 				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
-				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
-				updateDisplayFunction(i + 5, Actions.SELL);
-				updateDisplayValue(i + 5, i + 1);
 			} else if (this.currentPage * 5 - inventory.size() + i < deck.size()) {
-				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+				updateMainDisplay(i + 5, "./src/resources/Images/Card.png", true, true);
+			}
+			try {
 				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
-				updateDisplayFunction(i + 5, Actions.SELL);
-				updateDisplayValue(i + 5, i + 1);
+				updateDisplayFunction(i + 5, Actions.VIEW_SELL);
+				updateDisplayValue(i + 5, i);
+			} catch(IndexOutOfBoundsException e) {
+				break;
 			}
 		}
 	}
@@ -311,7 +444,7 @@ public class Display {
 		for (int reference = 0; reference < 5; reference++) {
 			if(this.currentPage * 5 + reference < items.size()) {
 				updateMainDisplay(reference, items.get(reference).getName(), true, true);
-				updateMainDisplay(reference + 5, items.get(reference).getDescription(), true, true);
+				updateMainDisplay(reference + 5, "<html>" + wrapButtonText(items.get(reference).getDescription()) + "</html>", true, true);
 			}
 			reference++;
 		}
@@ -327,7 +460,7 @@ public class Display {
 		} else {
 			updateMainDisplay(13, "Next Page", false, true);
 		}
-		updateMainDisplay(12, "Close Inventory", true, true);
+		updateMainDisplay(12, "Close Deck", true, true);
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
@@ -354,6 +487,35 @@ public class Display {
 	
 	public void setIsland() {
 		this.game.executeSail();
+	}
+	
+	public void pirateEncounter() {
+		this.enemy = new Ship("Enemy", 50, 4, 2);
+		updateDialogue("You are attacked by a ship full of pirates. Choose an option to continue");
+		updateMainDisplay(11, "Fight", true, true);
+		updateDisplayFunction(11, Actions.FIGHT);
+		
+		updateMainDisplay(12, "Attempt to flee", true, true);
+		updateDisplayFunction(12, Actions.FLEE);
+		
+		updateMainDisplay(13, "View enemy", true, true);
+		updateDisplayFunction(13, Actions.VIEW_SHIP);
+	}
+	
+	public void pirateFight() {
+		//ID
+	}
+	
+	public void unpauseGame() {
+		this.game.setPause(false);
+	}
+	
+	public void stormEncounter() {
+		Event event = new Event();
+		updateDialogue(event.stormGUI(game.getPlayer(), game.getCurrentDay()));
+		updateMainDisplay(12, "Continue", true, true);
+		game.setPause(true);
+		updateDisplayFunction(12, Actions.CONTINUE);
 	}
 	
 	public void setGameState(String s) {
@@ -414,6 +576,21 @@ public class Display {
 			updateDisplayValue(12, 2);
 			break;
 		case "Pirates":
+			changeBackground("./src/resources/Images/SeaBackground.png");
+			pirateEncounter();
+			break;
+		case "Storm":
+			changeBackground("./src/resources/Images/SeaBackground.png");
+			stormEncounter();
+			break;
+		case "Uneventful":
+			changeBackground("./src/resources/Images/SeaBackground.png");
+			updateDialogue("The day passes uneventfully.");
+			updateMainDisplay(7, "Continue", true, true);
+			updateDisplayFunction(7, Actions.CONTINUE);
+			game.setPause(true);
+			break;
+		case "Rescue":
 			changeBackground("./src/resources/Images/SeaBackground.png");
 			break;
 		case "Confirm":
@@ -536,9 +713,8 @@ public class Display {
 		entries.addAll(game.getLogItems());
 		for (int reference = 0; reference < 10; reference++) {
 			if(this.currentLogPage * 10 + reference < entries.size()) {
-				updateMainDisplay(reference, entries.get(reference).toString(), true, true);
+				updateMainDisplay(reference, "<html>" + wrapButtonText(entries.get(reference).toString()) + "</html>", true, true);
 			}
-			reference++;
 		}
 		updateDisplayFunction(11, Actions.LOG_PREV);
 		updateDisplayFunction(13, Actions.LOG_NEXT);
