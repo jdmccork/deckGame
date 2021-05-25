@@ -317,7 +317,7 @@ public class Store {
 		    if(adviceCount == adviceList.size()) {
 		    	adviceCount = 0;
 		    }
-		} catch (ArrayIndexOutOfBoundsException e) {
+		} catch (IndexOutOfBoundsException e) {
 			output = "*The shopkeeper seems like he's had a bit too much to drink to give advice*";
 		}
 		return output;

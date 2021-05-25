@@ -19,14 +19,23 @@ public class ChangingButton extends JButton {
 				case START:
 					display.setGameState("Beginning");
 					break;
+				case VIEW_SELL:
+					display.viewSell(value);
+					break;
 				case SELL:
-					//display.game.sellItem(this.value);
+					display.sellItem(value);
 					break;
 				case BUY:
-					//display.game.buyItem(this.value);
+					display.buyItem(value);
+					break;
+				case VIEW:
+					display.viewItem(value);
 					break;
 				case SAIL:
 					display.sailShip(value);
+					break;
+				case CONTINUE:
+					display.unpauseGame();
 					break;
 				case GO_TO_ISLAND:
 					display.setIsland(value);
@@ -98,6 +107,12 @@ public class ChangingButton extends JButton {
 					break;
 				case PAY:
 					display.payCrew(value);
+					break;
+				case FIGHT:
+					break;
+				case FLEE:
+					break;
+				case VIEW_SHIP:
 					break;
 				case NONE:
 					break;

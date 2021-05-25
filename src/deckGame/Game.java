@@ -18,6 +18,7 @@ public class Game {
 	private int currentDay;
 	private Display display;
 	private Route chosenRoute;
+	private boolean paused = false;
 	
 	public static void setTestInput() {
 		userInput = new Scanner(System.in);
@@ -457,9 +458,13 @@ public class Game {
 		int time = chosenRoute.getTime(player.getSpeed());
 		player.sail(chosenRoute);
 		for (int i = 0; i != time & currentDay < days; i++) {
+			while (paused) {
+				//An infinite loop that relies on external change of the paused variable.
+			}
 			currentDay += 1;
 			if (display != null) {
 				display.updateDay(String.valueOf(currentDay));
+				display.setGameState(chosenRoute.getEvent().eventForGUI());
 			}
 			chosenRoute.getEvent().selectEvent(player, currentDay, display);
 		}
@@ -475,6 +480,10 @@ public class Game {
 		} else {
 			throw new EndGameException();
 		}
+	}
+	
+	public void setPause(boolean setting) {
+		this.paused = setting;
 	}
 	
 	public static void pause() {
