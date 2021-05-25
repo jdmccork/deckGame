@@ -182,4 +182,32 @@ class PlayerTest {
 		
 		assertEquals(25, player.getGold());
 	}
+	
+	@Test
+	void testPayCrewCMDPoor() {
+		String input = "1" + System.lineSeparator() + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		player.modifyGold(-player.getGold());
+		
+		assertFalse(player.payCrewCMD(5));
+	}
+	
+	@Test
+	void testDump() {
+		String input = System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		Item item = Item.getRandomItem();
+		player.modifyCapacity(10);
+		player.addItem(item);
+		player.dump(item, 5);
+		
+		String expected = "Dump successful. " + item.getName() + " has been removed from your ship.";
+		
+		assertEquals(0, player.getCargoStored());
+	}
 }

@@ -220,15 +220,15 @@ class GameTest {
 		}
 	}
 	
-	@Test
-	void testExecuteSail() {
-		game.gameSetup();
-		game.sessionSetup("Tester", "Test ship", 25, "3");
-		Route route = game.getPlayer().getLocation().getRoutes().get(0);
-		route.getEvent().setChance(new ArrayList<Integer>(1));
-		game.executeSail(route);
-		assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
-	}
+//	@Test
+//	void testExecuteSail() {
+//		game.gameSetup();
+//		game.sessionSetup("Tester", "Test ship", 25, "3");
+//		Route route = game.getPlayer().getLocation().getRoutes().get(0);
+//		route.getEvent().setChance(new ArrayList<Integer>(1));
+//		game.executeSail(route);
+//		assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+//	}
 	
 	@Test
 	void testEndGame() {

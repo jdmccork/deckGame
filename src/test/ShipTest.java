@@ -2,6 +2,8 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -40,6 +42,11 @@ class ShipTest {
 
 	@Test
 	void damageTest() {
+		String input = System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
 		assertEquals(200, ship.getHealth());
 		ship.damage(15);
 		assertEquals(185, ship.getHealth());

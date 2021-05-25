@@ -262,7 +262,7 @@ public class Display {
 			source = "./src/resources/Images/Card.png";
 		}
 		updateMainDisplay(value + 5, source, true, true);
-		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getPrice()) + "</html>", true, true);
+		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getBasePrice()) + "</html>", true, true);
 		updateDialogue(item.getDescription());
 		//Create a button to purchase the item
 		updateMainDisplay(4, "Purchase", true, true);
@@ -516,8 +516,8 @@ public class Display {
 	}
 	
 	public void stormEncounter() {
-		Event event = new Event();
-		updateDialogue(event.stormGUI(game.getPlayer(), game.getCurrentDay()));
+		//Event event = new Event();
+		//updateDialogue(event.stormGUI(game.getPlayer(), game.getCurrentDay()));
 		updateMainDisplay(12, "Continue", true, true);
 		game.setPause(true);
 		updateDisplayFunction(12, Actions.CONTINUE);

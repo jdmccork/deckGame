@@ -158,7 +158,7 @@ public abstract class Item {
 		ArrayList<Item> uncommon = new ArrayList<Item>();
 		ArrayList<Item> rare = new ArrayList<Item>();
 		ArrayList<Item> legendary = new ArrayList<Item>();
-		
+
 		ArrayList<String> lines = readItems();
 		Item item;
 		for(String line : lines) {
@@ -264,6 +264,8 @@ public abstract class Item {
 				((Card) item).makeDiceAdder(Integer.parseInt(parts.get(index + 3)),
 						Integer.parseInt(parts.get(index + 5)), Integer.parseInt(parts.get(index + 7)));
 				index += 8;
+			}else {
+				throw new Exception("Variable doesn't exist");
 			}
 		}
 		return item;

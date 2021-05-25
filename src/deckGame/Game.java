@@ -173,6 +173,8 @@ public class Game {
 	
 	public void gameSetup() {
 		Item.generateItems();
+		System.out.println("WHY??");
+
 		//Store.readAdvice();
 		generateIslands();
 		generateAllRoutes(islands);

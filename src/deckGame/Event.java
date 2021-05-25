@@ -62,7 +62,7 @@ public class Event {
 	}
 	
 	public String eventForGUI() {
-		switch (Math.min((int) (Math.random() * numEvents), numEvents) + 1) {
+		switch (eventChance.get((int) (Math.random() * eventChance.size()))) {
 		case 1: //nothing happens
 			return "Sea";
 		case 2: //Fight

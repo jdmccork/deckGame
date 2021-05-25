@@ -87,7 +87,7 @@ public class Entry extends Logbook {
 	public String toString() {
 		String output = "Day " + day + ": ";
 		if (transactionType != null) {
-			output += item.getName() + " " + transactionType;
+			output += transactionType + " " + item.getName();
 		}
 		if (eventName != null) {
 			output += eventName;
