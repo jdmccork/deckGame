@@ -1,7 +1,5 @@
 package deckGame;
 
-import java.util.ArrayList;
-
 public class Route {
 	/**
 	 * The island from which this route starts.
@@ -16,9 +14,7 @@ public class Route {
 	/**
 	 * The distance between this route's source and destination.
 	 */
-	private int distance;	
-	
-	private int routeSafety;
+	private int distance;
 	
 	private Event event;
 	
@@ -31,7 +27,6 @@ public class Route {
 		this.source = source;
 		this.destination = destination;
 		distance = (int) Math.ceil(Island.getDistance(source, destination));
-		routeSafety = 1;
 		int nothingChance = Math.min(1,(int) (Math.random() * 25));
 		int pirateChance = (int) (Math.random() * 10);
 		int stormChance = (int) (Math.random() * 15);
@@ -79,6 +74,53 @@ public class Route {
 	
 	public Event getEvent() {
 		return event;
+	}
+	
+	/**
+	 * Prints the chance of any event happening on a route
+	 */
+	public void viewEvents() {
+		int totalProbability = event.getEventChance().size();
+		int count = 0;
+		String output = "There is a: ";
+		for (int nothingOccurance: event.getEventChance()) {
+			if (nothingOccurance == 1) {
+				count += 1;
+			}
+		}
+		if (count >= 1) {
+			output += "\n" + count/totalProbability + " chance for nothing to happen";
+			}
+		
+		count = 0;
+		for (int pirateOccurance: event.getEventChance()) {
+			if (pirateOccurance == 2) {
+				count += 1;
+			}
+		}
+		if (count >= 1) {
+			output += "\n" + count/totalProbability + " chance to be attacked by pirates";
+		}
+		
+		count = 0;
+		for (int stormOccurance: event.getEventChance()) {
+			if (stormOccurance == 3) {
+				count += 1;
+			}
+		}
+		if (count >= 1) {
+			output += "\n" + count/totalProbability + " chance to encounter a storm";
+		}
+		
+		count = 0;
+		for (int rescueOccurance: event.getEventChance()) {
+			if (rescueOccurance == 4) {
+				count += 1;
+			}
+		}
+		if (count >= 1) {
+			output += "\n" + count/totalProbability + " chance to find sailors in need of rescue";
+		}
 	}
 	
 }

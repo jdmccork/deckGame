@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import deckGame.Item;
 
 class GenerateItemTest {
-	private int currentItemCount = 24;
+	private int currentItemCount = 25;
 	
 	@Test
 	void testGenerateItems() {

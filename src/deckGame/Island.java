@@ -8,6 +8,9 @@ public class Island {
 	 */
 	private Store store;
 	
+	/**
+	 * Location in the display grid the island will be visable
+	 */
 	private int displayLocation = 0;
 	
 	/**
@@ -42,13 +45,20 @@ public class Island {
 		locationX = x;
 		locationY = y;
 		setDisplay(location);
-		generateStore();
+		store = new Store(this);
 	}
 	
+	/**
+	 * Sets the location that the island will be on the display grid
+	 * @param location
+	 */
 	public void setDisplay(int location) {
 		this.displayLocation = location;
 	}
 	
+	/**
+	 * @return location of the island on the display grid
+	 */
 	public int getDisplay() {
 		return this.displayLocation;
 	}
@@ -106,22 +116,12 @@ public class Island {
 		return store;
 	}
 	
-	public void generateStore() {
-		store = new Store(this);
-	}
-	
 	/**
 	 * Gets a string representation of this island.
 	 */
 	public String toString() {
 		return ("Island: " + islandName + "\nLocation: (" + locationX + ", " + locationY + ")");
 	}
-	
-	/*
-	public void getStores{
-		
-	}
-	*/
 	
 	/**
 	 * Gets the name of this island.
@@ -130,20 +130,4 @@ public class Island {
 	public String getName(){
 		return islandName;
 	}
-	/*
-	public static void main(String[] args) {
-		Island firstIsland = new Island("Home", 0, 0);
-		Island secondIsland = new Island("Uni", 10, 15);
-		Island thirdIsland = new Island("Shop", 5, -20);
-		ArrayList<Island> islands = new ArrayList<Island>();
-		islands.add(firstIsland);
-		islands.add(secondIsland);
-		islands.add(thirdIsland);
-		for (Island island : islands) {
-			island.generateRoutes(islands);
-			island.displayRoutes();
-		}
-	}
-	*/
-	
 }

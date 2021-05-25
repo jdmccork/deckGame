@@ -7,17 +7,17 @@ import enums.Actions;
 public class Player extends Ship {
 	
 	/**
-	 * The name of this player
+	 * The name of this player.
 	 */
 	private String userName;
 	
 	/**
-	 * The amount of gold this player has
+	 * The amount of gold this player has.
 	 */
 	private int gold;
 	
 	/**
-	 * The amount of cards the player can hold
+	 * The amount of cards the player can hold.
 	 */
 	private int deckSize;
 	
@@ -27,31 +27,43 @@ public class Player extends Ship {
 	private Island location;
 	
 	/**
-	 * The cards the player has
+	 * The cards the player has.
 	 */
 	private ArrayList<Card> cards;
 	
 	/**
-	 * A list of cargo that is currently being transported
+	 * A list of cargo that is currently being transported.
 	 */
 	private ArrayList<Cargo> inventory;
 	
 	/**
-	 * The number of item space that can be used on the ship
+	 * The number of item space that can be used on the ship.
 	 */
 	private int capacity;
 	
 	/**
-	 * Alters the chance for item and card rarity 
+	 * Alters the chance for item and card rarity .
 	 */
 	private int luck;
 	
+	/**
+	 * The amount of cargo that is currently stored in the ship.
+	 */
 	private int cargoStored;
 	
+	/**
+	 * The number of crew required to run the ship.
+	 */
 	private int crew;
 	
+	/**
+	 * The ships logbook which holds entries of all the events that occur to the player.
+	 */
 	private Logbook logbook;
 	
+	/**
+	 * The display that is used by the game.
+	 */
 	private Display display;
 	
 	/**
@@ -105,8 +117,13 @@ public class Player extends Ship {
 		return capacity;
 	}
 	
+	/**
+	 * Changes the amount of cargo that the ship can carry. 
+	 * @param amount
+	 * @return false if the cargo would reduce the storage capacity below the current storage
+	 */
 	public boolean modifyCapacity(int amount) {
-		if (capacity + amount >= inventory.size()) {
+		if (capacity + amount >= cargoStored) {
 			capacity += amount;
 			return true;
 		}
@@ -162,6 +179,10 @@ public class Player extends Ship {
 		return luck;
 	}
 	
+	/**
+	 * Changes the luck value associated with the player. This has no restrictions.
+	 * @param amount
+	 */
 	public void modifyLuck(int amount) {
 		luck += amount;
 	}
@@ -182,6 +203,10 @@ public class Player extends Ship {
 		}
 	}
 	
+	/**
+	 * Prints out the number of cards in the players deck, 
+	 * then prints each item in turn.
+	 */
 	public void printCards() {
 		if(cards.size() == 1) {
 			System.out.println("There is currently " + cards.size() + " card in your deck:");
@@ -233,14 +258,16 @@ public class Player extends Ship {
 	public void removeItem(Item item) {
 		if (item instanceof Cargo) {
 			if (inventory.contains(item)) {
-				if (((Cargo) item).alterStat(this, -1)) { //TODO Doesn't reduce
+				if (((Cargo) item).alterStat(this, -1)) {
 					inventory.remove(item);
 					cargoStored -= item.getSize();
+					
 				}
 			}
 		}else if (item instanceof Card) {
 			cards.remove(item);
 		}
+		item.setPurchaseCost(-1);
 	}
 	
 	public ArrayList<Card> getCards(){

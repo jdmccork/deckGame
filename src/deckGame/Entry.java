@@ -1,35 +1,89 @@
 package deckGame;
 
 public class Entry extends Logbook {
+	/**
+	 * The day that the entry was created
+	 */
 	private int day;
+	
+	/**
+	 * The item that is involved in the event if any
+	 */
 	private Item item = null;
+	
+	/**
+	 * The transaction that is involved in the event if any
+	 */
 	private String transactionType = null;
+	
+	/**
+	 * The name of the event that is involved in the event if any
+	 */
 	private String eventName = null;
+	
+	/**
+	 * The damage that occurred to the ship during the event if any
+	 */
 	private int damage = 0;
+	
+	/**
+	 * The cost of the event if any
+	 */
 	private int cost = 0;
+	
+	/**
+	 * The island the event happened if any
+	 */
 	private Island location = null;
 
+	/**
+	 * Creates a new instance of Entry
+	 * @param day
+	 */
 	public Entry(int day) {
 		this.day = day;
 	}
 	
+	/**
+	 * Sets the parameters to allow for correct formating
+	 * @param item
+	 * @param type
+	 */
 	public void makeTransaction(Item item, String type) {
 		this.item = item;
 		transactionType = type;
 	}
 	
+	/**
+	 * Sets the parameters to allow for correct formating
+	 * @param item
+	 * @param type
+	 */
 	public void makeEvent(String type) {
 		eventName = type;
 	}
 	
+	/**
+	 * Sets the parameters to allow for correct formating
+	 * @param item
+	 * @param type
+	 */
 	public void addDamage(int amount) {
 		damage = amount;
 	}
 	
+	/**
+	 * Sets the parameters to allow for correct formating
+	 * @param item
+	 * @param type
+	 */
 	public void addCost(int amount) {
 		cost = amount;
 	}
 	
+	/**
+	 * Formats the details of the entry in string form
+	 */
 	public String toString() {
 		String output = "Day " + day + ": ";
 		if (transactionType != null) {

@@ -290,7 +290,6 @@ public class Store {
 		if (player.getInventory().contains(item)) {
 			player.removeItem(item);
 			player.modifyGold(price);
-			item.setPurchaseCost(-1);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
 			item.setLocationPurchased(null);
 			Entry entry = new Entry(currentDay);

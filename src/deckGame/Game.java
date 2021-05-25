@@ -10,7 +10,6 @@ import enums.Statuses;
 
 
 public class Game {
-	private static Game currentGame;
 	private static Scanner userInput;
 	private Player player;
 	private ArrayList<Island> islands;
@@ -43,7 +42,6 @@ public class Game {
 	}
 	
 	public ArrayList<Entry> getLogItems() {
-		//TODO
 		return player.getLogbook().getEntries();
 	}
 
@@ -174,7 +172,6 @@ public class Game {
 	}
 	
 	public void gameSetup() {
-		currentGame = this;
 		Item.generateItems();
 		//Store.readAdvice();
 		generateIslands();
@@ -183,7 +180,6 @@ public class Game {
 	
 	public void sessionSetup(String userName, String shipName, int duration, String ship) {
 		player = createPlayer(userName, shipName, ship);
-		player.addItem(Item.getItem("Snake Eye Chef"));
 		player.getLocation().getStore().generateStock(player);
 		days = duration;
 	}

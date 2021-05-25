@@ -86,7 +86,7 @@ class PlayerTest {
 		player.addItem(testCardTransform);
 		
 		Card testCardMultiply = new Card("Test card", "Card to be used for testing", 1, 50, Rarity.COMMON);
-		testCardMultiply.makeDamageMultiplier(2, 1.3);
+		testCardMultiply.makeDamageMultiplier(2, 1.3, 1);
 		player.addItem(testCardMultiply);
 		
 		Card testCardDiceAdd = new Card("Test card", "Card to be used for testing", 1, 50, Rarity.COMMON);
