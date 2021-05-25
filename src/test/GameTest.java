@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import deckGame.Display;
+import deckGame.EndGameException;
 import deckGame.Game;
 import deckGame.Island;
 import deckGame.Item;
@@ -158,19 +159,86 @@ class GameTest {
 		assertEquals(4, island1routes.size());
 	}
 
+		
+	@Test
+	void testGetInt() {
+		for (int i = 0; i < 100; i++) {
+			String input = Integer.toString(i) + System.lineSeparator();
+			InputStream in = new ByteArrayInputStream(input.getBytes());
+			System.setIn(in);
+			Game.setTestInput();
+			assertEquals(i, Game.getInt());
+		}
+	}
+	
+	@Test
+	void testSessionSetup() {
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		assertEquals("Tester",game.getPlayer().getUserName());
+	}
+	
+	@Test
+	void testChargeRepairFull() {
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		int gold = game.getPlayer().getGold();
+		assertTrue(game.chargeRepair());
+		assertEquals(gold, game.getPlayer().getGold());
+	}
+	
+	@Test
+	void testChargeRepairDamaged() {
+		String input = System.lineSeparator() + 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		game.getPlayer().damage(20);
+		int gold = game.getPlayer().getGold();
+		assertTrue(game.chargeRepair());
+		assertEquals(game.getPlayer().getMaxHealth(), game.getPlayer().getHealth());
+		assertEquals(gold - 4, game.getPlayer().getGold());
+	}
+	
+	@Test
+	void testChargeRepairNoItems() {
+		String input = 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		game.getPlayer().damage(20);
+		int gold = game.getPlayer().getGold();
+		game.getPlayer().modifyGold(-gold);
+		try {
+			game.chargeRepair();
+			fail("Didn't end the game");
+		} catch (EndGameException e){
+		}
+	}
+	
+	@Test
+	void testExecuteSail() {
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		Route route = game.getPlayer().getLocation().getRoutes().get(0);
+		game.executeSail(route);
+		assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+	}
+	
+	@Test
+	void testEndGame() {
+		
+	}
 
 /*
 	@Test
 	void testGetGameLength() {
 		fail("Not yet implemented");
 	}
-
-
-	@Test
-	void testSessionSetup() {
-		fail("Not yet implemented");
-	}
-
 
 	@Test
 	void testPlay() {

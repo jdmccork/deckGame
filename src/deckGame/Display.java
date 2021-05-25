@@ -356,8 +356,9 @@ public class Display {
 		updateMainDisplay(13, "No", true, true);
 	}
 	
-	public void setIsland() {
-		this.game.executeSail();
+	public void setIsland(int routeIndex) {
+		Route chosenRoute = this.game.getPlayer().getLocation().getRoutes().get(routeIndex);
+		this.game.executeSail(chosenRoute);
 	}
 	
 	public void setGameState(String s) {

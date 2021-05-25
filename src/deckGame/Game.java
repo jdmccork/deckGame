@@ -30,14 +30,10 @@ public class Game {
 	public void runGUI() {
 		display = new Display();
 		display.run(this);
-		boolean playing = true;
-		while(playing == true) {
-			playing = mainMenu();
-		}
-		userInput.close();
 	}
 	
 	public void runCMD() {
+		userInput = new Scanner(System.in);
 		boolean playing = true;
 		while(playing == true) {
 			playing = mainMenu();
@@ -177,7 +173,6 @@ public class Game {
 	}
 	
 	public void gameSetup() {
-		userInput = new Scanner(System.in);
 		currentGame = this;
 		Item.generateItems();
 		//Store.readAdvice();
@@ -258,9 +253,30 @@ public class Game {
 				player.viewLogbook();
 				break;
 			case 6:
-				return;
+				if (menuConfirm() == true){
+					return;
+				}
+				break;
 			default:
 				System.out.println("Please enter a number between 1 and 5");
+				break;
+			}
+		}
+	}
+	
+	public boolean menuConfirm() {
+		while (true) {
+			System.out.println("Are you sure you want to return to the main menu?");
+			System.out.println("1: Yes");
+			System.out.println("2: No");
+			int selection = Game.getInt();
+			
+			switch(selection) {
+			case 1:
+				return true;
+			case 2:
+				return false;
+			default:
 				break;
 			}
 		}
@@ -284,7 +300,7 @@ public class Game {
 			return true;
 		}
 		int healthLost = player.getMaxHealth()-player.getHealth();
-		int cost = (int) (healthLost / 5) + 1;
+		int cost = Math.max((int) (healthLost / 5), 1);
 		if (player.getGold() < cost & player.getInventory().size() == 0 & player.getCards().size() == 0) {
 			if (display != null) {
 				this.display.updateDialogue("You don't have enough money and no items to sell for the repairs.");
@@ -310,9 +326,8 @@ public class Game {
 			System.out.println("1: Pay\n2: Return");
 			switch (Game.getInt()) {
 			case 1:
-				if (player.getGold() >= cost) {
+				if (player.modifyGold(-cost)) {
 					player.repair();
-					player.modifyGold(-cost);
 					return true;
 				} else {
 					System.out.println(
@@ -329,9 +344,8 @@ public class Game {
 		int healthLost = player.getMaxHealth()-player.getHealth();
 		int cost = (int) (healthLost / 5) + 1;
 		if(selection == 1) {
-			if (player.getGold() >= cost) {
+			if (player.modifyGold(-cost)) {
 				player.repair();
-				player.modifyGold(-cost);
 				Entry entry = new Entry(currentDay);
 					entry.addDamage(-healthLost);
 					entry.makeEvent("Repaired ship");
@@ -349,13 +363,12 @@ public class Game {
 	}
 	
 	public void executePay(int cost) {
-		if (cost <= player.getGold()) {
-			player.modifyGold(-cost);
+		if (player.modifyGold(-cost)) {
 			Entry entry = new Entry(currentDay);
 			entry.makeEvent("Payed crew");
 			entry.addCost(cost);
 			player.getLogbook().addEntry(entry);
-			executeSail();
+			executeSail(chosenRoute);
 		}else {
 			display.updateDialogue("You don't have enough money to pay your crew for this route. Get more money or select a different route.");
 		}
@@ -400,8 +413,8 @@ public class Game {
 				System.out.println("Please enter a number between 1 and " + index);
 			}else {
 				selection--; // accounts for the index's starting at 0 and not 1
-				Route route = routes.get(selection);
-				int time = route.getTime(player.getSpeed());
+				chosenRoute = routes.get(selection);
+				int time = chosenRoute.getTime(player.getSpeed());
 				if (currentDay + time >= days) {
 					System.out.println("Note, this trip will exceed your remaining time, all items will"
 							+ " be sold on day " + days + ".\nContinue?");
@@ -419,19 +432,7 @@ public class Game {
 				if (!player.payCrewCMD(time)) {
 					return;
 				}
-				player.sail(route);
-				for (int i = 0; i != time & currentDay < days; i++) {
-					currentDay += 1;
-					Event event = new Event();
-					event.selectEvent(route, player, currentDay, null);
-				}
-				if (currentDay < days) {
-					player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
-					System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
-					pause();
-				}else {
-					throw new EndGameException();
-				}
+				executeSail(chosenRoute);
 				return;
 			}
 		}
@@ -452,20 +453,27 @@ public class Game {
 		this.chosenRoute = route;
 	}
 	
-	public void executeSail() {
+	public void executeSail(Route chosenRoute) {
 		int time = chosenRoute.getTime(player.getSpeed());
 		player.sail(chosenRoute);
 		for (int i = 0; i != time & currentDay < days; i++) {
 			currentDay += 1;
-			display.updateDay(String.valueOf(currentDay));
-			Event event = new Event();
-			event.selectEvent(chosenRoute, player, currentDay, display);
+			if (display != null) {
+				display.updateDay(String.valueOf(currentDay));
+			}
+			Event event = new Event(new int[] {0, 1, 0, 0});
+			event.selectEvent(player, currentDay, display);
 		}
 		if (currentDay < days) {
 			player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
-			display.updateDialogue("You travelled for " + time + " days and have arrived at " + player.getLocation());
-			display.setGameState("Island");
-		}else {
+			if (display != null) {
+				display.updateDialogue("You travelled for " + time + " days and have arrived at " + player.getLocation());
+				display.setGameState("Island");
+			} else {
+				System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+				pause();
+			}
+		} else {
 			throw new EndGameException();
 		}
 	}
@@ -493,6 +501,8 @@ public class Game {
 	
 	public void printResults(int gold) {
 		System.out.println("Total gold earned: " + gold);
+		System.out.println("Days survived: " + currentDay + "/" + days);
+		System.out.println("Total score: " + gold/(currentDay/days));
 	}
 	
 	public int getCurrentDay() {
@@ -501,10 +511,6 @@ public class Game {
 	
 	public Player getPlayer() {
 		return player;
-	}
-	
-	public static Game getGame() {
-		return currentGame;
 	}
 	
 	public ArrayList<Island> getIslands(){

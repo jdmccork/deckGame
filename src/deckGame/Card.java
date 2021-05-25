@@ -135,7 +135,7 @@ public class Card extends Item {
 			}
 			break;
 		default:
-			System.out.println("This card is not functioning correctly");
+			System.out.println("Card " + this.getName() + " is not functioning correctly.");
 			break;
 		}
 		return dice;

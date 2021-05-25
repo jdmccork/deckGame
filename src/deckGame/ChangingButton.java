@@ -29,7 +29,7 @@ public class ChangingButton extends JButton {
 					display.sailShip(value);
 					break;
 				case GO_TO_ISLAND:
-					display.setIsland();
+					display.setIsland(value);
 					break;
 				case CHOOSE_ROUTE:
 					display.setGameState("Sea");

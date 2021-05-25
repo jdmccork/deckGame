@@ -137,8 +137,13 @@ public class Player extends Ship {
 	 * Changes the amount of gold this player has
 	 * @param amount the amount of gold to change by
 	 */
-	public void modifyGold(int amount) {
-		gold += amount;
+	public boolean modifyGold(int amount) {
+		if (gold + amount >= 0) {
+			gold += amount;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -308,6 +313,7 @@ public class Player extends Ship {
 					return true;
 				}else {
 					System.out.println("You don't have enough money to pay your crew for this route. Get more money or select a different route.");
+					Game.pause();
 					return false;
 				}
 			case 2:
@@ -325,6 +331,23 @@ public class Player extends Ship {
 		display.updateDisplayFunction(11, Actions.PAY);
 		display.updateDisplayValue(11, cost);
 		display.updateDisplayFunction(13, Actions.CHOOSE_ROUTE);
+	}
+	
+	public boolean dump(Item item, int currentDay) {
+		if (inventory.contains(item)) {
+			removeItem(item);
+			System.out.println("Dump successful. " + item.getName() + " has been removed from your ship.");
+			item.setLocationPurchased(null);
+			Entry entry = new Entry(currentDay);
+			entry.makeTransaction(item, "Dumped");;
+			logbook.addEntry(entry);
+			Game.pause();
+			return true;
+		} else {
+			System.out.println("Something went wrong, you don't have this item.");
+		}
+		Game.pause();
+		return false;
 	}
 
 }

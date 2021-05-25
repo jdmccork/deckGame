@@ -173,6 +173,13 @@ class PlayerTest {
 	
 	@Test
 	void testPayCrewCMD() {
+		String input = "1" + System.lineSeparator() + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
 		player.payCrewCMD(5);
+		
+		assertEquals(25, player.getGold());
 	}
 }

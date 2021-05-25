@@ -78,6 +78,7 @@ public class Ship {
     	} else {
     		getDestroyed();
     	}
+		Game.pause();
     }
 	
 	public void damage(ArrayList<Integer> dice) {

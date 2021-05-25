@@ -226,7 +226,9 @@ public class Store {
 				return false;
 			}
 			player.modifyGold(-price);
+			item.setPurchaseCost(price);
 			removeStock(item);
+			item.setLocationPurchased(location);
 			System.out.println("Purchase successful. " + item.getName() + " has been added to your ship");
 			Entry entry = new Entry(currentDay);
 			entry.makeTransaction(item, "Bought ");
@@ -288,6 +290,7 @@ public class Store {
 		if (player.getInventory().contains(item)) {
 			player.removeItem(item);
 			player.modifyGold(price);
+			item.setPurchaseCost(-1);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
 			item.setLocationPurchased(null);
 			Entry entry = new Entry(currentDay);

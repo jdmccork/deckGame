@@ -2,6 +2,7 @@ package deckGame;
 
 import java.util.ArrayList;
 
+import enums.ItemType;
 import enums.Statuses;
 
 public class Event {
@@ -13,10 +14,21 @@ public class Event {
 	
 	private int numEvents = 4;
 	private Display display;
+	private ArrayList<Integer> eventChance = new ArrayList<Integer>();
 	
-	public void selectEvent(Route route, Player player, int currentDay, Display display) {
+	public Event(int[] eventChance) {
+		int eventCounter = 1;
+		for (int event: eventChance) {
+			for (int i = 0; i < event; i++) {
+				this.eventChance.add(eventCounter);
+			}
+			eventCounter++;
+		}
+	}
+	
+	public void selectEvent(Player player, int currentDay, Display display) {
 		this.display = display;
-		switch (Math.min((int) (Math.random() * numEvents), numEvents) + 1) {
+		switch (eventChance.get((int) (Math.random() * eventChance.size()))) {
 		case 1: //nothing happens
 			if (display != null) {
 				display.updateDialogue("The day passes uneventfully.");
@@ -34,10 +46,10 @@ public class Event {
 			rescue(player, currentDay);
 			break;
 		}
-		Game.pause();
 	}
 	
 	public void fight(Player player, int currentDay){
+		boolean fleeAttempt = false;
 		Ship enemy = new Ship("Enemy", 50, 4, 2);
 		int startHealth = player.getHealth();
 		if (display != null) {
@@ -46,56 +58,93 @@ public class Event {
 		} else {
 			System.out.println("You are attacked by a ship full of pirates. Choose an option to continue");
 		}
-		while (true) {
+		while (enemy.getStatus() != Statuses.DESTROYED) {
 			int selection;
 			if (display != null) {
 				selection = -1;
 			} else {
 				System.out.println("1: Fight");
 				System.out.println("2: Attempt to flee");
-				System.out.println("3: View enemy");
+				System.out.println("3: Surrender cargo");
+				System.out.println("4: View enemy");
 				selection = Game.getInt();
 			}
 			
-			Entry entry;
 			switch (selection) {
 			case 1:
 				attack(enemy, player);
-				entry = new Entry(currentDay);
-				entry.makeEvent("Attacked by pirates");
-				entry.addDamage(startHealth - player.getHealth());
-				player.getLogbook().addEntry(entry);
-				Game.pause();
-				reward(player, 0, currentDay);
-				return;
+				break;
 			case 2:
-				flee(enemy, player);
-				entry = new Entry(currentDay);
-				entry.makeEvent("Fled from pirates");
-				player.getLogbook().addEntry(entry);
-				return;
+				if (!fleeAttempt) {
+					fleeAttempt = true;
+					if (flee(enemy, player)) {
+						Entry entry;
+						entry = new Entry(currentDay);
+						entry.makeEvent("Fled from pirates");
+						player.getLogbook().addEntry(entry);
+						return;
+					}
+				} else {
+					System.out.println("The pirates have harpooned you. You can no longer flee.");
+				}
+				break;
 			case 3:
+				if (surrenderItems(player, currentDay)) {
+					return;
+				}else {
+					break;
+				}
+			case 4:
 				System.out.println(enemy);
 				Game.pause();
 				break;
 			}
 		}
+		Entry entry;
+		entry = new Entry(currentDay);
+		entry.makeEvent("Attacked by pirates");
+		entry.addDamage(startHealth - player.getHealth());
+		player.getLogbook().addEntry(entry);
+		reward(player, 0, currentDay);
 	}
 	
+	public boolean surrenderItems(Player player, int currentDay) {
+		if (player.getInventory().size() == 0) {
+			System.out.println("You have no cargo to surrender.");
+			return false;
+		}
+		while (true) {
+			System.out.println("Are you sure you want to surrender a random piece of cargo?");
+			System.out.println("1: Yes");
+			System.out.println("2: No");
+			int selection = Game.getInt();
+			
+			switch(selection) {
+			case 1:
+				int itemIndex = (int) (Math.random() * player.getInventory().size());
+				
+				Item item = player.getInventory().get(itemIndex);
+				Entry entry = new Entry(currentDay);
+				entry.makeTransaction(item, "Surrendered ");
+				player.getLogbook().addEntry(entry);
+				break;
+			case 2:
+				return false;
+			default:
+				break;
+			}
+		}
+	}
 	
 	public void attack(Ship enemy, Ship player) {
-		while (enemy.getStatus() != Statuses.DESTROYED) {
-			ArrayList<Integer> playerDice = roll(player);
-			enemy.damage(playerDice);
-			
-			if (enemy.getStatus() == Statuses.DESTROYED) {
-				return;
-			}
-			
-			ArrayList<Integer> enemyDice = roll(enemy);
-			player.damage(enemyDice);
-			Game.pause();
+		ArrayList<Integer> playerDice = roll(player);
+		enemy.damage(playerDice);
+		if (enemy.getStatus() == Statuses.DESTROYED) {
+			return;
 		}
+		
+		ArrayList<Integer> enemyDice = roll(enemy);
+		player.damage(enemyDice);
 	}
 	
 	public boolean flee(Ship enemy, Ship player) {
@@ -132,7 +181,7 @@ public class Event {
 	}
 	
 	public void storm(Player player, int currentDay){
-		System.out.println("Storm");
+		System.out.println("You encounter a storm.");
 		int damage = ((int) (Math.random() * 20) + 1);
 		player.damage(damage);
 		Entry entry = new Entry(currentDay);
@@ -152,14 +201,15 @@ public class Event {
 		while (chance > 10) {
 			randomNum = (int) (Math.random() * items.size());
 			Item item = items.get(randomNum);
-			if (!player.getInventory().contains(item)) {
+			if (!player.getInventory().contains(item) & item.getType() == ItemType.CARGO) {
 				while (true) {
 					System.out.println("You found " + item.getName() + " among the wreckage.");
-					System.out.println("Bring it aboard?\n1: Yes\n2: No\n3: View inventory");
+					System.out.println("Bring it aboard?\n1: Yes\n2: No\n3: View inventory\n4: View item");
 					switch (Game.getInt()) {
 					case 1:
 						item.setLocationPurchased(player.getLocation());
 						if (player.addItem(item)) {
+							item.setPurchaseCost(0);
 							System.out.println("You aquired " + item.getName() + " and it has been added to your ship.");
 							Entry entry = new Entry(currentDay);
 							entry.makeTransaction(item, "Aquired");
@@ -170,12 +220,18 @@ public class Event {
 						}
 						return true;
 					case 2:
+						System.out.println("You decided to leave the " + item + " behind.");
 						Entry entry = new Entry(currentDay);
 						entry.makeTransaction(item, "Found");
 						player.getLogbook().addEntry(entry);
 						return true;
 					case 3:
 						dumpOptions(player, currentDay);
+						break;
+					case 4:
+						System.out.println(item);
+						Game.pause();
+						break;
 					default:
 						System.out.println("Invalid option, please try again");
 					}
@@ -207,7 +263,7 @@ public class Event {
 			System.out.println("2: Return");
 			switch (Game.getInt()) {
 			case 1:
-				complete = dump(item, player, currentDay);
+				complete = player.dump(item, currentDay);
 				break;
 			case 2:
 				complete = true;
@@ -220,23 +276,6 @@ public class Event {
 		}
 	}
 	
-	public boolean dump(Item item, Player player, int currentDay) {
-		if (player.getInventory().contains(item)) {
-			player.removeItem(item);
-			System.out.println("Dump successful. " + item.getName() + " has been removed from your ship.");
-			item.setLocationPurchased(null);
-			Entry entry = new Entry(currentDay);
-			entry.makeTransaction(item, "Dumped");;
-			player.getLogbook().addEntry(entry);
-			Game.pause();
-			return true;
-		} else {
-			System.out.println("Something went wrong, you don't have this item.");
-		}
-		Game.pause();
-		return false;
-	}
-	
 	public void rescue(Player player, int currentDay) {
 		int amount = Math.max((int) (Math.random() * 25) + 1, 10);
 		System.out.println("You come across a shipwreck and help the survivors onboard.\nThey reward you with $" + amount + ".");
@@ -245,5 +284,10 @@ public class Event {
 		entry.makeEvent("Rescued sailors");
 		entry.addCost(-amount);
 		player.getLogbook().addEntry(entry);
+		Game.pause();
+	}
+	
+	public ArrayList<Integer> getEventChance() {
+		return eventChance;
 	}
 }
