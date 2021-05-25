@@ -15,7 +15,7 @@ class CargoTest {
 	@BeforeEach
 	void setUp() throws Exception {
 	}
-
+/*
 	@Test
 	void testCargoWStats() {
 		fail("Not yet implemented");
@@ -40,5 +40,5 @@ class CargoTest {
 	void testGetModifyAmount() {
 		fail("Not yet implemented");
 	}
-
+*/
 }

@@ -2,6 +2,8 @@ package deckGame;
 
 import java.util.ArrayList;
 
+import enums.Actions;
+
 public class Player extends Ship {
 	
 	/**
@@ -50,6 +52,8 @@ public class Player extends Ship {
 	
 	private Logbook logbook;
 	
+	private Display display;
+	
 	/**
 	 * Creates a new player as an extension of the ship class.
 	 * @param userName this player's name
@@ -59,7 +63,8 @@ public class Player extends Ship {
 	 * @param capacity the amount of cargo this player's ship can hold
 	 * @param power the amount of damage this player's ship can do
 	 */
-	public Player(String userName, String shipName, int health, int speed, int capacity, int deckSize, int power, int gold, int crew, Island location) {
+	public Player(String userName, String shipName, int health, int speed, int capacity, int deckSize
+			, int power, int gold, int crew, Island location, Display display) {
 		super(shipName, health, speed, power);
 
 		this.capacity = capacity;
@@ -68,6 +73,7 @@ public class Player extends Ship {
 		this.userName = userName;
 		this.crew = crew;
 		this.deckSize = deckSize;
+		this.display = display;
 		luck = 0;
 		inventory = new ArrayList<Cargo>();
 		cards = new ArrayList<Card>();
@@ -131,8 +137,13 @@ public class Player extends Ship {
 	 * Changes the amount of gold this player has
 	 * @param amount the amount of gold to change by
 	 */
-	public void modifyGold(int amount) {
-		gold += amount;
+	public boolean modifyGold(int amount) {
+		if (gold + amount >= 0) {
+			gold += amount;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -263,6 +274,11 @@ public class Player extends Ship {
 		}
 	}
 	
+	public void viewLogbook() {
+		logbook.viewEntries();
+		Game.pause();
+	}
+	
 	/**
 	 * Gets the inventory of the ship
 	 * @return the ArrayList of the items in the inventory
@@ -281,6 +297,57 @@ public class Player extends Ship {
 	
 	public int getCargoStored() {
 		return cargoStored;
+	}
+	
+	public boolean payCrewCMD(int time) {
+		int cost = crew * time;
+
+		while (true) {
+			System.out.println("You must pay your crew $" + cost + " for this route.");
+			System.out.println("You currently have $" + gold + ".");
+			System.out.println("1: Pay\n2: Return");
+			switch (Game.getInt()) {
+			case 1:
+				if (cost <= gold) {
+					gold -= cost;
+					return true;
+				}else {
+					System.out.println("You don't have enough money to pay your crew for this route. Get more money or select a different route.");
+					Game.pause();
+					return false;
+				}
+			case 2:
+				return false;
+			}
+		}
+	}
+	
+	public void payCrew(int time) {
+		int cost = crew * time;
+
+		display.updateDialogue("You must pay your crew $" + cost + " for this route.\n"
+				+ "You currently have $" + gold + ". Do you still wish to sail?");
+		display.setGameState("Confirm");
+		display.updateDisplayFunction(11, Actions.PAY);
+		display.updateDisplayValue(11, cost);
+		display.updateDisplayFunction(13, Actions.CHOOSE_ROUTE);
+	}
+	
+	public boolean dump(Item item, int currentDay) {
+		if (inventory.contains(item)) {
+			removeItem(item);
+			System.out.println("Dump successful. " + item.getName() + " has been removed from your ship.");
+			item.setLocationPurchased(null);
+			Entry entry = new Entry(currentDay);
+			entry.makeTransaction(item, "Dumped");;
+			logbook.addEntry(entry);
+			Game.pause();
+			return true;
+		} else {
+			System.out.println("Something went wrong, you don't have this item.");
+		}
+		Game.pause();
+		return false;
 	}
 
 }

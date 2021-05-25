@@ -58,6 +58,21 @@ class CardTest {
 		card.doSpecial(dice);
 		assertEquals(expected, dice);
 	}
+	
+	@Test
+	void testMakeMultiTransformFail() {
+		card.makeMultiTransform(1, 6, 3);
+		
+		dice.add(1);
+		dice.add(3);
+		dice.add(1);
+		expected.add(1);
+		expected.add(3);
+		expected.add(1);
+		
+		card.doSpecial(dice);
+		assertEquals(expected, dice);
+	}
 
 	@Test
 	void testMakeDiceAdder() {
@@ -68,7 +83,6 @@ class CardTest {
 		dice.add(1);
 		
 		card.doSpecial(dice);
-		System.out.println(dice);
 		assertTrue(dice.size() == 4);
 	}
 
@@ -137,7 +151,7 @@ class CardTest {
 		while (!expected.contains(dice.get(0))) {
 			card.doSpecial(dice);
 			count++;
-			if (count == 10) {
+			if (count == 50) {
 				fail("Extremly unlucky or broken");
 			}
 		}

@@ -41,6 +41,8 @@ public abstract class Item {
 	
 	private Island locationPurchased;
 	
+	private int purchaseCost;
+	
 	/**
 	 * Creates a new instance of item from the given data.
 	 * @param tempName the name of the item
@@ -55,6 +57,7 @@ public abstract class Item {
 		size = tempSize;
 		basePrice = tempBasePrice;
 		rarity = tempRarity;
+		purchaseCost = -1;
 	}
 	
 	/**
@@ -69,7 +72,10 @@ public abstract class Item {
 			output = "Card: ";
 		}
 		 output += name + "\nRarity: " + rarity
-				+ "\nSize: " + size + "\nDescription: " + description + "\n";
+				+ "\nSize: " + size + "\nDescription: " + description;
+		if (purchaseCost != -1) {
+			output += "\n" + "Purchase Cost: $" + purchaseCost;
+		}
 		return output;
 	}
 	
@@ -109,7 +115,7 @@ public abstract class Item {
 	 * Gets the base price of this item.
 	 * @return the base price of this item
 	 */
-	public int getPrice() {
+	public int getBasePrice() {
 		return basePrice;
 	}
 	
@@ -279,19 +285,19 @@ public abstract class Item {
 		Game.pause();
 	}
 	
-	public int getPrice(double priceModifier, Island currentLocation/*double buySellModifier*/) {
+	public int getPrice(double priceModifier, Island currentLocation) {
 		double distanceModifier = (Island.getDistance(locationPurchased, currentLocation) * 0.2) + 1;
 		switch(getRarity()) {
 		case COMMON:
-			return (int) (getPrice() * priceModifier * distanceModifier);
+			return (int) (getBasePrice() * priceModifier * distanceModifier);
 		case UNCOMMON:
-			return (int) (getPrice() * priceModifier * 1.2 * distanceModifier);
+			return (int) (getBasePrice() * priceModifier * 1.2 * distanceModifier);
 		case RARE:
-			return (int) (getPrice() * priceModifier * 1.5 * distanceModifier);
+			return (int) (getBasePrice() * priceModifier * 1.5 * distanceModifier);
 		case LEGENDARY:
-			return (int) (getPrice() * priceModifier * 2 * distanceModifier);
+			return (int) (getBasePrice() * priceModifier * 2 * distanceModifier);
 		default:
-			return getPrice();
+			return getBasePrice();
 		}
 	}
 	
@@ -302,6 +308,14 @@ public abstract class Item {
 			}
 		}
 		return null;
+	}
+	
+	public void setPurchaseCost(int cost) {
+		purchaseCost = cost;
+	}
+	
+	public int getPurchaseCost() {
+		return purchaseCost;
 	}
 
 }

@@ -1,5 +1,7 @@
 package deckGame;
 
+import java.util.ArrayList;
+
 public class Route {
 	/**
 	 * The island from which this route starts.
@@ -14,16 +16,11 @@ public class Route {
 	/**
 	 * The distance between this route's source and destination.
 	 */
-	private int distance;
-	//private ArrayList<Event> dangers;
-	
-	/**
-	 * The likelihood of a dangerous event happening;
-	 */
-	private double eventChance;
-	
+	private int distance;	
 	
 	private int routeSafety;
+	
+	private Event event;
 	
 	/**
 	 * Creates a new route from the source island to the destination island.
@@ -34,8 +31,13 @@ public class Route {
 		this.source = source;
 		this.destination = destination;
 		distance = (int) Math.ceil(Island.getDistance(source, destination));
-		eventChance = Math.random()*2;
 		routeSafety = 1;
+		int nothingChance = Math.min(1,(int) (Math.random() * 25));
+		int pirateChance = (int) (Math.random() * 10);
+		int stormChance = (int) (Math.random() * 15);
+		int rescueChance = (int) (Math.random() * 5);
+		int[] eventChances = new int[] {nothingChance, pirateChance, stormChance, rescueChance};
+		event = new Event(eventChances);
 	}
 	
 	/**
@@ -60,23 +62,11 @@ public class Route {
 	 * @return the time to sail the entire route
 	 */
 	public int getTime(int speed) {
-		int time = distance/speed;
+		int time = (distance*5)/speed;
 		if (time <= 0) {
 			return 1;
 		} else {
 			return time;
-		}
-	}
-	
-	public double getEventChance() {
-		return eventChance;
-	}
-	
-	public void modifyEventChance(double value) {
-		if (eventChance + (value * routeSafety) > 0) {
-			eventChance += value * routeSafety;
-		}else {
-			eventChance = 0;
 		}
 	}
 	
@@ -85,6 +75,10 @@ public class Route {
 	 */
 	public String toString() {
 		return ("The journey from " + source.getName() + " to " + destination.getName() + " is " + getDistance() + " units.");
+	}
+	
+	public Event getEvent() {
+		return event;
 	}
 	
 }

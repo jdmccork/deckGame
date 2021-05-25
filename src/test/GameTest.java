@@ -12,9 +12,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import deckGame.Display;
+import deckGame.EndGameException;
 import deckGame.Game;
 import deckGame.Island;
 import deckGame.Item;
+import deckGame.Player;
 import deckGame.Route;
 
 class GameTest {
@@ -38,14 +41,13 @@ class GameTest {
 		assertTrue(Item.getItems().size() > 0);
 	}
 	
-	/*
 	@Test
 	void testGetNameNormal() {
 		String input = "Test" + System.lineSeparator() + "Tester";
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
-		String[] names = game.getNames();
+		Game.setTestInput();
+		String[] names = game.getNamesCMD();
 		assertEquals("Test", names[0]);
 		assertEquals("Tester", names[1]);
 	}
@@ -56,8 +58,8 @@ class GameTest {
 	+ System.lineSeparator() + "Test" + System.lineSeparator() + "Tester");
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
-		String[] names = game.getNames();
+		Game.setTestInput();
+		String[] names = game.getNamesCMD();
 		assertEquals("Test", names[0]);
 		assertEquals("Tester", names[1]);
 		String expected = "Username must not contain digits or special characters."; 
@@ -69,8 +71,8 @@ class GameTest {
 		String input = "T" + System.lineSeparator() + "Test" + System.lineSeparator() + "Tester";
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
-		String[] names = game.getNames();
+		Game.setTestInput();
+		String[] names = game.getNamesCMD();
 		assertEquals("Test", names[0]);
 		assertEquals("Tester", names[1]);
 		String expected = "Length of username must be between 3 and 15 characters."; 
@@ -82,8 +84,8 @@ class GameTest {
 		String input = "Tes" + System.lineSeparator() + "Tester";
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
-		String[] names = game.getNames();
+		Game.setTestInput();
+		String[] names = game.getNamesCMD();
 		assertEquals("Tes", names[0]);
 		assertEquals("Tester", names[1]);
 		String expected = "Length of username must be between 3 and 15 characters."; 
@@ -96,8 +98,8 @@ class GameTest {
 		String input = "Testing the tester" + System.lineSeparator() + "Test" + System.lineSeparator() + "Tester";
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
-		String[] names = game.getNames();
+		Game.setTestInput();
+		String[] names = game.getNamesCMD();
 		assertEquals("Test", names[0]);
 		assertEquals("Tester", names[1]);
 		String expected = "Length of username must be between 3 and 15 characters."; 
@@ -109,20 +111,20 @@ class GameTest {
 		String input = "JackMcorkindale" + System.lineSeparator() + "Tester";
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
-		String[] names = game.getNames();
+		Game.setTestInput();
+		String[] names = game.getNamesCMD();
 		assertEquals("JackMcorkindale", names[0]);
 		assertEquals("Tester", names[1]);
 		String expected = "Length of username must be between 3 and 15 characters."; 
 		assertFalse(testOut.toString().contains(expected));
 	}
-*/
+	
 	@Test
 	void testMainMenuQuit() {
 		String input = "2" + System.lineSeparator();
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
-		game.setTestInput();
+		Game.setTestInput();
 		game.mainMenu();
 		String expected = "Thanks for playing. Goodbye.";
 		assertTrue(testOut.toString().contains(expected));
@@ -157,18 +159,87 @@ class GameTest {
 		assertEquals(4, island1routes.size());
 	}
 
+		
+	@Test
+	void testGetInt() {
+		for (int i = 0; i < 100; i++) {
+			String input = Integer.toString(i) + System.lineSeparator();
+			InputStream in = new ByteArrayInputStream(input.getBytes());
+			System.setIn(in);
+			Game.setTestInput();
+			assertEquals(i, Game.getInt());
+		}
+	}
+	
+	@Test
+	void testSessionSetup() {
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		assertEquals("Tester",game.getPlayer().getUserName());
+	}
+	
+	@Test
+	void testChargeRepairFull() {
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		int gold = game.getPlayer().getGold();
+		assertTrue(game.chargeRepair());
+		assertEquals(gold, game.getPlayer().getGold());
+	}
+	
+	@Test
+	void testChargeRepairDamaged() {
+		String input = System.lineSeparator() + 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		game.getPlayer().damage(20);
+		int gold = game.getPlayer().getGold();
+		assertTrue(game.chargeRepair());
+		assertEquals(game.getPlayer().getMaxHealth(), game.getPlayer().getHealth());
+		assertEquals(gold - 4, game.getPlayer().getGold());
+	}
+	
+	@Test
+	void testChargeRepairNoItems() {
+		String input = 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		game.getPlayer().damage(20);
+		int gold = game.getPlayer().getGold();
+		game.getPlayer().modifyGold(-gold);
+		try {
+			game.chargeRepair();
+			fail("Didn't end the game");
+		} catch (EndGameException e){
+		}
+	}
+	
+	@Test
+	void testExecuteSail() {
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		Route route = game.getPlayer().getLocation().getRoutes().get(0);
+		route.getEvent().setChance(new ArrayList<Integer>(1));
+		game.executeSail(route);
+		assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+	}
+	
+	@Test
+	void testEndGame() {
+		
+	}
+
 /*
 	@Test
 	void testGetGameLength() {
 		fail("Not yet implemented");
 	}
-
-
-	@Test
-	void testSessionSetup() {
-		fail("Not yet implemented");
-	}
-
 
 	@Test
 	void testPlay() {
@@ -226,11 +297,6 @@ class GameTest {
 	}
 
 	@Test
-	void testPause() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	void testGenerateStore() {
 		fail("Not yet implemented");
 	}
@@ -247,16 +313,6 @@ class GameTest {
 
 	@Test
 	void testPrintResults() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testTemplate() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testMain() {
 		fail("Not yet implemented");
 	}
 */

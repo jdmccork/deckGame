@@ -17,7 +17,7 @@ import deckGame.Player;
 import deckGame.Store;
 
 class StoreTest {
-	private int expectedAdviceCount = 6;
+	private int expectedAdviceCount = 30;
 	static ArrayList<Island> islands = new ArrayList<Island>();
 	private Player player;
 	private Store store;
@@ -45,7 +45,7 @@ class StoreTest {
 	void setUp() throws Exception {
 		testOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(testOut));
-		player = new Player("Tester", "Testing ship", 100, 2, 4, 4, 3, 25, 10, islands.get(0));
+		player = new Player("Tester", "Testing ship", 100, 2, 4, 4, 3, 25, 10, islands.get(0), null);
 		store = new Store(islands.get(0));
 	}
 
