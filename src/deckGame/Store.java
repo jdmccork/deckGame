@@ -40,6 +40,9 @@ public class Store {
 	 */
 	private int storeModifier = 0;
 	
+	/**
+	 * The island that the store is located on.
+	 */
 	private Island location;
 	
 	/**
@@ -111,7 +114,7 @@ public class Store {
 	}
 	
 	/**
-	 * TBD
+	 * Adds an item to the stock that the store sells
 	 */
 	public void addStock(Item item) {
 		stock.add(item);
@@ -147,13 +150,23 @@ public class Store {
 		}
 	}
 	
+	/**
+	 * Used for testing purposes
+	 * @return The list of advice that has been generated
+	 */
 	public static ArrayList<String> getAdvice(){
 		return adviceList;
 	}
 	
+	/**
+	 * The logic for how the player can interact with the store. This will allow the player to
+	 * choose if they are buying, selling, or leaving
+	 * @param player
+	 * @param currentDay
+	 */
 	public void interact(Player player, int currentDay) {
+		talkToShopKeep();
 		while (true) {
-			//talkToShopKeep();
 			System.out.println("Select an option to continue");
 			System.out.println("1: Buy");
 			System.out.println("2: Sell");
@@ -177,6 +190,11 @@ public class Store {
 		}
 	}
 	
+	/**
+	 * Displays the items that are for sale and allows the player to select one of the items to view
+	 * @param player
+	 * @param currentDay
+	 */
 	public void buyOptions(Player player, int currentDay) {
 		while (true) {
 			printStock();
@@ -191,31 +209,48 @@ public class Store {
 				return;
 			}else if (selection <= getStock().size() & selection > 0) {
 				Item item = stock.get(selection - 1);
-				boolean complete = false;
-				while (complete == false) {
-					System.out.println(item);
-					System.out.println("You currently have $" + player.getGold());
-					System.out.println("1: Buy for $" + item.getPrice(buyModifier, player.getLocation()));
-					System.out.println("2: Return");
-					switch (Game.getInt()) {
-					case 1:
-						complete = buyItem(item, player, currentDay);
-						break;
-					case 2:
-						complete = true;
-						break;						
-					default:
-						System.out.println("Please enter a number between 1 and 2");
-						Game.pause();
-						break;
-					}
-				}
+				buyConfirm(item, player, currentDay);
 			}else {
 				System.out.println("Please enter a number between 1 and " + (stock.size() + 1) + ".");
 			}
 		}
 	}
 	
+	/**
+	 * Displays the item and determines if the player wants to buy it.
+	 * @param item
+	 * @param player
+	 * @param currentDay
+	 */
+	public void buyConfirm(Item item, Player player, int currentDay) {
+		boolean complete = false;
+		while (complete == false) {
+			System.out.println(item);
+			System.out.println("You currently have $" + player.getGold());
+			System.out.println("1: Buy for $" + item.getPrice(buyModifier, player.getLocation()));
+			System.out.println("2: Return");
+			switch (Game.getInt()) {
+			case 1:
+				complete = buyItem(item, player, currentDay);
+				break;
+			case 2:
+				complete = true;
+				break;						
+			default:
+				System.out.println("Please enter a number between 1 and 2");
+				Game.pause();
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Takes the money from the player, adds an event to the logbook, and adds the item to the players ship
+	 * @param item
+	 * @param player
+	 * @param currentDay
+	 * @return true if the item is added successfully
+	 */
 	public boolean buyItem(Item item, Player player, int currentDay) {
 		int price = item.getPrice(buyModifier, player.getLocation());
 		if (player.getGold() >= price) {
@@ -247,27 +282,42 @@ public class Store {
 		}
 	}
 	
+	/**
+	 * Displays the items that the player can sell and allows the player to select one of the items to view
+	 * @param player
+	 * @param currentDay
+	 */
 	public void sellOptions(Player player, int currentDay) {
-		System.out.println("Select an item to sell.");
-		player.printInventory();
-		player.printCards();
-		System.out.println((player.getInventory().size() + player.getCards().size() + 1) + ": Return\n" + "Select an item or return to continue.");
-		int selection = Game.getInt();
-		if (selection == player.getInventory().size() + player.getCards().size() + 1) {
-			return;
-		}else if (selection <= player.getInventory().size()) {
-			sellConfirm(player.getInventory().get(selection - 1), player, currentDay);
-		}else if (selection <= player.getInventory().size() + player.getCards().size() ) {
-			sellConfirm(player.getCards().get(selection - player.getInventory().size() - 1), player, currentDay);
-		} else {
-			System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
+		while (true) {
+			System.out.println("Select an item to sell.");
+			player.printInventory();
+			player.printCards();
+			System.out.println((player.getInventory().size() + player.getCards().size() + 1) + ": Return");
+			System.out.println( "Select an item or return to continue.");
+			int selection = Game.getInt();
+			if (selection == player.getInventory().size() + player.getCards().size() + 1) {
+				return;
+			}else if (selection <= player.getInventory().size()) {
+				sellConfirm(player.getInventory().get(selection - 1), player, currentDay);
+			}else if (selection <= player.getInventory().size() + player.getCards().size() ) {
+				sellConfirm(player.getCards().get(selection - player.getInventory().size() - 1), player, currentDay);
+			} else {
+				System.out.println("Please enter a number between 1 and " + player.getInventory().size() + 1 + ".");
+			}
 		}
 	}
 	
+	/**
+	 * Displays the item and determines if the player wants to sell it.
+	 * @param item
+	 * @param player
+	 * @param currentDay
+	 */
 	public void sellConfirm(Item item, Player player, int currentDay) {
 		boolean complete = false;
 		while (complete == false) {
 			System.out.println(item);
+			System.out.println("You currently have $" + player.getGold());
 			System.out.println("1: Sell for $" + item.getPrice(sellModifier, player.getLocation()));
 			System.out.println("2: Return");
 			switch (Game.getInt()) {
@@ -285,6 +335,13 @@ public class Store {
 		}
 	}
 	
+	/**
+	 * Adds the money to the player, adds an event to the logbook, and removes the item to the players ship
+	 * @param item
+	 * @param player
+	 * @param currentDay
+	 * @return true if the item is removed successfully
+	 */
 	public boolean sellItem(Item item, Player player, int currentDay) {
 		int price = item.getPrice(sellModifier, player.getLocation());
 		if (player.getInventory().contains(item)) {

@@ -66,43 +66,28 @@ public class Ship {
 	 * Takes damage and alters the status of this ship.
 	 * @param damage the amount of damage this ship takes.
 	 */
-	public void damage(int damage) {
+	public String damage(int damage) {
+		String output;
 		System.out.println("The " + shipName + " took " + damage + " damage.");
 		if (health > damage) {
             health -= damage;
             status = Statuses.DAMAGED;
             System.out.println("It currently has " + health + " health remaining.");
+            output =  "The " + shipName + " took " + damage + " damage."
+			+ "\nIt currently has " + health + " health remaining.";
     	} else {
-    		getDestroyed();
+    		output = getDestroyed();
     	}
 		Game.pause();
-    }
-	
-	public String damageGUI(int damage) {
-		if (health > damage) {
-            health -= damage;
-            status = Statuses.DAMAGED;
-    	} else {
-    		getDestroyed();
-    	}
-		return "The " + shipName + " took " + damage + " damage."
-				+ "\nIt currently has " + health + " health remaining.";
-    }
-	
-	public void damage(ArrayList<Integer> dice) {
-		int damage = 0;
-		for (int die:dice) {
-			damage += die;
-		}
-		damage(damage);
+		return output;
 	}
 	
-	public String damageGUI(ArrayList<Integer> dice) {
+	public String damage(ArrayList<Integer> dice) {
 		int damage = 0;
 		for (int die:dice) {
 			damage += die;
 		}
-		return damageGUI(damage);
+		return damage(damage);
 	}
 	
 	public int getHealth() {
@@ -128,12 +113,14 @@ public class Ship {
 	/**
 	 * Sets the status of the ship to destroyed
 	 */
-	public void getDestroyed() {
+	public String getDestroyed() {
 		status = Statuses.DESTROYED;
 		health = 0;
 		if (!(this instanceof Player)) {
 			System.out.println("The enemy has been sunk");
+			return "The enemy has been sunk";
 		}
+		return "";
 	}
 	
 	/**
@@ -158,28 +145,44 @@ public class Ship {
 	 * @return the string detailing all the stats of this ship
 	 */
 	public String toString() {
-		String output = "The " + shipName + " has the following stats:\n";
-		output += "Health: " + health + "/" + maxHealth + "\n";
-		output += "Speed: " + speed + "\n";
-		output += "Strength: " + strength + "\n";
+		String output = "The " + shipName + " has the following stats:";
+		output += "\nHealth: " + health + "/" + maxHealth;
+		output += "\nSpeed: " + speed;
+		output += "\nStrength: " + strength;
 		if (this instanceof Player) {
-			output += "Capacity: " + ((Player) this).getCapacity() + "\n";
+			output += "\nCapacity: " + ((Player) this).getCapacity();
 		}
 		return output;
 	}
 	
+	/**
+	 * 
+	 * @return The strength of the ship
+	 */
 	public int getStrength() {
 		return strength;
 	}
 
+	/**
+	 * 
+	 * @return The maximum possible health of the ship.
+	 */
 	public int getMaxHealth() {
 		return maxHealth;
 	}
 
+	/**
+	 * 
+	 * @param maxHealth
+	 */
 	public void setMaxHealth(int maxHealth) {
 		this.maxHealth = maxHealth;
 	}
 	
+	/**
+	 * changes the ships speed by the amount. This can be negative and is accounted for elsewhere.
+	 * @param amount
+	 */
 	public void modifySpeed(int amount) {
 		speed += amount;
 	}

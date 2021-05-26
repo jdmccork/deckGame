@@ -16,6 +16,9 @@ public class Route {
 	 */
 	private int distance;
 	
+	/**
+	 * An instance of event which contains the chance of each event happening
+	 */
 	private Event event;
 	
 	/**
@@ -72,6 +75,10 @@ public class Route {
 		return ("The journey from " + source.getName() + " to " + destination.getName() + " is " + getDistance() + " units.");
 	}
 	
+	/**
+	 * 
+	 * @return The instance of Event stored in the route
+	 */
 	public Event getEvent() {
 		return event;
 	}
@@ -122,5 +129,4 @@ public class Route {
 			output += "\n" + count/totalProbability + " chance to find sailors in need of rescue";
 		}
 	}
-	
 }

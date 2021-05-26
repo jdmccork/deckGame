@@ -1,5 +1,7 @@
 package deckGame;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -18,6 +20,7 @@ public class Game {
 	private Display display;
 	private Route chosenRoute;
 	private boolean paused = false;
+	//private ByteArrayOutputStream GUIOut;
 	
 	public static void setTestInput() {
 		userInput = new Scanner(System.in);
@@ -27,9 +30,16 @@ public class Game {
 		gameSetup();
 	}
 	
+	/**
+	 * Creates a new display for the game to run on and sets the out to GUIOut to prevent 
+	 * any text getting posted on the command line
+	 */
 	public void runGUI() {
 		display = new Display();
 		display.run(this);
+		
+		//GUIOut = new ByteArrayOutputStream();
+		//System.setOut(new PrintStream(GUIOut));
 	}
 	
 	public void runCMD() {
@@ -173,8 +183,6 @@ public class Game {
 	
 	public void gameSetup() {
 		Item.generateItems();
-		System.out.println("WHY??");
-
 		//Store.readAdvice();
 		generateIslands();
 		generateAllRoutes(islands);
@@ -462,7 +470,7 @@ public class Game {
 			currentDay += 1;
 			if (display != null) {
 				display.updateDay(String.valueOf(currentDay));
-				display.setGameState(chosenRoute.getEvent().eventForGUI());
+				display.setGameState(chosenRoute.getEvent().selectEvent(player, currentDay, display));
 			}
 			chosenRoute.getEvent().selectEvent(player, currentDay, display);
 		}

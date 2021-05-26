@@ -167,6 +167,97 @@ class PlayerTest {
 		player.addItem(testCargo);
 		
 		player.viewInventory();
+		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testViewNoInventory() {
+		String input = "1" + System.lineSeparator() + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		String expected = "There are currently 0 items on the ship:" + System.lineSeparator()
+		+ "Press enter to continue";
+		
+		player.viewInventory();
+		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testViewInvalidInventory() {
+		String input = "3" + System.lineSeparator() + System.lineSeparator() + "2" + System.lineSeparator()
+		+ System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		String expected = "There is currently 1 item on the ship:" + System.lineSeparator()
+		+ "1: Test cargo" + System.lineSeparator()
+		+ "2: Return";
+		Cargo testCargo = new Cargo("Test cargo", "Cargo to be used for testing", 1, 50, Rarity.COMMON);
+		player.addItem(testCargo);
+		
+		String expected2 = "Please enter a number between 1 and 2." + System.lineSeparator();
+
+		
+		player.viewInventory();
+		assertTrue(testOut.toString().contains(expected));
+		assertTrue(testOut.toString().contains(expected2));
+	}
+	
+	@Test
+	void testViewItemInventory() {
+		String input = "1" + System.lineSeparator() + System.lineSeparator() + "2" + System.lineSeparator()
+		+ System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		String expected = "There is currently 1 item on the ship:" + System.lineSeparator()
+		+ "1: Test cargo" + System.lineSeparator()
+		+ "2: Return";
+		Cargo testCargo = new Cargo("Test cargo", "Cargo to be used for testing", 1, 50, Rarity.COMMON);
+		player.addItem(testCargo);
+		
+		String expected2 = "Cargo: Test cargo\nRarity: COMMON\nSize: 1";
+
+		
+		player.viewInventory();
+		assertTrue(testOut.toString().contains(expected));
+		assertTrue(testOut.toString().contains(expected2));
+	}
+	
+	@Test
+	void testViewCards() {
+		String input = "2" + System.lineSeparator() + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		String expected = "There is currently 1 card in your deck:" + System.lineSeparator()
+		+ "1: Test card" + System.lineSeparator()
+		+ "2: Return";
+		Card testCard = new Card("Test card", "Card to be used for testing", 1, 50, Rarity.COMMON);
+		player.addItem(testCard);
+		
+		player.viewCards();
+		System.out.println(testOut);
+		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testViewNoCards() {
+		String input = "1" + System.lineSeparator() + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		String expected = "There are currently 0 cards in your deck:" + System.lineSeparator()
+		+ "Press enter to continue";
+		
+		
+		player.viewCards();
 		System.out.println(testOut);
 		assertTrue(testOut.toString().contains(expected));
 	}
@@ -209,5 +300,6 @@ class PlayerTest {
 		String expected = "Dump successful. " + item.getName() + " has been removed from your ship.";
 		
 		assertEquals(0, player.getCargoStored());
+		assertTrue(testOut.toString().contains(expected));
 	}
 }

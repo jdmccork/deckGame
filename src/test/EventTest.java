@@ -35,12 +35,6 @@ class EventTest {
 		Game game = new Game();
 		Item.generateItems();
 	}
-	/*
-	String input = "Test" + System.lineSeparator() + "Tester";
-	InputStream in = new ByteArrayInputStream(input.getBytes());
-	System.setIn(in);
-	game.setTestInput();
-	*/
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -112,7 +106,7 @@ class EventTest {
 	@Test
 	void testFleeSuccess() {
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 25, 1, 4, 0, 1, 1, islands.get(0), new Display());
+			player = new Player("Test", "Tester", 100, 25, 1, 4, 0, 1, 1, islands.get(0), null);
 			enemy = new Ship("Jolly Rodgers", 1, 0, 3);
 			
 			assertTrue(event.flee(enemy, player));
@@ -129,7 +123,7 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 1, 0, 4, 1, 1, islands.get(0), new Display());
+			player = new Player("Test", "Tester", 100, 0, 1, 0, 4, 1, 1, islands.get(0), null);
 			enemy = new Ship("Jolly Rodgers", 1, 25, 3);
 			
 			assertFalse(event.flee(enemy, player));
@@ -162,7 +156,7 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 10, 4, 0, 1, 1, islands.get(0), new Display());
+			player = new Player("Test", "Tester", 100, 0, 10, 4, 0, 1, 1, islands.get(0), null);
 			player.modifyLuck(20);
 			
 			assertTrue(event.reward(player, 0, 1));
@@ -183,7 +177,7 @@ class EventTest {
 		System.setIn(in);
 		Game.setTestInput();
 		for (int i = 0; i < testNum; i++) {
-			player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 1, 1, islands.get(0), new Display());
+			player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 1, 1, islands.get(0), null);
 			player.modifyLuck(-20);
 			
 			assertFalse(event.reward(player, 0, 1));
@@ -192,7 +186,7 @@ class EventTest {
 	
 	@Test
 	void testRescue() {
-		player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 100, 1, islands.get(0), new Display());
+		player = new Player("Test", "Tester", 100, 0, 10, 0, 4, 100, 1, islands.get(0), null);
 		event.rescue(player, 1);
 		String expected = "1: Rescued sailors reciving $";
 		
@@ -201,5 +195,82 @@ class EventTest {
 		
 		assertTrue(testOut.toString().contains(expected));
 		}
+	
+	@Test
+	void testSurrenderWItems() {
+		String input = "3" + System.lineSeparator() 
+		+ "1" + System.lineSeparator() 
+		+ System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		player.addItem(Item.getItems().get(0));
+		
+		String expected = "Are you sure you want to surrender a random piece of cargo?" + System.lineSeparator()
+				+ "1: Yes" + System.lineSeparator()
+				+ "2: No" + System.lineSeparator()
+				+ "The pirates took your Bread and allowed you to escape with your lives." + System.lineSeparator()
+				+ "Press enter to continue";
+		
+		event.setChance(new ArrayList<>(Arrays.asList(2)));
+		event.selectEvent(player, 0, null);
+		
+		assertEquals(0, player.getInventory().size());
+		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testSurrenderWNoItems() {
+		String input = "3" + System.lineSeparator() 
+		+ System.lineSeparator()
+		+ "2" + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		player.modifySpeed(500);
+		
+		String expected = "You have no cargo? Then pay with your life!" + System.lineSeparator()
+				+ "Press enter to continue" + System.lineSeparator()
+				+ "1: Fight";
+		
+		event.setChance(new ArrayList<>(Arrays.asList(2)));
+		event.selectEvent(player, 0, null);
+		
+		assertTrue(testOut.toString().contains(expected));
+	}
 
+	@Test
+	void testAttack() {
+		player.setMaxHealth(500);
+		enemy.setMaxHealth(500);
+		player.repair();
+		enemy.repair();
+		
+		event.attack(enemy, player);
+
+		assertTrue(enemy.getHealth() < enemy.getMaxHealth());
+		assertTrue(player.getHealth() < player.getMaxHealth());
+	}
+	
+	@Test
+	void testDumping() {
+		
+	}
+	
+	@Test
+	void testRewardAccept() {
+		String input = "1" + System.lineSeparator() 
+		+ System.lineSeparator()
+		+ "2" + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		player = new Player("Test", "Tester", 100, 0, 500, 4, 0, 1, 1, islands.get(0), null);
+		player.modifyLuck(20);
+		
+		event.reward(player, 0, 1);
+		assertEquals(1, player.getInventory().size());
+	}
 }

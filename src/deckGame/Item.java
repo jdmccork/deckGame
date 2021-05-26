@@ -404,23 +404,6 @@ public abstract class Item {
 	}
 	
 	/**
-	 * Allows you to search for an item that has been generated based on name.
-	 * <p>
-	 * This was not used in the current implementation but was designed so that events could 
-	 * give you a specific item eg. having live chickens gives you a chance to get eggs
-	 * @param itemName
-	 * @return
-	 */
-	public static Item getItem(String itemName) {
-		for (Item item: getItems()) {
-			if (item.getName() == itemName) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
-	/**
 	 * Saves the amount that you bought the item for.
 	 * @param cost
 	 */

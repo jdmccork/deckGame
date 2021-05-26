@@ -22,7 +22,6 @@ import deckGame.Route;
 
 class GameTest {
 	Game game;
-	private final PrintStream systemOut = System.out;
 	private ByteArrayOutputStream testOut;
 
 	@BeforeAll

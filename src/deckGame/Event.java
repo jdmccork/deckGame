@@ -38,42 +38,35 @@ public class Event {
 	 * @param player
 	 * @param currentDay
 	 * @param display
+	 * @return The type of event that occurs for GUI
 	 */
-	public void selectEvent(Player player, int currentDay, Display display) {
+	public String selectEvent(Player player, int currentDay, Display display) {
 		this.display = display;
 		switch (eventChance.get((int) (Math.random() * eventChance.size()))) {
 		case 1: //nothing happens
-			if (display != null) {
-				display.updateDialogue("The day passes uneventfully.");
-			} else {
+			if (display == null) {
 				System.out.println("The day passes uneventfully.");
 			}
-			break;
-		case 2: //Fight
-			fight(player, currentDay);
-			break;
-		case 3: //Storm
-			storm(player, currentDay);
-			break;
-		case 4: //rescue sailors
-			rescue(player, currentDay);
-			break;
-		}
-	}
-	
-	public String eventForGUI() {
-		switch (eventChance.get((int) (Math.random() * eventChance.size()))) {
-		case 1: //nothing happens
 			return "Sea";
 		case 2: //Fight
+			if (display == null) {
+				fight(player, currentDay);
+			}
 			return "Pirates";
 		case 3: //Storm
+			if (display == null) {
+				storm(player, currentDay);
+			}
 			return "Storm";
 		case 4: //rescue sailors
+			if (display == null) {
+				rescue(player, currentDay);
+			}
 			return "Rescue";
 		default:
 			return "Error";
 		}
+			
 	}
 	
 	/**
@@ -154,6 +147,7 @@ public class Event {
 	public boolean surrenderItems(Player player, int currentDay) {
 		if (player.getInventory().size() == 0) {
 			System.out.println("You have no cargo? Then pay with your life!");
+			Game.pause();
 			return false;
 		}
 		while (true) {
@@ -174,6 +168,7 @@ public class Event {
 				player.getLogbook().addEntry(entry);
 				
 				System.out.println("The pirates took your " + item.getName() + " and allowed you to escape with your lives.");
+				Game.pause();
 				return true;
 			case 2:
 				return false;
@@ -188,30 +183,17 @@ public class Event {
 	 * @param enemy
 	 * @param player
 	 */
-	public void attack(Ship enemy, Ship player) {
+	public String attack(Ship enemy, Ship player) {
 		ArrayList<Integer> playerDice = roll(player);
 		enemy.damage(playerDice);
 		if (enemy.getStatus() == Statuses.DESTROYED) {
-			return;
+			return "The enemy has been sunk";
 		}
 		
 		ArrayList<Integer> enemyDice = roll(enemy);
 		player.damage(enemyDice);
-	}
-	
-	public String attackGUI(Ship enemy, Ship player) {
-		while (enemy.getStatus() != Statuses.DESTROYED) {
-			ArrayList<Integer> playerDice = roll(player);
-			enemy.damage(playerDice);
-			
-			if (enemy.getStatus() == Statuses.DESTROYED) {
-				return "The enemy has been sunk";
-			}
-			
-			ArrayList<Integer> enemyDice = roll(enemy);
-			return player.damageGUI(enemyDice);
-		}
-		return "An error occurred. The enemy claims to be destroyed before you even fight them";
+		return player.damage(enemyDice);
+
 	}
 	
 	/**
@@ -231,7 +213,6 @@ public class Event {
 			System.out.println("While trying to escape the enemy attacks and harpons you.");
 			ArrayList<Integer> enemyDice = roll(enemy);
 			player.damage(enemyDice);
-			Game.pause();
 			
 			attack(enemy, player);
 			return false;
@@ -266,28 +247,20 @@ public class Event {
 	 * Simulates a storm damaging the player and rewarding the player if they are lucky
 	 * @param player
 	 * @param currentDay
+	 * @return A String of the damage that occurred
 	 */
-	public void storm(Player player, int currentDay){
+	public String storm(Player player, int currentDay){
 		System.out.println("You encounter a storm.");
 		int damage = ((int) (Math.random() * 15) + 1);
-		player.damage(damage);
+		
 		Entry entry = new Entry(currentDay);
 		entry.addDamage(damage);
 		entry.makeEvent("Encountered a storm");
 		player.getLogbook().addEntry(entry);
 		reward(player, -5, currentDay);
+		
+		return player.damage(damage);
 	}
-	
-	public String stormGUI(Player player, int currentDay) {
-		int damage = ((int) (Math.random() * 20));
-		Entry entry = new Entry(currentDay);
-		entry.addDamage(damage);
-		entry.makeEvent("Encountered a storm");
-		player.getLogbook().addEntry(entry);
-		return player.damageGUI(damage);
-	}
-
-	//Item
 	
 	/**
 	 * Gets a random item if the dice roll + players luck + the modifier is over 15 and allows inventory

@@ -135,7 +135,7 @@ public class Player extends Ship {
 	 * <p>
 	 * Says game over and sets the status of this player's ship to destroyed.
 	 */
-	public void getDestroyed() {
+	public String getDestroyed() {
 		System.out.println("The " + getShipName() + " has been destroyed. Game Over.");
 		super.getDestroyed();
 		throw new EndGameException();
@@ -270,37 +270,63 @@ public class Player extends Ship {
 		item.setPurchaseCost(-1);
 	}
 	
+	/**
+	 * Returns the cards that are currently in the players deck
+	 * @return
+	 */
 	public ArrayList<Card> getCards(){
 		return cards;
 	}
 	
-	
+	/**
+	 * Formats the inventory of the player and allows them to select cargo to view
+	 */
 	public void viewInventory() {
-		printInventory();
-		System.out.println((inventory.size() + 1) + ": Return\n" + "Select an item or return to continue.");
-		int selection = Game.getInt();
-		if (selection == inventory.size() + 1) {
-			return;
-		}else if (selection <= inventory.size()) {
-			inventory.get(selection - 1).viewItem();
-		}else {
-			System.out.println("Please enter a number between 1 and " + getInventory().size() + 1 + ".");
+		while (true) {
+			printInventory();
+			if (inventory.size() == 0) {
+				Game.pause();
+				return;
+			}
+			System.out.println((inventory.size() + 1) + ": Return\n" + "Select an item or return to continue.");
+			int selection = Game.getInt();
+			if (selection == inventory.size() + 1) {
+				return;
+			}else if (selection <= inventory.size()) {
+				inventory.get(selection - 1).viewItem();
+			}else {
+				System.out.println("Please enter a number between 1 and " + (getInventory().size() + 1) + ".");
+				Game.pause();
+			}
 		}
 	}
 	
+	/**
+	 * Formats the deck of the player and allows them to select cards to view
+	 */
 	public void viewCards() {
-		printCards();
-		System.out.println((cards.size() + 1) + ": Return\n" + "Select an item or return to continue.");
-		int selection = Game.getInt();
-		if (selection == cards.size() + 1) {
-			return;
-		}else if (selection <= cards.size()) {
-			cards.get(selection - 1).viewItem();
-		}else {
-			System.out.println("Please enter a number between 1 and " + inventory.size() + 1 + ".");
+		while(true) {
+			printCards();
+			if (cards.size() == 0) {
+				Game.pause();
+				return;
+			}
+			System.out.println((cards.size() + 1) + ": Return\n" + "Select an item or return to continue.");
+			int selection = Game.getInt();
+			if (selection == cards.size() + 1) {
+				return;
+			}else if (selection <= cards.size()) {
+				cards.get(selection - 1).viewItem();
+			}else {
+				System.out.println("Please enter a number between 1 and " + (inventory.size() + 1) + ".");
+				Game.pause();
+			}
 		}
 	}
 	
+	/**
+	 * Displays the players logbook
+	 */
 	public void viewLogbook() {
 		logbook.viewEntries();
 		Game.pause();
@@ -314,18 +340,37 @@ public class Player extends Ship {
 		return inventory;
 	}
 	
+	/**
+	 * 
+	 * @return The number of crew on the ship
+	 */
 	public int getNumCrew() {
 		return crew;
 	}
 	
+	/**
+	 * 
+	 * @return The logbook of the player
+	 */
 	public Logbook getLogbook() {
 		return logbook;
 	}
 	
+	/**
+	 * 
+	 * @return The total space taken up by the cargo onboard
+	 */
 	public int getCargoStored() {
 		return cargoStored;
 	}
 	
+	/**
+	 * [CMD]
+	 * <p>
+	 * Give the player the option to pay their crew
+	 * @param time
+	 * @return If the player payed their crew
+	 */
 	public boolean payCrewCMD(int time) {
 		int cost = crew * time;
 
@@ -349,6 +394,12 @@ public class Player extends Ship {
 		}
 	}
 	
+	/**
+	 * [GUI]
+	 * <p>
+	 * Give the player the option to pay their crew
+	 * @param time
+	 */
 	public void payCrew(int time) {
 		int cost = crew * time;
 
@@ -360,6 +411,12 @@ public class Player extends Ship {
 		display.updateDisplayFunction(13, Actions.CHOOSE_ROUTE);
 	}
 	
+	/**
+	 * Removes an item from the players inventory and adds an entry into the logbook
+	 * @param item
+	 * @param currentDay
+	 * @return if the item was dumped successfully
+	 */
 	public boolean dump(Item item, int currentDay) {
 		if (inventory.contains(item)) {
 			removeItem(item);
@@ -376,5 +433,4 @@ public class Player extends Ship {
 		Game.pause();
 		return false;
 	}
-
 }

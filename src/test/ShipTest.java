@@ -37,7 +37,7 @@ class ShipTest {
 	
 	@BeforeEach
 	public void init() {
-		ship = new Ship("Jolly Rogers", 200, 45, 253);
+		ship = new Ship("Jolly Rogers", 200, 45, 5);
 	}
 
 	@Test
@@ -52,27 +52,14 @@ class ShipTest {
 		assertEquals(185, ship.getHealth());
 		assertEquals(ship.getStatus(), Statuses.DAMAGED);
 	}
-	//TODO move to player
 	
-//	@Test
-//	void inventoryTest() {
-//		ship.addItem((Cargo) Item.getItems().get(0));
-//		assertEquals(ship.getInventory().get(0), Item.getItems().get(0));
-//	}
-	
-//	@Test
-//	void smallInventoryTest() {
-//		ship = new Ship("Jolly Rogers", 200, 45, 0, 253);
-//		ship.addItem((Cargo) Item.getItems().get(0));
-//		assertEquals(ship.getInventory().size(), 0);
-//	}
-	
-	
-//	@Test
-//	void maxHealthItemTest(){
-//		Cargo item = new Cargo("Max health test", "Test max health stat", 1, 1, Rarity.COMMON, Stats.MAXHEALTH, 50);
-//		ship.addItem(item);
-//		assertEquals(ship.getMaxHealth(), 250);
-//	}
-
+	@Test
+	void testPrint() {
+		//This will also test the creation of ship
+		String expected = "The Jolly Rogers has the following stats:\n"
+				+ "Health: 200/200\n"
+				+ "Speed: 45\n"
+				+ "Strength: 5";
+		assertEquals(expected, ship.toString());
+	}
 }
