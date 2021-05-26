@@ -338,86 +338,83 @@ class GameTest {
 			assertTrue(testOut.toString().contains(expected3));
 			assertTrue(testOut.toString().contains(expected4));
 	}
-
-/*
+	
+	void testSelectRouteDamaged() {
+		String expected1 = "You travelled for 4 days and have arrived at Island: Golgolles";
+		String expected2 = "Are you sure you want to travel to Island: Golgolles";
+		String expected3 = "100% chance for nothing to happen";
+		String expected4 = "You must pay your crew $40 for this route.";
+		String expected5 = "Your ship has sustained 5  damage. This will cost $2 to repair.";
+		String input = 1 + System.lineSeparator()
+				+ 1 + System.lineSeparator()
+				+ 1 + System.lineSeparator()
+				+ 1 + System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator();
+			InputStream in = new ByteArrayInputStream(input.getBytes());
+			System.setIn(in);
+			Game.setTestInput();
+			
+			game.gameSetup();
+			game.sessionSetup("Tester", "Test ship", 25, "3");
+			Route route = game.getPlayer().getLocation().getRoutes().get(0);
+			route.getEvent().setChance(new ArrayList<Integer>(Arrays.asList(1)));
+			
+			game.getPlayer().damage(5);
+			
+			game.selectRoute();
+			
+			assertEquals(208, game.getPlayer().getGold());
+			assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+			assertTrue(testOut.toString().contains(expected1));
+			assertTrue(testOut.toString().contains(expected2));
+			assertTrue(testOut.toString().contains(expected3));
+			assertTrue(testOut.toString().contains(expected4));
+			assertTrue(testOut.toString().contains(expected5));
+	}
+	
 	@Test
-	void testGetGameLength() {
-		fail("Not yet implemented");
+	void testPlayText() {
+		String input = 6 + System.lineSeparator()
+				+ 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		game.setCurrentDay(5);
+		game.setDayLimit(10);
+		
+		String expected = "Current day: 5/10" + System.lineSeparator()
+		+ "Select an option to continue" + System.lineSeparator()
+		+ "1: Interact with store" + System.lineSeparator()
+		+ "2: Set sail" + System.lineSeparator()
+		+ "3: See inventory" + System.lineSeparator()
+		+ "4: See deck" + System.lineSeparator()
+		+ "5: View Captain's log" + System.lineSeparator()
+		+ "6: Return to main menu";
+		
+		game.play();
+		
+		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testGetIntInvalid() {
+		String expected = "Invalid character, please enter a valid integer.";
+		String input = "g" + System.lineSeparator()
+			+ 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		int result = Game.getInt();
+		
+		assertEquals(1, result);
+		
+		assertTrue(testOut.toString().contains(expected));
 	}
 
-	@Test
-	void testPlay() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testShopInteraction() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testBuyStock() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testViewItem() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testPurchaseItem() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testSellItem() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testGetPrice() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testSellStock() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testGetInt() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testSelectRoute() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testViewInventory() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testGenerateStore() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testEndGame() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testGetTotalWorth() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testPrintResults() {
-		fail("Not yet implemented");
-	}
-*/
 }
