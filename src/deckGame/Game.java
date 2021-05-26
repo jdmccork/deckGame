@@ -145,10 +145,10 @@ public class Game {
 	public void generateIslands() {
 		islands = new ArrayList<Island>();
 		islands.add(new Island("Home", 0, 0, 7));
-		islands.add(new Island("Golgolles", -10, 5, 0));
-		islands.add(new Island("Cansburg", 5, 5, 3));
-		islands.add(new Island("Tisjour", -5, -5, 11));
-		islands.add(new Island("Brighdown", 5, -5, 13));
+		islands.add(new Island("Golgolles", -13, 4, 0));
+		islands.add(new Island("Cansburg", 7, 3, 3));
+		islands.add(new Island("Tisjour", -5, -10, 11));
+		islands.add(new Island("Brighdown", 6, -8, 13));
 	}
 	
 	public void generateAllRoutes(ArrayList<Island> islands) {
@@ -435,12 +435,35 @@ public class Game {
 					default:
 						System.out.println("Please enter the number 1 or 2.");
 					}
+				}else if(!confirmRoute(chosenRoute)) {
+					return;
 				}
 				if (!player.payCrewCMD(time)) {
 					return;
 				}
 				executeSail(chosenRoute);
 				return;
+			}
+		}
+	}
+	
+	public boolean confirmRoute(Route route) {
+		while (true) {
+			System.out.println("Are you sure you want to travel to " + route.getDestination() + "?");
+			System.out.println("This will take " + route.getTime(player.getSpeed()) 
+			+ " days arriving on day " + currentDay + route.getTime(player.getSpeed()) + ".");
+			System.out.println(route.viewEvents());
+			System.out.println("1: Yes");
+			System.out.println("2: No");
+			switch (Game.getInt()) {
+			case 1:
+				return true;
+			case 2:
+				return false;					
+			default:
+				System.out.println("Please enter a number between 1 and 2");
+				Game.pause();
+				break;
 			}
 		}
 	}
@@ -529,6 +552,10 @@ public class Game {
 	
 	public ArrayList<Island> getIslands(){
 		return islands;
+	}
+	
+	public void setCurrentDay(int day) {
+		currentDay = day;
 	}
 			
 	public static void main(String[] args) {

@@ -292,12 +292,12 @@ class PlayerTest {
 		System.setIn(in);
 		Game.setTestInput();
 		
-		Item item = Item.getRandomItem();
+		Item item = Item.getItems().get(0);
 		player.modifyCapacity(10);
 		player.addItem(item);
 		player.dump(item, 5);
 		
-		String expected = "Dump successful. " + item.getName() + " has been removed from your ship.";
+		String expected = "Dump successful. Bread has been removed from your ship.";
 		
 		assertEquals(0, player.getCargoStored());
 		assertTrue(testOut.toString().contains(expected));

@@ -54,6 +54,10 @@ public class Entry extends Logbook {
 		transactionType = type;
 	}
 	
+	public void addLocation(Island island) {
+		location = island;
+	}
+	
 	/**
 	 * Sets the parameters to allow for correct formating
 	 * @param item
@@ -111,7 +115,7 @@ public class Entry extends Logbook {
 			output += cost;
 		}
 		if (location != null) {
-			output += "at " + location.getName();
+			output += " at " + location.getName();
 		}
 		output += ".";
 		return output;

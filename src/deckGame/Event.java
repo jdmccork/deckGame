@@ -214,7 +214,6 @@ public class Event {
 			ArrayList<Integer> enemyDice = roll(enemy);
 			player.damage(enemyDice);
 			
-			attack(enemy, player);
 			return false;
 		}
 	}
@@ -370,7 +369,7 @@ public class Event {
 	 * @param currentDay
 	 */
 	public void rescue(Player player, int currentDay) {
-		int amount = Math.max((int) (Math.random() * 25) + 1, 10);
+		int amount = Math.max((int) (Math.random() * 100) + 1, 10);
 		System.out.println("You come across a shipwreck and help the survivors onboard.\nThey reward you with $" + amount + ".");
 		player.modifyGold(amount);
 		Entry entry = new Entry(currentDay);

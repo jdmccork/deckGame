@@ -268,6 +268,7 @@ public class Store {
 			Entry entry = new Entry(currentDay);
 			entry.makeTransaction(item, "Bought ");
 			entry.addCost(price);
+			entry.addLocation(location);
 			player.getLogbook().addEntry(entry);
 			Game.pause();
 			return true;
@@ -352,6 +353,7 @@ public class Store {
 			Entry entry = new Entry(currentDay);
 			entry.makeTransaction(item, "Sold ");
 			entry.addCost(-price);
+			entry.addLocation(location);
 			player.getLogbook().addEntry(entry);
 			Game.pause();
 			return true;

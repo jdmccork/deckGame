@@ -30,10 +30,10 @@ public class Route {
 		this.source = source;
 		this.destination = destination;
 		distance = (int) Math.ceil(Island.getDistance(source, destination));
-		int nothingChance = Math.min(1,(int) (Math.random() * 25));
-		int pirateChance = (int) (Math.random() * 10);
-		int stormChance = (int) (Math.random() * 15);
-		int rescueChance = (int) (Math.random() * 5);
+		int nothingChance = Math.max(1,(int) (Math.random() * 50));
+		int pirateChance = (int) (Math.random() * 25);
+		int stormChance = (int) (Math.random() * 20);
+		int rescueChance = (int) (Math.random() * 10);
 		int[] eventChances = new int[] {nothingChance, pirateChance, stormChance, rescueChance};
 		event = new Event(eventChances);
 	}
@@ -60,7 +60,7 @@ public class Route {
 	 * @return the time to sail the entire route
 	 */
 	public int getTime(int speed) {
-		int time = (distance*5)/speed;
+		int time = (distance*3)/speed;
 		if (time <= 0) {
 			return 1;
 		} else {
@@ -86,17 +86,17 @@ public class Route {
 	/**
 	 * Prints the chance of any event happening on a route
 	 */
-	public void viewEvents() {
+	public String viewEvents() {
 		int totalProbability = event.getEventChance().size();
 		int count = 0;
-		String output = "There is a: ";
+		String output = "Each day there is a: ";
 		for (int nothingOccurance: event.getEventChance()) {
 			if (nothingOccurance == 1) {
 				count += 1;
 			}
 		}
 		if (count >= 1) {
-			output += "\n" + count/totalProbability + " chance for nothing to happen";
+			output += "\n" + Math.round((((double)count/totalProbability) * 100)) + "% chance for nothing to happen";
 			}
 		
 		count = 0;
@@ -106,7 +106,7 @@ public class Route {
 			}
 		}
 		if (count >= 1) {
-			output += "\n" + count/totalProbability + " chance to be attacked by pirates";
+			output += "\n" + Math.round((((double)count/totalProbability) * 100)) + "% chance to be attacked by pirates";
 		}
 		
 		count = 0;
@@ -116,7 +116,7 @@ public class Route {
 			}
 		}
 		if (count >= 1) {
-			output += "\n" + count/totalProbability + " chance to encounter a storm";
+			output += "\n" + Math.round((((double)count/totalProbability) * 100)) + "% chance to encounter a storm";
 		}
 		
 		count = 0;
@@ -126,7 +126,8 @@ public class Route {
 			}
 		}
 		if (count >= 1) {
-			output += "\n" + count/totalProbability + " chance to find sailors in need of rescue";
+			output += "\n" + Math.round((((double)count/totalProbability) * 100)) + "% chance to find sailors in need of rescue";
 		}
+		return output;
 	}
 }
