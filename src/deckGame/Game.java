@@ -12,20 +12,61 @@ import enums.Statuses;
 
 
 public class Game {
-	private static Scanner userInput;
-	private Player player;
-	private ArrayList<Island> islands;
-	private int days;
-	private int currentDay;
-	private Display display;
-	private Route chosenRoute;
-	private boolean paused = false;
-	//private ByteArrayOutputStream GUIOut;
 	
+	/**
+	 * The player input used in the command line application
+	 */
+	private static Scanner userInput;
+	
+	/**
+	 * The instance of player associated with the instance of Game
+	 */
+	private Player player;
+	
+	/**
+	 * The list of islands associated with the instance of Game
+	 */
+	private ArrayList<Island> islands;
+	
+	/**
+	 * The number of days that the game will last for
+	 */
+	private int days;
+	
+	/**
+	 * The number of days that have passed since the start of the game
+	 */
+	private int currentDay;
+	
+	/**
+	 * The display used for the GUI application
+	 */
+	private Display display;
+	
+	/**
+	 * The route that is being traveled, used for the GUI
+	 */
+	private Route chosenRoute;
+	
+	
+	private boolean paused = false;
+	
+	/**
+	 * Sets the output when running GUI so the application so the command line output can run without
+	 * outputing to the console
+	 */
+	//TODO private ByteArrayOutputStream GUIOut;
+	
+	/**
+	 * Used for testing to allow the input to be changed to a byteArray string
+	 */
 	public static void setTestInput() {
 		userInput = new Scanner(System.in);
 	}
 	
+	/**
+	 * Creates a new instance of game and sets it up
+	 */
 	public Game() {
 		gameSetup();
 	}
@@ -38,8 +79,8 @@ public class Game {
 		display = new Display();
 		display.run(this);
 		
-		//GUIOut = new ByteArrayOutputStream();
-		//System.setOut(new PrintStream(GUIOut));
+		// TODO GUIOut = new ByteArrayOutputStream();
+		// TODO System.setOut(new PrintStream(GUIOut));
 	}
 	
 	public void runCMD() {
@@ -51,16 +92,33 @@ public class Game {
 		userInput.close();
 	}
 	
+	/**
+	 * Returns the entries in the players logbook 
+	 * @return
+	 */
 	public ArrayList<Entry> getLogItems() {
 		return player.getLogbook().getEntries();
 	}
 
+	/**
+	 * Creates a new player for the instance of game
+	 * @param userName
+	 * @param shipName
+	 * @param shipType
+	 * @return The player created
+	 */
 	public Player createPlayer(String userName, String shipName, String shipType) {
 		int[] ship = getShip(shipType);
 		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], ship[6], islands.get(0), display);
 		return player;
 	}
 	
+	/**
+	 * Gets the players selection of ship and passes it as an int list to create the player
+	 * @param shipType
+	 * @return A list of ints corresponding to the ships;
+	 * health, speed, capacity, deck size, power, gold, and crew
+	 */
 	public int[] getShip(String shipType) {
 		int[] output;
 		switch (shipType) {
@@ -77,6 +135,10 @@ public class Game {
 		return output;
 	}
 	
+	/**
+	 * Gets the players selection of ship and passes it as an int list to create the player
+	 * @return The integer selection of the ship
+	 */
 	public String getShipCMD() {
 		while (true) {
 			System.out.println("Select a class:");
@@ -100,6 +162,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Gets the names of the player and their ship from the player
+	 * @param userName
+	 * @param shipName
+	 * @return A string that informs if the name is too short/long, has special characters or is accepted
+	 */
 	public String getNames(String userName, String shipName) {
 		if (userName != null) {
 			if (hasSpecial(userName)) {
@@ -114,6 +182,10 @@ public class Game {
 		return "Good";
 	}
 	
+	/**
+	 * Gets the names of the player and their ship from the player
+	 * @return A list of strings corresponding to the player's name and the ship's name
+	 */
 	public String[] getNamesCMD() {
 		String userName = null;
 		do {
@@ -132,8 +204,11 @@ public class Game {
 		return new String[] {userName, shipName};
 	}
 	
+	/**
+	 * @param string
+	 * @return true if the string has any special characters
+	 */
 	public boolean hasSpecial(String string) {
-		//allowing spaces in people names
 		Pattern my_pattern = Pattern.compile("[^(a-z)\s]", Pattern.CASE_INSENSITIVE);
 		Matcher my_match = my_pattern.matcher(string);
 	    if (my_match.find() | string.contains("\s\s"))
@@ -142,6 +217,9 @@ public class Game {
 	        return false;
 	}
 	
+	/**
+	 * Generates the islands to be used in the game and stores them in the ArrayList islands
+	 */
 	public void generateIslands() {
 		islands = new ArrayList<Island>();
 		islands.add(new Island("Home", 0, 0, 7));
@@ -151,12 +229,20 @@ public class Game {
 		islands.add(new Island("Brighdown", 6, -8, 13));
 	}
 	
+	/**
+	 * iterates through the islands and generates the routes between them
+	 * @param islands
+	 */
 	public void generateAllRoutes(ArrayList<Island> islands) {
 		for (Island island : islands) {
 			island.generateRoutes(islands);
 		}
 	}
 	
+	/**
+	 * Prints a welcome message to the player
+	 * @param player
+	 */
 	public void welcome(Player player) {
 		System.out.println(player.getUserName() + " is the new captain of The " + player.getShipName() + "."
 				+ "\nEarn as much gold as you can in the " + days + " days you have left."
@@ -164,36 +250,49 @@ public class Game {
 		pause();
 	}
 	
+	/**
+	 * Gets the number of days that the player want to play for
+	 * @return the number of days the player has selected 
+	 */
 	public int getGameLength() {
 		while (true) {
-			System.out.println("Choose game length:");
-			try {
-				int days = getInt();
-				if (days >= 20 & days <= 50) {
-					return days;
-				}else {
-					System.out.println("Please enter an integer between 20 and 50.");
-				}
-			} catch (java.util.InputMismatchException e){
-				System.out.println("Please enter a valid integer.");
-				userInput.nextLine();
+			System.out.println("Choose game length in days (between 20 and 50):");
+			int days = getInt();
+			if (days >= 20 & days <= 50) {
+				return days;
+			}else {
+				System.out.println("Please enter an integer between 20 and 50.");
 			}
 		}
 	}
 	
+	/**
+	 * Sets up the game state by generating things that are maintained between players
+	 */
 	public void gameSetup() {
 		Item.generateItems();
-		//Store.readAdvice();
+		Store.readAdvice();
 		generateIslands();
 		generateAllRoutes(islands);
 	}
 	
+	/**
+	 * Creates the classes and information required for a players session
+	 * @param userName
+	 * @param shipName
+	 * @param duration
+	 * @param ship
+	 */
 	public void sessionSetup(String userName, String shipName, int duration, String ship) {
 		player = createPlayer(userName, shipName, ship);
 		player.getLocation().getStore().generateStock(player);
 		days = duration;
 	}
 	
+	/**
+	 * The first menu options the player experiences allowing access to the rest of the game
+	 * @return
+	 */
 	public boolean mainMenu(){
 		int selection;
 		try {
@@ -231,6 +330,10 @@ public class Game {
 		return false;//should never be reached in reality
 	}
 	
+	/**
+	 * Puts the player onto their current island and allows them to select what they want to 
+	 * do from the options.
+	 */
 	public void play() {
 		while (currentDay <= days) {
 			System.out.println("Current day: " + currentDay + "/" + days);
@@ -271,6 +374,11 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Confirms if the player want to return to the main menu. This was added to prevent players losing their 
+	 * current session
+	 * @return
+	 */
 	public boolean menuConfirm() {
 		while (true) {
 			System.out.println("Are you sure you want to return to the main menu?");
@@ -289,6 +397,10 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Gets an integer value from the player.
+	 * @return An integer from the player
+	 */
 	public static int getInt(){
 		while(true) {
 			try {
@@ -296,12 +408,17 @@ public class Game {
 				userInput.nextLine();
 				return selection;
 			}catch (java.util.InputMismatchException e) {
-				System.out.println("Invalid character, please enter a valid option.");
+				System.out.println("Invalid character, please enter a valid integer.");
 				userInput.nextLine();
 			}
 		}
 	}
 	
+	/**
+	 * Charges the player repair costs depending on how much damage they have taken. Ends the game if they
+	 * don't have enough money and no items.
+	 * @return
+	 */
 	public boolean chargeRepair() {
 		if (player.getStatus() == Statuses.REPAIRED) {
 			return true;
@@ -326,6 +443,13 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Charges the player repair costs depending on how much damage they have taken. Ends the game if they
+	 * don't have enough money and no items.
+	 * @param cost
+	 * @param healthLost
+	 * @return
+	 */
 	public boolean chargeRepairCMD(int cost, int healthLost) {
 		while (true) {
 			System.out.println(
@@ -347,6 +471,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Repairs the players ship, removes the amount it costs from the
+	 * players gold and adds an entry to the logbook
+	 * @param selection
+	 * @return
+	 */
 	public boolean executeRepair(int selection) {
 		int healthLost = player.getMaxHealth()-player.getHealth();
 		int cost = (int) (healthLost / 5) + 1;
@@ -369,6 +499,11 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Pays the crew the correct amount, removes the money from the players gold and adds
+	 * an entry into the logbook.
+	 * @param cost
+	 */
 	public void executePay(int cost) {
 		if (player.modifyGold(-cost)) {
 			Entry entry = new Entry(currentDay);
@@ -381,6 +516,9 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Determines how to the player will select the route and charges for repairs
+	 */
 	public void selectRoute() {
 		if (chargeRepair()) {
 			if (display != null) {
@@ -396,6 +534,10 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * The command line variation to select a route. Gets a player input and
+	 * send them back or onto confirm route
+	 */
 	public void selectRouteCMD() {
 		int selection;
 		ArrayList<Route> routes = player.getLocation().getRoutes();
@@ -419,8 +561,7 @@ public class Game {
 			}else if (selection > index | selection < 0) {
 				System.out.println("Please enter a number between 1 and " + index);
 			}else {
-				selection--; // accounts for the index's starting at 0 and not 1
-				chosenRoute = routes.get(selection);
+				chosenRoute = routes.get(selection-1);
 				int time = chosenRoute.getTime(player.getSpeed());
 				if (currentDay + time >= days) {
 					System.out.println("Note, this trip will exceed your remaining time, all items will"
@@ -447,6 +588,11 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Confirms if the player want to travel the route they selected and prints the information about the route.
+	 * @param route
+	 * @return
+	 */
 	public boolean confirmRoute(Route route) {
 		while (true) {
 			System.out.println("Are you sure you want to travel to " + route.getDestination() + "?");
@@ -468,6 +614,10 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Selects the route the player selected and pays the crew
+	 * @param selection
+	 */
 	public void executeRoute(int selection) {
 		ArrayList<Route> routes = player.getLocation().getRoutes();
 		Route route = routes.get(selection);
@@ -483,6 +633,11 @@ public class Game {
 		this.chosenRoute = route;
 	}
 	
+	/**
+	 * Executes the sail which causes the events to occur for the number of days that the route takes and
+	 * sets the players location to the destination
+	 * @param chosenRoute
+	 */
 	public void executeSail(Route chosenRoute) {
 		int time = chosenRoute.getTime(player.getSpeed());
 		player.sail(chosenRoute);
@@ -511,22 +666,32 @@ public class Game {
 		}
 	}
 	
+
 	public void setPause(boolean setting) {
 		this.paused = setting;
 	}
 	
+	/**
+	 * Put the input in a state where the player has to input something for the game state to continue
+	 */
 	public static void pause() {
 		System.out.println("Press enter to continue");
 		userInput.nextLine();
 	}
 	
+	/**
+	 * Ends the game and gets the players score
+	 */
 	public void endGame() {
 		int gold = getTotalWorth();
 		printResults(gold);
-		//extendGame(); question with y/n answer
-		
 	}
 	
+	/**
+	 * Sells all the players items and adds it to the players gold to get the total value
+	 * in gold the player has
+	 * @return Players total gold
+	 */
 	public int getTotalWorth() {
 		int totalGold = 0;
 		totalGold += player.getGold();
@@ -536,28 +701,49 @@ public class Game {
 		return totalGold;
 	}
 	
+	/**
+	 * Calculates the players score and displays the number of days the player survived
+	 * @param gold
+	 */
 	public void printResults(int gold) {
 		System.out.println("Total gold earned: " + gold);
 		System.out.println("Days survived: " + currentDay + "/" + days);
 		System.out.println("Total score: " + gold/(currentDay/days));
 	}
 	
+	/** 
+	 * @return The games current day
+	 */
 	public int getCurrentDay() {
 		return currentDay;
 	}
 	
+	/**
+	 * @return The instance of player associated with the instance of game
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 	
+	/**
+	 * @return An ArrayList of the islands associated with the instance of game
+	 */
 	public ArrayList<Island> getIslands(){
 		return islands;
 	}
 	
+	/**
+	 * Sets the current day
+	 * @param day
+	 */
 	public void setCurrentDay(int day) {
 		currentDay = day;
 	}
-			
+	
+	/**
+	 * Runs the program
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Game game = new Game();
 		game.runCMD();
