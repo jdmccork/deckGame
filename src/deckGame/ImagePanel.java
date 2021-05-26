@@ -11,8 +11,15 @@ import javax.swing.JPanel;
  *
  */
 public class ImagePanel extends JPanel {
+	/**
+	 * The image in the background of this ImagePanel
+	 */
 	private Image background;
 	
+	/**
+	 * Creates a panel with an image for a background
+	 * @param img the image to have as a background
+	 */
 	public ImagePanel(Image img) {
 		this.background = img;
 		Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
@@ -23,11 +30,18 @@ public class ImagePanel extends JPanel {
 	    setLayout(null);
 	}
 	
+	/**
+	 * Changes the image that this panel displays and refreshes the panel.
+	 * @param img
+	 */
 	public void setImage(Image img) {
 		this.background = img;
 		this.repaint();
 	}
 	
+	/**
+	 * Draws the panel with an image
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 	    g.drawImage(background, 0, 0, null);

@@ -23,49 +23,154 @@ import javax.swing.border.EmptyBorder;
 
 import enums.Actions;
 import enums.ItemType;
-import enums.Statuses;
 
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.JTextField;
 import javax.swing.JSlider;
 import javax.swing.JRadioButton;
 
-public class Display {
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
+public class Display {
+	/**
+	 * The frame which houses the main gameplay window
+	 */
 	private JFrame frmDeckgame;
+	
+	/**
+	 * The label which displays the current day
+	 */
 	private JLabel lblCurrentDay;
+	
+	/**
+	 * The label which displays the amount of money
+	 */
 	private JLabel lblMoney;
+	
+	/**
+	 * The panel which contains the ship stats labels
+	 */
 	private JPanel statsPanel;
+	
+	/**
+	 * The main dialog area
+	 */
 	private JTextArea outputArea;
+	
+	/**
+	 * The label which has the value of the player's health
+	 */
 	private JLabel lblHealthStat;
+	
+	/**
+	 * The label which has the value of the player's speed
+	 */
 	private JLabel lblSpeedStat;
+	
+	/**
+	 * The label which has the value of the player's luck
+	 */
 	private JLabel lblLuckStat;
+	
+	/**
+	 * The label which has the value of the player's capacity
+	 */
 	private JLabel lblCapacityStat;
+	
+	/**
+	 * The label which has the value of the player's deck size
+	 */
+	private JLabel lblDeckSizeStat;
+	
+	/**
+	 * The label which has the value of the player's number of crew
+	 */
+	private JLabel lblCrewAmountStat;
+	
+	/**
+	 * The label which has the value of the player's daily cost to sail
+	 */
+	private JLabel lblDailyCostStat;
+	
+	/**
+	 * The background panel of the main window
+	 */
 	private ImagePanel displayPanel;
+	
+	/**
+	 * The panel which houses all of the multi-tasking buttons in the main window
+	 */
 	private JPanel mainDisplayPanel;
+	
+	/**
+	 * A list of the multi-tasking buttons in the main window
+	 */
 	private ArrayList<ChangingButton> mainDisplays;
+	
+	/**
+	 * The game instance to which this instance of display is linked
+	 */
 	private Game game;
+	
+	/**
+	 * The panel at the bottom of the screen
+	 */
 	private JPanel dialogPanel;
+	
+	/**
+	 * A flag to alter the use of the log icon as a button
+	 */
 	private boolean logOpen;
+	
+	/**
+	 * The current state of the main window, used to restore after opening log.
+	 */
 	private String currentState;
+	
+	/**
+	 * The page in the log that the player is viewing / can view
+	 */
 	private int currentLogPage;
+	
+	/**
+	 * The page in all other circumstances that the player is viewing/can view
+	 */
 	private int currentPage;
+	
+	/**
+	 * The button which opens and closes the ship's log
+	 */
 	private JButton openLog;
+	
+	/**
+	 * The enemy instance being fought in the most recent pirate battle
+	 */
 	private Ship enemy;
+	
+	/**
+	 * A flag variable of whether the player attempted to flee pirates
+	 */
+	private boolean attemptedToFlee = false;
+	
+	/**
+	 * The music that is running in the background.
+	 */
+	private Clip soundtrack;
 
 	/**
-	 * Create the application.
+	 * Creates the application
+	 * @param game the instance of game which this is linked to.
 	 */
-	public Display() {
-		//welcome(game);
-		//initialize();
-	}
-	
 	public void run(Game game) {
 		welcome(game);
 	}
@@ -94,6 +199,10 @@ public class Display {
 		this.outputArea.setText(message);
 	}
 	
+	/**
+	 * Changes the background image and repaints to keep borders on top
+	 * @param source the file path to the new background image
+	 */
 	public void changeBackground(String source) {
 		this.displayPanel.setImage(new ImageIcon(source).getImage());
 		this.dialogPanel.repaint();
@@ -115,6 +224,10 @@ public class Display {
 		this.lblSpeedStat.setText(speed);
 	}
 	
+	/**
+	 * Changes the colour which text displays in
+	 * @param color the color to display text in
+	 */
 	private void changeForegroundColour(Color color) {
 		for (ChangingButton button : this.mainDisplays) {
 			button.setForeground(color);
@@ -138,20 +251,53 @@ public class Display {
 	}
 	
 	/**
-	 * Updates the graphical display of all stats
-	 * @param health the new amount of health to display
-	 * @param speed the new speed to display
-	 * @param luck the new luck to display
-	 * @param weakness the new weakness to display
-	 * @param capacity the new capacity to display
+	 * Updates the deck size stat that is displayed.
+	 * @param size the new size to display
 	 */
-	public void updateStats(String health, String speed, String luck, String weakness, String capacity) {
-		updateHealth(health);
-		updateSpeed(speed);
-		updateLuck(luck);
-		updateCapacity(capacity);
+	public void updateDeckSize(String size) {
+		this.lblDeckSizeStat.setText(size);
 	}
 	
+	/**
+	 * Updates the crew count stat that is displayed
+	 * @param amount the new number of crew to display
+	 */
+	public void updateCrewAmount(String amount) {
+		this.lblCrewAmountStat.setText(amount);
+	}
+	
+	/**
+	 * Updates the daily cost stat that is displayed.
+	 * @param cost the new cost to display.
+	 */
+	public void updateDailyCost(String cost) {
+		this.lblDailyCostStat.setText(cost);
+	}
+	
+	/**
+	 * Updates the graphical display of all stats, drawing on their values from game.
+	 */
+	public void updateStats() {
+		updateHealth(game.getPlayer().getHealth() + "/" + game.getPlayer().getMaxHealth() + " ");
+		updateSpeed(game.getPlayer().getSpeed() + " ");
+		updateLuck(game.getPlayer().getLuck() + " ");
+		int capacityUsed = 0;
+		for (Cargo cargo : game.getPlayer().getInventory()) {
+			capacityUsed += cargo.getSize();
+		}
+		updateCapacity(capacityUsed + "/" + game.getPlayer().getCapacity() + " ");
+		updateDeckSize(game.getPlayer().getCards().size() + "/" + game.getPlayer().getDeckSize() + " ");
+		updateCrewAmount(game.getPlayer().getNumCrew() + " ");
+		updateDailyCost(game.getPlayer().getNumCrew() + " ");
+	}
+	
+	/**
+	 * Changes one of the multi-tasking buttons
+	 * @param index (0-14) the button to change
+	 * @param input the text OR file path to image that will be displayed
+	 * @param enabled whether the button should be represented as enabled
+	 * @param show whether the button should be visible
+	 */
 	public void updateMainDisplay(int index, String input, boolean enabled, boolean show) {
 		if(input.length() == 0) {
 			this.mainDisplays.get(index).setIcon(null);
@@ -166,18 +312,36 @@ public class Display {
 		this.mainDisplays.get(index).setVisible(show);
 	}
 	
+	/**
+	 * Changes the value assigned to one of the multi-tasking buttons
+	 * @param index (0-14) the button to change
+	 * @param value the value that the button will now represent
+	 */
 	public void updateDisplayValue(int index, int value) {
 		this.mainDisplays.get(index).setValue(value);
 	}
 	
+	/**
+	 * Changes the text that appears when the user hovers over one of the multi-tasking buttons
+	 * @param index (0-14) the button to change
+	 * @param tip the new text to display
+	 */
 	public void updateDisplayToolTip(int index, String tip) {
 		this.mainDisplays.get(index).setToolTipText(tip);
 	}
 	
+	/**
+	 * Changes the function of one of the multi-tasking buttons
+	 * @param index (0-14) the button to change
+	 * @param action the action which the button will take
+	 */
 	public void updateDisplayFunction(int index, Actions action) {
 		this.mainDisplays.get(index).setAction(action);
 	}
 	
+	/**
+	 * Opens the store GUI for the user to interact with
+	 */
 	public void openStore() {
 		//Gives player options to buy, sell, close, or ask for advice
 		updateMainDisplay(10, "Buy Items", true, true);
@@ -190,6 +354,9 @@ public class Display {
 		updateDisplayFunction(13, Actions.CLOSE_STORE);
 	}
 	
+	/**
+	 * Opens the buy menu GUI for the player to interact with
+	 */
 	public void openBuy() {
 		this.statsPanel.setVisible(false);
 		clearButtons();
@@ -214,6 +381,10 @@ public class Display {
 		}
 	}
 	
+	/**
+	 * Gives the item to the player and takes their money
+	 * @param value the list index in the store's stock list of the item to buy
+	 */
 	public void buyItem(int value) {
 		ArrayList<Item> stock = game.getPlayer().getLocation().getStore().getStock();
 		Item item = stock.get(value);
@@ -239,6 +410,10 @@ public class Display {
 		openBuy();
 	}
 	
+	/**
+	 * Brings up slightly more information about an item once it is clicked on, and allows the user to select it.
+	 * @param value
+	 */
 	public void viewItem(int value) {
 		clearButtons();
 		//Create an exit button
@@ -270,6 +445,9 @@ public class Display {
 		updateDisplayValue(4, value);
 	}
 	
+	/**
+	 * Resets all of the multi-tasking buttons
+	 */
 	private void clearButtons() {
 		for (int i = 0; i < 15; i++) {
 			updateDisplayToolTip(i, null);
@@ -278,12 +456,19 @@ public class Display {
 		}
 	}
 	
+	/**
+	 * Closes the buy menu and takes the user back to the main store menu
+	 */
 	public void closeBuy() {
 		this.statsPanel.setVisible(true);
 		setGameState("Store");
 	}
 	
+	/**
+	 * Generates buttons for route selection
+	 */
 	private void makeIslandButtons() {
+		updateMainDisplay(2, game.getPlayer().getLocation().getName(), true, true);
 		updateMainDisplay(10, "Interact with Store", true, true);
 		updateDisplayFunction(10, Actions.OPEN_STORE);
 		updateMainDisplay(11, "Set Sail", true, true);
@@ -296,17 +481,25 @@ public class Display {
 		updateDisplayFunction(14, Actions.CONFIRM_MENU);
 	}
 	
+	/**
+	 * Fetches the value of the current page that the player is viewing or can view
+	 * @return the page number
+	 */
 	public int getCurrentPage() {
 		return this.currentPage;
 	}
 	
+	/**
+	 * Takes the specified item off the player and pays them for it
+	 * @param value the list position of the item in the player's inventory
+	 */
 	public void sellItem(int value) {
 		clearButtons();
 		Player player = game.getPlayer();
 		ArrayList<Item> inventory = new ArrayList<Item>();
 		inventory.addAll(player.getInventory());
 		inventory.addAll(player.getCards());
-		Item item =  inventory.get(value + (game.getCurrentDay() * 5));
+		Item item =  inventory.get(value);
 		int price = item.getPrice(player.getLocation().getStore().getSellModifier(), player.getLocation());
 		if (player.getInventory().contains(item)) {
 			player.removeItem(item);
@@ -324,7 +517,12 @@ public class Display {
 		}
 	}
 	
-	private String wrapButtonText(String message) {
+	/**
+	 * Formats long strings to better fit into the multi-tasking buttons
+	 * @param message the string to format
+	 * @return a formatted version of the string with <br> tags included
+	 */
+	public String wrapButtonText(String message) {
 		int buttonSize = 30;
 		if (message.length() > buttonSize) {
 			int splitPlace = message.substring(0, buttonSize).lastIndexOf(" ");
@@ -335,6 +533,9 @@ public class Display {
 		}
 	}
 	
+	/**
+	 * Opens the inventory GUI for the player to use
+	 */
 	public void showInventory() {
 		clearButtons();
 		ArrayList<Item> items = new ArrayList<Item>();
@@ -361,6 +562,10 @@ public class Display {
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
+	/**
+	 * Gives more information about an item before selling it
+	 * @param value the position of the item in the players inventory
+	 */
 	public void viewSell(int value) {
 		clearButtons();
 		//Create an exit button
@@ -401,6 +606,9 @@ public class Display {
 		updateDialogue(item.getDescription());
 	}
 	
+	/**
+	 * Opens the sell menu GUI for the player to interact with
+	 */
 	public void openSell() {
 		this.statsPanel.setVisible(false);
 		clearButtons();
@@ -426,21 +634,25 @@ public class Display {
 		//Create an icon and label for each item in inventory
 		
 		for(int i = 0; i < 5; i++) {
-			if(this.currentPage * 5 + i < inventory.size()) {
-				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
-			} else if (this.currentPage * 5 - inventory.size() + i < deck.size()) {
-				updateMainDisplay(i + 5, "./src/resources/Images/Card.png", true, true);
-			}
 			try {
-				updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
+				if(this.currentPage * 5 + i < inventory.size()) {
+					updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+					updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
+				} else if (this.currentPage * 5 - inventory.size() + i < deck.size()) {
+					updateMainDisplay(i + 5, "./src/resources/Images/Card.png", true, true);
+					updateMainDisplay(i + 10, deck.get(i - inventory.size() % 5).getName(), true, true);
+				}
 				updateDisplayFunction(i + 5, Actions.VIEW_SELL);
-				updateDisplayValue(i + 5, i);
+				updateDisplayValue(i + 5, this.currentPage * 5 + i);
 			} catch(IndexOutOfBoundsException e) {
 				break;
 			}
 		}
 	}
 	
+	/**
+	 * Opens the deck menu GUI for the player to interact with
+	 */
 	public void showDeck() {
 		clearButtons();
 		ArrayList<Item> items = new ArrayList<Item>();
@@ -468,61 +680,284 @@ public class Display {
 		updateDisplayFunction(12, Actions.CLOSE_STORE);
 	}
 	
+	/**
+	 * Updates the text area to advise the player
+	 */
 	public void talk() {
 		this.outputArea.setText(this.game.getPlayer().getLocation().getStore().talkToShopKeep());
 	}
 	
+	/**
+	 * Repairs the player's ship //TODO Wat?
+	 * @param button the choice which the player made
+	 */
 	public void repairShip(int button) {
 		this.game.executeRepair(button);
 	}
 	
+	/**
+	 * Gives information on a reward item
+	 */
+	public void showReward() {
+		updateDialogue(game.getChosenRoute().getEvent().getReward().toString());
+	}
+	
+	/**
+	 * Gives the player a reward item
+	 */
+	public void getItem() {
+		Item item = game.getChosenRoute().getEvent().getReward();
+		item.setLocationPurchased(game.getPlayer().getLocation());
+		if (game.getPlayer().addItem(item)) {
+			item.setPurchaseCost(0);
+			updateDialogue("You aquired " + item.getName() + " and it has been added to your ship.");
+			Entry entry = new Entry(game.getCurrentDay());
+			entry.makeTransaction(item, "Aquired");
+			game.getPlayer().getLogbook().addEntry(entry);
+			clearButtons();
+			updateMainDisplay(12, "Continue Sailing", true, true);
+			updateDisplayFunction(12, Actions.CONTINUE);
+		}else {
+			updateDialogue("You don't have enough space to take this item. Dump an item or leave it behind.");
+		}
+	}
+	
+	/**
+	 * Interfaces between GUI and game instance to pay the crew.
+	 * @param value the choice the player made
+	 */
 	public void payCrew(int value) {
 		this.game.executePay(value);
 	}
 	
+	/**
+	 * Begins the sailing process
+	 * @param value the route on which to sail
+	 */
 	public void sailShip(int value) {
 		this.game.executeRoute(value);
 	}
 	
+	/**
+	 * Progress a day in sailing
+	 */
+	public void executeSail() {
+		clearButtons();
+		this.game.executeSail(game.getChosenRoute());
+	}
+	
+	/**
+	 * Generates a yes/no dialogue in the GUI
+	 */
 	public void showConfirm() {
 		updateMainDisplay(11, "Yes", true, true);
 		updateMainDisplay(13, "No", true, true);
 	}
 	
+	/**
+	 * Sets sail along the chosen route
+	 * @param routeIndex
+	 */
 	public void setIsland(int routeIndex) {
 		Route chosenRoute = this.game.getPlayer().getLocation().getRoutes().get(routeIndex);
 		this.game.executeSail(chosenRoute);
 	}
 	
+	/**
+	 * Totals up the score of the player at the end and displays it.
+	 */
+	public void showFinalScore() {
+		//TODO
+	}
+	
+	/**
+	 * Creates the main menu GUI from which the encounter is run
+	 */
 	public void pirateEncounter() {
-		this.enemy = new Ship("Enemy", 50, 4, 2);
-		updateDialogue("You are attacked by a ship full of pirates. Choose an option to continue");
 		updateMainDisplay(11, "Fight", true, true);
 		updateDisplayFunction(11, Actions.FIGHT);
 		
 		updateMainDisplay(12, "Attempt to flee", true, true);
 		updateDisplayFunction(12, Actions.FLEE);
 		
-		updateMainDisplay(13, "View enemy", true, true);
-		updateDisplayFunction(13, Actions.VIEW_SHIP);
+		updateMainDisplay(13, "Surrender an item", true, true);
+		updateDisplayFunction(13, Actions.SURRENDER);
+		
+		updateMainDisplay(14, "View enemy", true, true);
+		updateDisplayFunction(14, Actions.VIEW_SHIP);
 	}
 	
+	/**
+	 * Runs the attack event and displays the results
+	 */
 	public void pirateFight() {
-		//ID
+		clearButtons();
+		try {
+			String result = game.getChosenRoute().getEvent().attack(enemy, game.getPlayer());
+			updateHealth(game.getPlayer().getHealth() + "/" + game.getPlayer().getMaxHealth() + " ");
+			if(result.equals("The enemy has been sunk")) {
+				updateDialogue(result);
+				updateStats();
+				updateMainDisplay(12, "Continue Sailing", true, true);
+				updateDisplayFunction(12, Actions.CONTINUE);
+			} else {
+				String[] parts = result.split("#");
+				updateStats();
+				updateMainDisplay(6, "<html>" + wrapButtonText(parts[0]) + "</html>", true, true);
+				updateMainDisplay(8, "<html>" + wrapButtonText(parts[1]) + "</html>", true, true);
+				updateMainDisplay(12, "Continue", true, true);
+				updateDisplayFunction(12, Actions.PIRATE_MENU);
+			}
+		} catch(EndGameException e) {
+			updateDialogue("The " + game.getPlayer().getShipName() + "has been destroyed. Game Over.");
+			updateMainDisplay(12, "Calculate my score", true, true);
+			updateDisplayFunction(12, Actions.END);
+		}
 	}
 	
-	public void unpauseGame() {
-		this.game.setPause(false);
+	/**
+	 * Checks to see if the player can flee the pirates.
+	 */
+	public void pirateFlee() {
+		clearButtons();
+		if (!attemptedToFlee) {
+			attemptedToFlee = true;
+			if(game.getChosenRoute().getEvent().flee(enemy, game.getPlayer())) {
+				Entry entry;
+				entry = new Entry(game.getCurrentDay());
+				entry.makeEvent("Fled from pirates");
+				game.getPlayer().getLogbook().addEntry(entry);
+				updateMainDisplay(12, "Continue Sailing", true, true);
+				updateDisplayFunction(12, Actions.CONTINUE);
+			} else {
+				updateMainDisplay(12, "Continue", true, true);
+				updateDisplayFunction(12, Actions.PIRATE_MENU);
+			}
+		} else {
+			updateDialogue("You are harpooned by the pirates. You cannot flee.");
+			updateMainDisplay(12, "Continue", true, true);
+			updateDisplayFunction(12, Actions.PIRATE_MENU);
+		}
 	}
 	
-	public void stormEncounter() {
-		//Event event = new Event();
-		//updateDialogue(event.stormGUI(game.getPlayer(), game.getCurrentDay()));
+	/**
+	 * Displays information about the pirates
+	 */
+	public void pirateView() {
+		clearButtons();
+		updateMainDisplay(2, "<html>" + wrapButtonText(enemy.toString()) + "</html>", true, true);
 		updateMainDisplay(12, "Continue", true, true);
-		game.setPause(true);
+		updateDisplayFunction(12, Actions.PIRATE_MENU);
+	}
+	
+	/**
+	 * Checks that the player both has cargo and is willing to surrender a piece of cargo.
+	 */
+	public void surrenderCheck() {
+		clearButtons();
+		if(game.getPlayer().getInventory().size() == 0) {
+			updateDialogue("You have no cargo? Then pay with your life!");
+			updateMainDisplay(12, "Continue", true, true);
+			updateDisplayFunction(12, Actions.PIRATE_MENU);
+		} else {
+			showConfirm();
+			updateDialogue("Are you sure you want to surrender a random piece of cargo?");
+			updateDisplayFunction(11, Actions.CONFIRM_SURRENDER);
+			updateDisplayFunction(13, Actions.PIRATE_MENU);
+		}
+	}
+	
+	/**
+	 * Runs event code to surrender a random item and creates a continue button
+	 */
+	public void surrenderItem() {
+		game.getChosenRoute().getEvent().chooseSurrender(game.getPlayer(), game.getCurrentDay());
+		updateMainDisplay(12, "Continue", true, true);
 		updateDisplayFunction(12, Actions.CONTINUE);
 	}
 	
+	/**
+	 * Informs the player what occurred in the storm and presents them with a continue button.
+	 */
+	public void stormEncounter() {
+		updateDialogue("You encountered a storm. \n" 
+				+ game.getChosenRoute().getEvent().storm(game.getPlayer(), game.getCurrentDay()));
+		updateMainDisplay(12, "Continue", true, true);
+		updateDisplayFunction(12, Actions.CONTINUE); //TODO Bug, somehow, this occasionally crashes the game on completion
+	}
+	
+	/**
+	 * Gives the player an inventory list of what they can dump
+	 */
+	public void showDump() {
+		clearButtons();
+		ArrayList<Item> items = new ArrayList<Item>();
+		items.addAll(game.getPlayer().getInventory());
+		for (int reference = 0; reference < 5; reference++) {
+			if(this.currentPage * 5 + reference < items.size()) {
+				updateMainDisplay(reference, items.get(reference).getName(), true, true);
+				updateMainDisplay(reference + 5, "<html>" + wrapButtonText(items.get(reference).getDescription()) + "</html>", true, true);
+				updateDisplayFunction(reference, Actions.DUMP);
+				updateDisplayValue(reference, this.currentPage * 5 + reference);
+			}
+		}
+		updateDisplayFunction(11, Actions.PREV_INV);
+		updateDisplayFunction(13, Actions.NEXT_INV);
+		if (this.currentPage == 0) {
+			updateMainDisplay(11, "Previous Page", false, true);
+		} else {
+			updateMainDisplay(11, "Previous Page", true, true);
+		}
+		if (items.size() > this.currentPage * 10 + 10) {
+			updateMainDisplay(13, "Next Page", true, true);
+		} else {
+			updateMainDisplay(13, "Next Page", false, true);
+		}
+		updateMainDisplay(12, "Close Inventory", true, true);
+		updateDisplayFunction(12, Actions.SHOW_REWARD);
+	}
+	
+	/**
+	 * Dumps a chosen item into the sea
+	 * @param index the position of the chosen item in teh player's inventory
+	 */
+	public void dumpItem(int index) {
+		clearButtons();
+		ArrayList<Item> items = new ArrayList<Item>();
+		items.addAll(game.getPlayer().getInventory());
+		Item item = items.get(index);
+		game.getPlayer().removeItem(item);
+		updateDialogue(item.getName() + " was dumped.");
+		updateMainDisplay(12, "Continue", true, true);
+		updateDisplayFunction(12, Actions.SHOW_REWARD);
+	}
+	
+	/**
+	 * Shows the player more information about an item and gives them the choice to dump it.
+	 * @param index the item's position in the play'es inventory
+	 */
+	public void viewDump(int index) {
+		clearButtons();
+		ArrayList<Item> items = new ArrayList<Item>();
+		items.addAll(game.getPlayer().getInventory());
+		Item item = items.get(index);
+		//Create a cancel button
+		updateMainDisplay(0, "Return to Dump Menu", true, true);
+		updateDisplayFunction(0, Actions.OPEN_DUMP);
+		//Create a confirm button
+		updateMainDisplay(4, "Dump Item", true, true);
+		updateDisplayFunction(4, Actions.CONFIRM_DUMP);
+		updateDisplayValue(4, index);
+		//Create info buttons
+		updateMainDisplay(7, item.getName(), true, true);
+		updateMainDisplay(12, "<html>" + wrapButtonText(item.getDescription())
+			+ "</html>", true, true);
+	}
+	
+	/**
+	 * Determines how to set up the GUI depending on the parameter given
+	 * @param s A word describing the situation (Island, Sea, Store, Inventory, Deck, Repair, Pirates, Storm, Uneventful, Rescue, Confirm, Reward, Dump, Menu)
+	 */
 	public void setGameState(String s) {
 		this.currentState = s;
 		clearButtons();
@@ -533,11 +968,12 @@ public class Display {
 			makeIslandButtons();
 			break;
 		case "Sea":
+			//TODO bug noted of log duplicating storm
+			//TODO bug, currentday not updating except for days which have events.
 			changeBackground("./src/resources/Images/SeaBackground.png");
 			changeForegroundColour(Color.BLACK);
 			updateMainDisplay(10, "Return to Island", true, true);
 			updateDisplayFunction(10, Actions.CLOSE_STORE);
-			game.selectRoute();
 			ArrayList<Island> islands = new ArrayList<Island>();
 			islands.addAll(game.getIslands());
 			ArrayList<Route> routes = new ArrayList<Route>();
@@ -555,6 +991,7 @@ public class Display {
 					}
 				}
 			}
+			game.selectRoute();
 			break;
 		case "Store":
 			changeForegroundColour(Color.WHITE);
@@ -572,7 +1009,9 @@ public class Display {
 			showDeck();
 			break;
 		case "Repair":
-			changeBackground("./src/resources/Image/ShopBackground.png");
+			//TODO bug, this is sometimes called at end of sailing
+			changeForegroundColour(Color.WHITE);
+			changeBackground("./src/resources/Images/ShopBackground.png");
 			updateMainDisplay(11, "Repair Ship", true, true);
 			updateDisplayFunction(11, Actions.REPAIR);
 			updateDisplayValue(11, 1);
@@ -581,30 +1020,56 @@ public class Display {
 			updateDisplayValue(12, 2);
 			break;
 		case "Pirates":
+			updateDialogue("You encounter a ship full of pirates.");
+			changeForegroundColour(Color.BLACK);
 			changeBackground("./src/resources/Images/SeaBackground.png");
+			this.attemptedToFlee = false;
+			this.enemy = this.game.getChosenRoute().getEvent().getEnemy();
 			pirateEncounter();
 			break;
 		case "Storm":
+			changeForegroundColour(Color.BLACK);
 			changeBackground("./src/resources/Images/SeaBackground.png");
 			stormEncounter();
 			break;
 		case "Uneventful":
+			changeForegroundColour(Color.BLACK);
 			changeBackground("./src/resources/Images/SeaBackground.png");
 			updateDialogue("The day passes uneventfully.");
-			updateMainDisplay(7, "Continue", true, true);
-			updateDisplayFunction(7, Actions.CONTINUE);
-			game.setPause(true);
+			updateMainDisplay(12, "Continue", true, true);
+			updateDisplayFunction(12, Actions.CONTINUE);
 			break;
 		case "Rescue":
+			changeForegroundColour(Color.BLACK);
 			changeBackground("./src/resources/Images/SeaBackground.png");
+			game.getChosenRoute().getEvent().rescue(game.getPlayer(), game.getCurrentDay());
 			break;
 		case "Confirm":
 			changeForegroundColour(Color.WHITE);
 			changeBackground("./src/resources/Images/ShopBackground.png");
 			showConfirm();
 			break;
+		case "Reward":
+			changeForegroundColour(Color.BLACK);
+			changeBackground("./src/resources/Images/InventoryBackground.png");
+			updateDialogue("You found " + game.getChosenRoute().getEvent().getReward().getName() + " among the wreckage. Bring it aboard?");
+			updateMainDisplay(11, "Yes", true, true);
+			updateDisplayFunction(11, Actions.GET_ITEM);
+			updateMainDisplay(12, "No", true, true);
+			updateDisplayFunction(12, Actions.CONTINUE);
+			updateMainDisplay(13, "View Inventory", true, true);
+			updateDisplayFunction(13, Actions.OPEN_DUMP);
+			updateMainDisplay(14, "View Item", true, true);
+			updateDisplayFunction(14, Actions.VIEW_REWARD);
+		case "Dump":
+			currentPage = 0;
+			changeForegroundColour(Color.BLACK);
+			changeBackground("./src/resources/Images/InventoryBackground.png");
+			showDump();
+			break;
 		case "Menu":
 			welcome(game);
+			soundtrack.close();
 			this.frmDeckgame.dispose();
 			break;
 		}
@@ -614,7 +1079,7 @@ public class Display {
 	 * Fills the stats panel of the ship with labels.
 	 */
 	private void fillStatsPanel() {
-		JLabel lblPanelTitle = new JLabel(" Ship Stats ");
+		JLabel lblPanelTitle = new JLabel(" " + game.getPlayer().getShipName() + " ");
 		lblPanelTitle.setFont(new Font("Lucida Handwriting", Font.PLAIN, 16));
 		statsPanel.add(lblPanelTitle, "cell 2 0 2 1, alignx center, aligny center");
 		
@@ -638,21 +1103,45 @@ public class Display {
 		lblAnnounceCapacity.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
 		statsPanel.add(lblAnnounceCapacity, "cell 0 5 2 1,alignx left,aligny center");
 		
-		lblHealthStat = new JLabel("Error ");
+		JLabel lblAnnounceDeckSize = new JLabel("Deck Size:");
+		lblAnnounceDeckSize.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+		statsPanel.add(lblAnnounceDeckSize, "cell 0 6 2 1,alignx left,aligny center");
+		
+		JLabel lblAnnounceCrewAmount = new JLabel("Crew amount:");
+		lblAnnounceCrewAmount.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+		statsPanel.add(lblAnnounceCrewAmount, "cell 0 7 2 1,alignx left,aligny center");
+		
+		JLabel lblAnnounceDailyCost = new JLabel("Daily cost:");
+		lblAnnounceDailyCost.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+		statsPanel.add(lblAnnounceDailyCost, "cell 0 8 2 1,alignx left,aligny center");
+		
+		lblHealthStat = new JLabel(game.getPlayer().getHealth() + " ");
 		lblHealthStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
 		statsPanel.add(lblHealthStat, "cell 5 2, alignx right, aligny center");
 		
-		lblSpeedStat = new JLabel("Error ");
+		lblSpeedStat = new JLabel(game.getPlayer().getSpeed() + " ");
 		lblSpeedStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
 		statsPanel.add(lblSpeedStat, "cell 5 3, alignx right, aligny center");
 		
-		lblLuckStat = new JLabel("Error ");
+		lblLuckStat = new JLabel(game.getPlayer().getLuck() + " ");
 		lblLuckStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
 		statsPanel.add(lblLuckStat, "cell 5 4, alignx right, aligny center");
 		
-		lblCapacityStat = new JLabel("Error ");
+		lblCapacityStat = new JLabel(game.getPlayer().getCapacity() + " ");
 		lblCapacityStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
 		statsPanel.add(lblCapacityStat, "cell 5 5, alignx right, aligny center");
+		
+		lblDeckSizeStat = new JLabel(game.getPlayer().getCards().size() + "/" + game.getPlayer().getDeckSize() + " ");
+		lblDeckSizeStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+		statsPanel.add(lblDeckSizeStat, "cell 5 6, alignx right, aligny center");
+		
+		lblCrewAmountStat = new JLabel(game.getPlayer().getNumCrew() + " ");
+		lblCrewAmountStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+		statsPanel.add(lblCrewAmountStat, "cell 5 7, alignx right, aligny center");
+		
+		lblDailyCostStat = new JLabel("$" + game.getPlayer().getNumCrew() + " ");
+		lblDailyCostStat.setFont(new Font("Lucida Handwriting", Font.PLAIN, 14));
+		statsPanel.add(lblDailyCostStat, "cell 5 8, alignx right, aligny center");
 	}
 	
 	/**
@@ -695,23 +1184,36 @@ public class Display {
 		outputPanel.add(outputArea);
 	}
 	
+	/**
+	 * Opens the ship's log and displays it to the player.
+	 */
 	private void openLog() {
 		this.logOpen = true;
 		changeForegroundColour(Color.BLACK);
 		changeBackground("./src/resources/Images/LogBackground.png");
-		//TODO update background sprite for log
 		this.statsPanel.setVisible(false);
 		showLog();
 	}
 	
+	/**
+	 * Used by buttons to flick through pages in inventory situations
+	 * @param change (1,-1) the amount by which to change the page
+	 */
 	public void changeCurrentPage(int change) {
 		this.currentPage += change;
 	}
 	
+	/**
+	 * Used by buttons to flick through pages in logbook situation
+	 * @param change (1,-1) the amount by which to change the page
+	 */
 	public void changeLogPage(int change) {
 		this.currentLogPage += change;
 	}
 	
+	/**
+	 * Displays the ship's log for the player.
+	 */
 	public void showLog() {
 		clearButtons();
 		ArrayList<Entry> entries = new ArrayList<Entry>();
@@ -735,6 +1237,9 @@ public class Display {
 		}
 	}
 	
+	/**
+	 * Closes the ship's log and returns the gamestate to how it was when the log was opened
+	 */
 	private void closeLog() {
 		this.logOpen = false;
 		setGameState(currentState);
@@ -766,6 +1271,10 @@ public class Display {
 		}
 	}
 	
+	/**
+	 * Creates the menu window
+	 * @param game the game instance to connect to and send starting variables to
+	 */
 	private void welcome(Game game) {
 		this.game = game;
 		ArrayList<JComponent> info = new ArrayList<JComponent>();
@@ -911,9 +1420,21 @@ public class Display {
 	}
 	
 	/**
-	 * Initialize the contents of the frame.
+	 * Initialize the contents of the frame. 
 	 */
 	private void initialize() {
+		try {
+			AudioInputStream audioInput = AudioSystem.getAudioInputStream(Display.class.getResource("../resources/Ketsa_Sailing_Wounded.wav"));
+			Clip soundtrack = AudioSystem.getClip();
+			soundtrack.open(audioInput);
+			soundtrack.start();
+			soundtrack.loop(Clip.LOOP_CONTINUOUSLY);
+			this.soundtrack = soundtrack;
+		} 
+		catch(UnsupportedAudioFileException e) {}
+		catch(IOException e) {}
+		catch(LineUnavailableException e) {}
+		
 		logOpen = false;
 		currentPage = 0;
 		currentLogPage = 0;
@@ -1005,6 +1526,8 @@ public class Display {
 		);
 		sideBarPanel.setLayout(gl_sideBarPanel);
 		fillStatsPanel();
+		updateStats();
+		updateGold(game.getPlayer().getGold() + " ");
 		
 		setGameState("Island");
 		

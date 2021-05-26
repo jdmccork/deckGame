@@ -157,6 +157,7 @@ public class Player extends Ship {
 	public boolean modifyGold(int amount) {
 		if (gold + amount >= 0) {
 			gold += amount;
+			display.updateDialogue(String.valueOf(gold));
 			return true;
 		} else {
 			return false;
@@ -276,6 +277,10 @@ public class Player extends Ship {
 	 */
 	public ArrayList<Card> getCards(){
 		return cards;
+	}
+	
+	public int getDeckSize() {
+		return deckSize;
 	}
 	
 	/**

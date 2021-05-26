@@ -107,7 +107,4 @@ public class Cargo extends Item{
 		}
 		return true;
 	}
-	
-	
-	
 }
