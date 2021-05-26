@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -219,19 +220,123 @@ class GameTest {
 		}
 	}
 	
-//	@Test
-//	void testExecuteSail() {
-//		game.gameSetup();
-//		game.sessionSetup("Tester", "Test ship", 25, "3");
-//		Route route = game.getPlayer().getLocation().getRoutes().get(0);
-//		route.getEvent().setChance(new ArrayList<Integer>(1));
-//		game.executeSail(route);
-//		assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
-//	}
+	@Test
+	void testExecuteSail() {
+		String expected = "You travelled for 4 days and have arrived at Island: Golgolles";
+		String input = System.lineSeparator()
+			+ System.lineSeparator()
+			+ System.lineSeparator()
+			+ System.lineSeparator()
+			+ System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		Route route = game.getPlayer().getLocation().getRoutes().get(0);
+		route.getEvent().setChance(new ArrayList<Integer>(Arrays.asList(1)));
+		
+		game.executeSail(route);
+		assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+		assertTrue(testOut.toString().contains(expected));
+	}
 	
 	@Test
 	void testEndGame() {
+		String expected = "Total gold earned: 255" + System.lineSeparator()
+			+ "Days survived: 10/20" + System.lineSeparator()
+			+ "Total score: 255";
 		
+		game.createPlayer("Test", "Test ship", "1");
+		
+		game.setCurrentDay(10);
+		game.setDayLimit(20);
+		
+		game.getPlayer().addItem(Item.getItems().get(0));
+		
+		game.endGame();
+		
+		assertTrue(testOut.toString().contains(expected));
+	}
+	
+	@Test
+	void testCreatePlayer() {
+		String input = "Tester" + System.lineSeparator()
+			+ "Test ship" + System.lineSeparator()
+			+ 1 + System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		String[] names = game.getNamesCMD();
+		Player player = game.createPlayer(names[0], names[1], game.getShipCMD());
+		
+		
+		assertEquals(250, player.getGold());
+		assertEquals(10, player.getNumCrew());
+		
+		assertEquals(player, game.getPlayer());
+	}
+	
+	@Test
+	void testGameEndingTravel() {
+		String input = System.lineSeparator()
+			+ System.lineSeparator()
+			+ System.lineSeparator()
+			+ System.lineSeparator()
+			+ System.lineSeparator();
+		InputStream in = new ByteArrayInputStream(input.getBytes());
+		System.setIn(in);
+		Game.setTestInput();
+		
+		
+		game.gameSetup();
+		game.sessionSetup("Tester", "Test ship", 25, "3");
+		Route route = game.getPlayer().getLocation().getRoutes().get(0);
+		route.getEvent().setChance(new ArrayList<Integer>(Arrays.asList(1)));
+		
+		game.setCurrentDay(19);
+		game.setDayLimit(20);
+		try {
+			game.executeSail(route);
+			fail("Game didn't end");
+		}catch (EndGameException e) {
+			assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+		}
+	}
+	
+	@Test
+	void testSelectRoute() {
+		String expected1 = "You travelled for 4 days and have arrived at Island: Golgolles";
+		String expected2 = "Are you sure you want to travel to Island: Golgolles";
+		String expected3 = "100% chance for nothing to happen";
+		String expected4 = "You must pay your crew $40 for this route.";
+		String input = 1 + System.lineSeparator()
+				+ 1 + System.lineSeparator()
+				+ 1 + System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator()
+				+ System.lineSeparator();
+			InputStream in = new ByteArrayInputStream(input.getBytes());
+			System.setIn(in);
+			Game.setTestInput();
+			
+			game.gameSetup();
+			game.sessionSetup("Tester", "Test ship", 25, "3");
+			Route route = game.getPlayer().getLocation().getRoutes().get(0);
+			route.getEvent().setChance(new ArrayList<Integer>(Arrays.asList(1)));
+			
+			game.selectRoute();
+			
+			assertEquals(210, game.getPlayer().getGold());
+			assertFalse(game.getPlayer().getLocation() == game.getIslands().get(0));
+			assertTrue(testOut.toString().contains(expected1));
+			assertTrue(testOut.toString().contains(expected2));
+			assertTrue(testOut.toString().contains(expected3));
+			assertTrue(testOut.toString().contains(expected4));
 	}
 
 /*

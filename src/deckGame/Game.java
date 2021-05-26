@@ -109,7 +109,7 @@ public class Game {
 	 */
 	public Player createPlayer(String userName, String shipName, String shipType) {
 		int[] ship = getShip(shipType);
-		Player player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], ship[6], islands.get(0), display);
+		player = new Player(userName, shipName, ship[0], ship[1], ship[2], ship[3], ship[4], ship[5], ship[6], islands.get(0), display);
 		return player;
 	}
 	
@@ -284,7 +284,7 @@ public class Game {
 	 * @param ship
 	 */
 	public void sessionSetup(String userName, String shipName, int duration, String ship) {
-		player = createPlayer(userName, shipName, ship);
+		createPlayer(userName, shipName, ship);
 		player.getLocation().getStore().generateStock(player);
 		days = duration;
 	}
@@ -708,7 +708,7 @@ public class Game {
 	public void printResults(int gold) {
 		System.out.println("Total gold earned: " + gold);
 		System.out.println("Days survived: " + currentDay + "/" + days);
-		System.out.println("Total score: " + gold/(currentDay/days));
+		System.out.println("Total score: " + (int) (gold * 2 * ((double) currentDay/days)));
 	}
 	
 	/** 
@@ -738,6 +738,10 @@ public class Game {
 	 */
 	public void setCurrentDay(int day) {
 		currentDay = day;
+	}
+	
+	public void setDayLimit(int day) {
+		days = day;
 	}
 	
 	/**

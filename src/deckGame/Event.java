@@ -46,6 +46,7 @@ public class Event {
 		case 1: //nothing happens
 			if (display == null) {
 				System.out.println("The day passes uneventfully.");
+				Game.pause();
 			}
 			return "Sea";
 		case 2: //Fight
