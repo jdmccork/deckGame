@@ -436,8 +436,9 @@ public class Display {
 		} else {
 			source = "./src/resources/Images/Card.png";
 		}
+		double buyModifier = game.getPlayer().getLocation().getStore().getBuyModifier();
 		updateMainDisplay(value + 5, source, true, true);
-		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getBasePrice()) + "</html>", true, true);
+		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getPrice(buyModifier, game.getPlayer().getLocation())) + "</html>", true, true);
 		updateDialogue(item.getDescription());
 		//Create a button to purchase the item
 		updateMainDisplay(4, "Purchase", true, true);
@@ -965,6 +966,7 @@ public class Display {
 		case "Island":
 			changeForegroundColour(Color.WHITE);
 			changeBackground("./src/resources/Images/IslandBackground.png");
+			this.statsPanel.setVisible(true);
 			makeIslandButtons();
 			break;
 		case "Sea":
@@ -996,6 +998,7 @@ public class Display {
 		case "Store":
 			changeForegroundColour(Color.WHITE);
 			changeBackground("./src/resources/Images/ShopBackground.png");
+			this.statsPanel.setVisible(true);
 			openStore();
 			break;
 		case "Inventory":
@@ -1220,7 +1223,7 @@ public class Display {
 		entries.addAll(game.getLogItems());
 		for (int reference = 0; reference < 10; reference++) {
 			if(this.currentLogPage * 10 + reference < entries.size()) {
-				updateMainDisplay(reference, "<html>" + wrapButtonText(entries.get(reference).toString()) + "</html>", true, true);
+				updateMainDisplay(reference, "<html>" + wrapButtonText(entries.get(this.currentLogPage * 10 + reference).toString()) + "</html>", true, true);
 			}
 		}
 		updateDisplayFunction(11, Actions.LOG_PREV);

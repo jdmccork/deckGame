@@ -10,7 +10,13 @@ import java.util.regex.Pattern;
 import enums.Actions;
 import enums.Statuses;
 
+//TODO Closing store doesn't make ship stats reappear
+//TODO Buying/selling items doesn't update the ship stats
+//TODO Rescuing sailors doesn't have an event or update gold
+//TODO Selling at less cost, add location purchased
 
+//TODO Going to island requires number of days 
+//TODO Index error with cards and cargo
 public class Game {
 	
 	/**
@@ -52,13 +58,12 @@ public class Game {
 	 * The number of days that sailing has occurred for, used by GUI
 	 */
 	private int daysSailed = 0;
-	//private ByteArrayOutputStream GUIOut;
 	
 	/**
-	 * Sets the output when running GUI so the application so the command line output can run without
-	 * outputing to the console
+	 * Provides an output variable to store any output that occurs to the command line during a GUI run
 	 */
-	//TODO private ByteArrayOutputStream GUIOut;
+	private ByteArrayOutputStream GUIOut;
+
 	
 	/**
 	 * Used for testing to allow the input to be changed to a byteArray string
@@ -82,8 +87,8 @@ public class Game {
 		display = new Display();
 		display.run(this);
 		
-		// TODO GUIOut = new ByteArrayOutputStream();
-		// TODO System.setOut(new PrintStream(GUIOut));
+		//GUIOut = new ByteArrayOutputStream();
+		//System.setOut(new PrintStream(GUIOut));
 	}
 	
 	public void runCMD() {

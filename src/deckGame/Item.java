@@ -279,7 +279,7 @@ public abstract class Item {
 		ArrayList<String> items = new ArrayList<String>();
 		try {
 			//Defines the items file as a new file to read
-			File myObj = new File("src/resources/Items");
+			File myObj = new File("src/resources/Items.txt");
 			//Creates a scanner object to read the items file
 		    Scanner myReader = new Scanner(myObj);
 		    //While the scanner finds new lines, keep adding them to the list
