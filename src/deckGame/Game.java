@@ -19,7 +19,7 @@ public class Game {
 	private int currentDay;
 	private Display display;
 	private Route chosenRoute;
-	private boolean paused = false;
+	private int daysSailed = 0;
 	//private ByteArrayOutputStream GUIOut;
 	
 	public static void setTestInput() {
@@ -49,6 +49,10 @@ public class Game {
 			playing = mainMenu();
 		}
 		userInput.close();
+	}
+	
+	public Route getChosenRoute() {
+		return chosenRoute;
 	}
 	
 	public ArrayList<Entry> getLogItems() {
@@ -319,8 +323,8 @@ public class Game {
 		if (display != null) {
 			this.display.updateDialogue(
 					"Your ship has sustained " + healthLost + " damage. This will cost $" + cost + " to repair.");
-			this.display.setGameState("Repairs");
-			return true;
+			this.display.setGameState("Repair");
+			return false;
 		}else {
 			return chargeRepairCMD(cost, healthLost);
 		}
@@ -353,11 +357,14 @@ public class Game {
 		if(selection == 1) {
 			if (player.modifyGold(-cost)) {
 				player.repair();
+				display.updateGold(String.valueOf(player.getGold()));
 				Entry entry = new Entry(currentDay);
 					entry.addDamage(-healthLost);
 					entry.makeEvent("Repaired ship");
 					entry.addCost(cost);
 					player.getLogbook().addEntry(entry);
+				display.updateDialogue("Your ship has been repaired.");
+				display.setGameState("Sea");
 				return true;
 			} else {
 				this.display.updateDialogue(
@@ -371,10 +378,12 @@ public class Game {
 	
 	public void executePay(int cost) {
 		if (player.modifyGold(-cost)) {
+			display.updateGold(String.valueOf(player.getGold()));
 			Entry entry = new Entry(currentDay);
-			entry.makeEvent("Payed crew");
+			entry.makeEvent("Paid crew");
 			entry.addCost(cost);
 			player.getLogbook().addEntry(entry);
+			display.updateDialogue("You paid your crew $" + cost + " to sail.");
 			executeSail(chosenRoute);
 		}else {
 			display.updateDialogue("You don't have enough money to pay your crew for this route. Get more money or select a different route.");
@@ -462,34 +471,36 @@ public class Game {
 	
 	public void executeSail(Route chosenRoute) {
 		int time = chosenRoute.getTime(player.getSpeed());
-		player.sail(chosenRoute);
-		for (int i = 0; i != time & currentDay < days; i++) {
-			while (paused) {
-				//An infinite loop that relies on external change of the paused variable.
-			}
+		if(display != null) {
+			this.daysSailed += 1;
 			currentDay += 1;
-			if (display != null) {
-				display.updateDay(String.valueOf(currentDay));
-				display.setGameState(chosenRoute.getEvent().selectEvent(player, currentDay, display));
-			}
-			chosenRoute.getEvent().selectEvent(player, currentDay, display);
-		}
-		if (currentDay < days) {
-			player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
-			if (display != null) {
-				display.updateDialogue("You travelled for " + time + " days and have arrived at " + player.getLocation());
-				display.setGameState("Island");
-			} else {
-				System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
-				pause();
+			display.updateDay(String.valueOf(currentDay));
+			display.setGameState(chosenRoute.getEvent().selectEvent(player, currentDay, display));
+			if(daysSailed >= time) {
+				this.daysSailed = 0;
+				if (currentDay < days) {
+					player.sail(chosenRoute);
+					player.getLocation().getStore().generateStock(player);
+					display.updateDialogue("You travelled for " + time + " days and have arrived at " + player.getLocation());
+					display.setGameState("Island");
+				} else {
+					throw new EndGameException();
+				}
 			}
 		} else {
-			throw new EndGameException();
+			player.sail(chosenRoute);
+			for (int i = 0; i != time & currentDay < days; i++) {
+				currentDay += 1;
+				chosenRoute.getEvent().selectEvent(player, currentDay, display);
+			}
+			if (currentDay < days) {
+				player.getLocation().getStore().generateStock(player); //generates shops when you arrive at the destination so that you can't enter and exit to regenerate the shops
+				System.out.println("You travelled for " + time + " days and have arrived at " + player.getLocation());
+				pause();
+			} else {
+				throw new EndGameException();
+			}
 		}
-	}
-	
-	public void setPause(boolean setting) {
-		this.paused = setting;
 	}
 	
 	public static void pause() {
@@ -514,9 +525,17 @@ public class Game {
 	}
 	
 	public void printResults(int gold) {
-		System.out.println("Total gold earned: " + gold);
-		System.out.println("Days survived: " + currentDay + "/" + days);
-		System.out.println("Total score: " + gold/(currentDay/days));
+		if (display == null) {
+			System.out.println("Total gold earned: " + gold);
+			System.out.println("Days survived: " + currentDay + "/" + days);
+			System.out.println("Total score: " + gold/(currentDay/days));
+		} else {
+			display.updateMainDisplay(6, "<html>" + display.wrapButtonText("Total gold earned: " + gold) + "</html>", true, true);
+			display.updateMainDisplay(7, "<html>" + display.wrapButtonText("Days survived: " + currentDay + "/" + days) + "</html>", true, true);
+			display.updateMainDisplay(8, "<html>" + display.wrapButtonText("Total score: " + gold/(currentDay/days)) + "</html>", true, true);
+			display.updateMainDisplay(12, "Return to Main Menu", true, true);
+			display.updateDisplayFunction(12, Actions.MAIN_MENU);
+		}
 	}
 	
 	public int getCurrentDay() {
@@ -533,6 +552,6 @@ public class Game {
 			
 	public static void main(String[] args) {
 		Game game = new Game();
-		game.runCMD();
+		game.runGUI();
 	}
 }

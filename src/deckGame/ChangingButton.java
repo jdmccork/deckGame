@@ -10,6 +10,12 @@ import enums.Actions;
 public class ChangingButton extends JButton {
 	private Actions action;
 	private int value;
+	
+	/**
+	 * Constructs a button with an actionlistener that can do different things
+	 * @param s the string to display in the button
+	 * @param display the display instance this button is in
+	 */
 	ChangingButton(String s, Display display) {
 		super(s);
 		this.action = Actions.NONE;
@@ -28,6 +34,12 @@ public class ChangingButton extends JButton {
 				case BUY:
 					display.buyItem(value);
 					break;
+				case GET_ITEM:
+					display.getItem();
+					break;
+				case OPEN_DUMP:
+					display.setGameState("Dump");
+					break;
 				case VIEW:
 					display.viewItem(value);
 					break;
@@ -35,11 +47,16 @@ public class ChangingButton extends JButton {
 					display.sailShip(value);
 					break;
 				case CONTINUE:
-					display.unpauseGame();
+					display.executeSail();
 					break;
 				case GO_TO_ISLAND:
 					display.setIsland(value);
 					break;
+				case END:
+					display.showFinalScore();
+					break;
+				case VIEW_REWARD:
+					display.showReward();
 				case CHOOSE_ROUTE:
 					display.setGameState("Sea");
 					break;
@@ -79,6 +96,15 @@ public class ChangingButton extends JButton {
 				case MAIN_MENU:
 					display.setGameState("Menu");
 					break;
+				case SHOW_REWARD:
+					display.setGameState("Reward");
+					break;
+				case DUMP:
+					display.viewDump(value);
+					break;
+				case CONFIRM_DUMP:
+					display.dumpItem(value);
+					break;
 				case CLOSE_STORE:
 					display.changeCurrentPage(-display.getCurrentPage());
 					display.setGameState("Island");
@@ -109,10 +135,22 @@ public class ChangingButton extends JButton {
 					display.payCrew(value);
 					break;
 				case FIGHT:
+					display.pirateFight();
 					break;
 				case FLEE:
+					display.pirateFlee();
 					break;
 				case VIEW_SHIP:
+					display.pirateView();
+					break;
+				case SURRENDER:
+					display.surrenderCheck();
+					break;
+				case CONFIRM_SURRENDER:
+					display.surrenderItem();
+					break;
+				case PIRATE_MENU:
+					display.pirateEncounter();
 					break;
 				case NONE:
 					break;
@@ -121,10 +159,18 @@ public class ChangingButton extends JButton {
 		} );
 	}
 	
+	/**
+	 * Sets the value that the button can pass on
+	 * @param value the value that will be passed
+	 */
 	public void setValue(int value) {
 		this.value = value;
 	}
 	
+	/**
+	 * Sets the action which the button carries out.
+	 * @param action the action to perform
+	 */
 	public void setAction(Actions action) {
 		this.action = action;
 	}

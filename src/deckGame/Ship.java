@@ -78,7 +78,8 @@ public class Ship {
     	} else {
     		output = getDestroyed();
     	}
-		Game.pause();
+		//TODO Resolve at calls of this function outside GUI
+		//Game.pause();
 		return output;
 	}
 	
