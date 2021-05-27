@@ -227,7 +227,7 @@ public class Store {
 		while (complete == false) {
 			System.out.println(item);
 			System.out.println("You currently have $" + player.getGold());
-			System.out.println("1: Buy for $" + item.getPrice(buyModifier, player.getLocation()));
+			System.out.println("1: Buy for $" + item.getPrice(buyModifier, location));
 			System.out.println("2: Return");
 			switch (Game.getInt()) {
 			case 1:
@@ -252,7 +252,7 @@ public class Store {
 	 * @return true if the item is added successfully
 	 */
 	public boolean buyItem(Item item, Player player, int currentDay) {
-		int price = item.getPrice(buyModifier, player.getLocation());
+		int price = item.getPrice(buyModifier, location);
 		if (player.getGold() >= price) {
 			if (!player.addItem(item)) {
 				System.out.println("Your ship currently has " + player.getCargoStored() + "/" + player.getCapacity()   
@@ -319,7 +319,7 @@ public class Store {
 		while (complete == false) {
 			System.out.println(item);
 			System.out.println("You currently have $" + player.getGold());
-			System.out.println("1: Sell for $" + item.getPrice(sellModifier, player.getLocation()));
+			System.out.println("1: Sell for $" + item.getPrice(sellModifier, location));
 			System.out.println("2: Return");
 			switch (Game.getInt()) {
 			case 1:
@@ -344,7 +344,7 @@ public class Store {
 	 * @return true if the item is removed successfully
 	 */
 	public boolean sellItem(Item item, Player player, int currentDay) {
-		int price = item.getPrice(sellModifier, player.getLocation());
+		int price = item.getPrice(sellModifier, location);
 		if (player.getInventory().contains(item)) {
 			player.removeItem(item);
 			player.modifyGold(price);

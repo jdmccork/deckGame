@@ -2,8 +2,11 @@ package deckGame;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.sound.sampled.AudioSystem;
 
 import enums.ItemType;
 import enums.Rarity;
@@ -288,7 +291,7 @@ public abstract class Item {
 		        items.add(data);
 		    }
 		    myReader.close();
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			System.out.println("An error occurred.");
 		    e.printStackTrace();
 		}
