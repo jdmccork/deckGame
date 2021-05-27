@@ -693,7 +693,7 @@ public class Display {
 	}
 	
 	/**
-	 * Repairs the player's ship //TODO Wat?
+	 * Repairs the player's ship
 	 * @param button the choice which the player made
 	 */
 	public void repairShip(int button) {
@@ -772,7 +772,7 @@ public class Display {
 	 * Totals up the score of the player at the end and displays it.
 	 */
 	public void showFinalScore() {
-		//TODO
+		game.printResults(game.getPlayer().getGold());
 	}
 	
 	/**
@@ -1428,6 +1428,7 @@ public class Display {
 	
 	/**
 	 * Initialize the contents of the frame. 
+	 * @wbp.parser.entryPoint
 	 */
 	private void initialize() {
 		try {
