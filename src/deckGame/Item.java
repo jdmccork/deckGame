@@ -282,6 +282,7 @@ public abstract class Item {
 		ArrayList<String> items = new ArrayList<String>();
 		try {
 			//Defines the items file as a new file to read
+			//new File(Item.class.getResource("Items.txt"));
 			File myObj = new File("src/resources/Items.txt");
 			//Creates a scanner object to read the items file
 		    Scanner myReader = new Scanner(myObj);

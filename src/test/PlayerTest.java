@@ -42,7 +42,7 @@ class PlayerTest {
 		
 		island = new Island("Island1", 5, 5, 0);
 		//userName, shipName, health, speed, capacity, power, gold, crew, location
-		player = new Player("Tester", "Test ship", 100, 10, 4, 4, 3, 75, 10, island, new Display());
+		player = new Player("Tester", "Test ship", 100, 10, 4, 4, 3, 75, 10, island, null);
 	}
 
 	@Test

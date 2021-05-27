@@ -157,7 +157,9 @@ public class Player extends Ship {
 	public boolean modifyGold(int amount) {
 		if (gold + amount >= 0) {
 			gold += amount;
-			display.updateDialogue(String.valueOf(gold));
+			if(display != null) {
+				display.updateDialogue(String.valueOf(gold));
+			}
 			return true;
 		} else {
 			return false;
@@ -256,19 +258,24 @@ public class Player extends Ship {
 	 * from this ship's inventory.
 	 * @param cargo the cargo to remove
 	 */
-	public void removeItem(Item item) {
+	public boolean removeItem(Item item) {
 		if (item instanceof Cargo) {
 			if (inventory.contains(item)) {
 				if (((Cargo) item).alterStat(this, -1)) {
 					inventory.remove(item);
 					cargoStored -= item.getSize();
-					
+					item.setPurchaseCost(-1);
+					return true;
+				} else {
+					return false;
 				}
 			}
 		}else if (item instanceof Card) {
 			cards.remove(item);
+			item.setPurchaseCost(-1);
+			return true;
 		}
-		item.setPurchaseCost(-1);
+		return false;
 	}
 	
 	/**

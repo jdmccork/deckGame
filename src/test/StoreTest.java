@@ -19,7 +19,7 @@ import deckGame.Player;
 import deckGame.Store;
 
 class StoreTest {
-	private int expectedAdviceCount = 30;
+	private int expectedAdviceCount = 31;
 	static ArrayList<Island> islands = new ArrayList<Island>();
 	private Player player;
 	private Store store;

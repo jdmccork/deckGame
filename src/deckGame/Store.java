@@ -345,8 +345,7 @@ public class Store {
 	 */
 	public boolean sellItem(Item item, Player player, int currentDay) {
 		int price = item.getPrice(sellModifier, location);
-		if (player.getInventory().contains(item)) {
-			player.removeItem(item);
+		if (player.removeItem(item)) {
 			player.modifyGold(price);
 			System.out.println("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
 			item.setLocationPurchased(null);
