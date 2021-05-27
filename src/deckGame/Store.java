@@ -135,6 +135,7 @@ public class Store {
 	public static void readAdvice() {
 		try {
 			//Defines the advice file as a new file
+			//InputStream in = Item.class.getResourceAsStream("../Advice.txt");
 			File myObj = new File("src/resources/Advice.txt");
 			//Creates a scanner object to read the advice file
 		    Scanner myReader = new Scanner(myObj);
