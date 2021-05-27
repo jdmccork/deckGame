@@ -50,7 +50,7 @@ public class Event {
 				System.out.println("The day passes uneventfully.");
 				Game.pause();
 			}
-			return "Sea";
+			return "Uneventful";
 		case 2: //Fight
 			if (display == null) {
 				fight(player, currentDay);
