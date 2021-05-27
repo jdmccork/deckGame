@@ -10,13 +10,8 @@ import java.util.regex.Pattern;
 import enums.Actions;
 import enums.Statuses;
 
-//TODO Closing store doesn't make ship stats reappear
-//TODO Buying/selling items doesn't update the ship stats
-//TODO Rescuing sailors doesn't have an event or update gold
-//TODO Selling at less cost, add location purchased
+//TODO Going to island requires paying for the number of days
 
-//TODO Going to island requires number of days 
-//TODO Index error with cards and cargo
 public class Game {
 	
 	/**

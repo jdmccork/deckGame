@@ -399,10 +399,13 @@ public class Display {
 				updateGold(String.valueOf(game.getPlayer().getGold()));
 				game.getPlayer().getLocation().getStore().removeStock(item);
 				updateDialogue("Purchase successful. " + item.getName() + " has been added to your ship");
+				item.setLocationPurchased(game.getPlayer().getLocation());
 				Entry entry = new Entry(game.getCurrentDay());
 				entry.makeTransaction(item, "Bought ");
 				entry.addCost(price);
+				entry.addLocation(game.getPlayer().getLocation());
 				game.getPlayer().getLogbook().addEntry(entry);
+				updateStats();
 			}
 		}else{
 			updateDialogue("You don't have enough money to buy this item.");
@@ -511,8 +514,10 @@ public class Display {
 			Entry entry = new Entry(game.getCurrentDay());
 			entry.makeTransaction(item, "Sold ");
 			entry.addCost(-price);
+			entry.addLocation(game.getPlayer().getLocation());
 			player.getLogbook().addEntry(entry);
 			openSell();
+			updateStats();
 		} else {
 			updateDialogue("Something went wrong, you don't have this item.");
 		}
@@ -600,7 +605,7 @@ public class Display {
 		if (item.getType() == ItemType.CARGO) {
 			updateMainDisplay(value + 5, "./src/resources/Images/Crate.png", true, true);
 		} else {
-			updateMainDisplay(value + 5, "./src/resources.Images/Card.png", true, true);
+			updateMainDisplay(value + 5, "./src/resources/Images/Card.png", true, true);
 		}
 		double modifier = game.getPlayer().getLocation().getStore().getSellModifier();
 		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Price: $" + item.getPrice(modifier, game.getPlayer().getLocation())) + "</html>", true, true);

@@ -414,6 +414,7 @@ public class Event {
 			display.updateDialogue("You come across a shipwreck and help the survivors onboard.\nThey reward you with $" + amount + ".");
 			display.updateMainDisplay(12, "Continue", true, true);
 			display.updateDisplayFunction(12, Actions.CONTINUE);
+			display.updateGold(String.valueOf(player.getGold()));
 		} else {
 			System.out.println("You come across a shipwreck and help the survivors onboard.\nThey reward you with $" + amount + ".");
 			Game.pause();
