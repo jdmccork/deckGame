@@ -542,7 +542,7 @@ public class Game {
 				for (Route route: routes) {
 					display.updateDisplayToolTip(route.getDestination().getDisplay(), "The journey to " 
 							+ route.getDestination().getName() + " will take " + route.getTime(player.getSpeed())
-							+ " days to complete.");
+							+ " days to complete." + route.viewEvents());
 				}
 			}else {
 				selectRouteCMD();

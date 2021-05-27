@@ -505,8 +505,7 @@ public class Display {
 		inventory.addAll(player.getCards());
 		Item item =  inventory.get(value);
 		int price = item.getPrice(player.getLocation().getStore().getSellModifier(), player.getLocation());
-		if (player.getInventory().contains(item)) {
-			player.removeItem(item);
+		if (player.removeItem(item)) {
 			player.modifyGold(price);
 			updateGold(String.valueOf(player.getGold()));
 			updateDialogue("Sale successful. " + item.getName() + " has been removed from your ship and $" + price + " has been added to your account.");
@@ -1512,7 +1511,7 @@ public class Display {
 		statsPanel = new JPanel();
 		statsPanel.setBackground(Color.decode("#F0DD8D"));
 		statsPanel.setBounds(0, 0, 300, 300);
-		statsPanel.setLayout(new MigLayout("", "[45px][][45px][45px][][45px,grow]", "[13px][][][][][][][grow][][][][]"));
+		statsPanel.setLayout(new MigLayout("", "[45px][][45px][45px][][45px,grow]", "[13px][][][][][][][][][][grow][]"));
 		GroupLayout gl_sideBarPanel = new GroupLayout(sideBarPanel);
 		gl_sideBarPanel.setHorizontalGroup(
 			gl_sideBarPanel.createParallelGroup(Alignment.LEADING)
