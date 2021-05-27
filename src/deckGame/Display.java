@@ -441,7 +441,7 @@ public class Display {
 		}
 		double buyModifier = game.getPlayer().getLocation().getStore().getBuyModifier();
 		updateMainDisplay(value + 5, source, true, true);
-		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getPrice(buyModifier, game.getPlayer().getLocation())) + "</html>", true, true);
+		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Cost: $" + item.getPrice(buyModifier, game.getPlayer().getLocation()) + "<br>Size: " + item.getSize()) + "</html>", true, true);
 		updateDialogue(item.getDescription());
 		//Create a button to purchase the item
 		updateMainDisplay(4, "Purchase", true, true);
