@@ -203,7 +203,7 @@ public class Display {
 	 * Changes the background image and repaints to keep borders on top
 	 * @param source the file path to the new background image
 	 */
-	public void changeBackground(String source) {
+	public void changeBackground(java.net.URL source) {
 		this.displayPanel.setImage(new ImageIcon(source).getImage());
 		this.dialogPanel.repaint();
 	}
@@ -294,7 +294,7 @@ public class Display {
 	/**
 	 * Changes one of the multi-tasking buttons
 	 * @param index (0-14) the button to change
-	 * @param input the text OR file path to image that will be displayed
+	 * @param input the text that will be displayed
 	 * @param enabled whether the button should be represented as enabled
 	 * @param show whether the button should be visible
 	 */
@@ -302,12 +302,23 @@ public class Display {
 		if(input.length() == 0) {
 			this.mainDisplays.get(index).setIcon(null);
 			this.mainDisplays.get(index).setText(null);
-		} else if(input.substring(0,1).equals(".")) {
-			ImageIcon img = new ImageIcon(input);
-			this.mainDisplays.get(index).setIcon(img);
 		} else {
 			this.mainDisplays.get(index).setText(input);
 		}
+		this.mainDisplays.get(index).setEnabled(enabled);
+		this.mainDisplays.get(index).setVisible(show);
+	}
+	
+	/**
+	 * Changes a multi-tasking button to an image
+	 * @param index (0-14) the button to change
+	 * @param input the url of the image that will be displayed
+	 * @param enabled whether the button should be represented as enabled
+	 * @param show whether the button should be visible
+	 */
+	public void updateMainDisplay(int index, java.net.URL input, boolean enabled, boolean show) {
+		ImageIcon img = new ImageIcon(input);
+		this.mainDisplays.get(index).setIcon(img);
 		this.mainDisplays.get(index).setEnabled(enabled);
 		this.mainDisplays.get(index).setVisible(show);
 	}
@@ -367,16 +378,16 @@ public class Display {
 		ArrayList<Item> stock = game.getPlayer().getLocation().getStore().getStock();
 		for(int i = 0; i < 5; i++) {
 			if(i < stock.size()) {
-				String source = "./src/resources/Images/Crate.png";
+				java.net.URL imageURL = Display.class.getClassLoader().getResource("resources/Images/Crate.png");
 				if(stock.get(i).getType() == ItemType.CARD) {
-					source = "./src/resources/Images/Card.png";
+					imageURL = Display.class.getClassLoader().getResource("resources/Images/Card.png");
 				}
-				updateMainDisplay(i + 5, source, true, true);
+				updateMainDisplay(i + 5, imageURL, true, true);
 				updateMainDisplay(i + 10, stock.get(i).getName(), true, true);
 				updateDisplayFunction(i + 5, Actions.VIEW);
 				updateDisplayValue(i + 5, i);
 			} else {
-				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", false, true);
+				updateMainDisplay(i + 5, Display.class.getClassLoader().getResource("resources/Images/Crate.png"), false, true);
 			}
 		}
 	}
@@ -426,18 +437,18 @@ public class Display {
 		//Create greyed-out displays of other items for aesthetics
 		for(int i = 0; i < stock.size(); i++) {
 			if(stock.get(i).getType() == ItemType.CARGO) {
-				updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", false, true);
+				updateMainDisplay(i + 5, Display.class.getClassLoader().getResource("resources/Images/Crate.png"), false, true);
 			} else {
-				updateMainDisplay(i + 5, "./src/resources/Images/Card.png", false, true);
+				updateMainDisplay(i + 5, Display.class.getClassLoader().getResource("resources/Images/Card.png"), false, true);
 			}
 		}
 		//Create a display of the item, with some information
 		Item item = stock.get(value);
-		String source;
+		java.net.URL source;
 		if (item.getType() == ItemType.CARGO) {
-			source = "./src/resources/Images/Crate.png";
+			source = Display.class.getClassLoader().getResource("resources/Images/Crate.png");
 		} else {
-			source = "./src/resources/Images/Card.png";
+			source = Display.class.getClassLoader().getResource("resources/Images/Card.png");
 		}
 		double buyModifier = game.getPlayer().getLocation().getStore().getBuyModifier();
 		updateMainDisplay(value + 5, source, true, true);
@@ -588,11 +599,11 @@ public class Display {
 		for(int i = 0; i < 5; i++) {
 			try {
 				Item item = inventory.get(i + pageShift);
-				String source;
+				java.net.URL source;
 				if(item.getType() == ItemType.CARGO) {
-					source = "./src/resources/Images/Crate.png";
+					source = Display.class.getClassLoader().getResource("resources/Images/Crate.png");
 				} else {
-					source = "./src/resources/Images/Card.png";
+					source = Display.class.getClassLoader().getResource("resources/Images/Card.png");
 				}
 				updateMainDisplay(i + 5, source, false, true);
 			} catch(IndexOutOfBoundsException e) {
@@ -602,9 +613,9 @@ public class Display {
 		//Create an icon for selected item
 		Item item = inventory.get(value);
 		if (item.getType() == ItemType.CARGO) {
-			updateMainDisplay(value + 5, "./src/resources/Images/Crate.png", true, true);
+			updateMainDisplay(value + 5, Display.class.getClassLoader().getResource("resources/Images/Crate.png"), true, true);
 		} else {
-			updateMainDisplay(value + 5, "./src/resources/Images/Card.png", true, true);
+			updateMainDisplay(value + 5, Display.class.getClassLoader().getResource("resources/Images/Card.png"), true, true);
 		}
 		double modifier = game.getPlayer().getLocation().getStore().getSellModifier();
 		updateMainDisplay(value + 10, "<html>" + wrapButtonText(item.getName() + "<br>Price: $" + item.getPrice(modifier, game.getPlayer().getLocation())) + "</html>", true, true);
@@ -641,10 +652,10 @@ public class Display {
 		for(int i = 0; i < 5; i++) {
 			try {
 				if(this.currentPage * 5 + i < inventory.size()) {
-					updateMainDisplay(i + 5, "./src/resources/Images/Crate.png", true, true);
+					updateMainDisplay(i + 5, Display.class.getClassLoader().getResource("resources/Images/Crate.png"), true, true);
 					updateMainDisplay(i + 10, inventory.get(i).getName(), true, true);
 				} else if (this.currentPage * 5 - inventory.size() + i < deck.size()) {
-					updateMainDisplay(i + 5, "./src/resources/Images/Card.png", true, true);
+					updateMainDisplay(i + 5, Display.class.getClassLoader().getResource("resources/Images/Card.png"), true, true);
 					updateMainDisplay(i + 10, deck.get(i - inventory.size() % 5).getName(), true, true);
 				}
 				updateDisplayFunction(i + 5, Actions.VIEW_SELL);
@@ -748,7 +759,12 @@ public class Display {
 	 */
 	public void executeSail() {
 		clearButtons();
-		this.game.executeSail(game.getChosenRoute());
+		try {
+			this.openLog.setVisible(false);
+			this.game.executeSail(game.getChosenRoute());
+		}catch(EndGameException e) {
+			showFinalScore();
+		}
 	}
 	
 	/**
@@ -764,6 +780,7 @@ public class Display {
 	 * @param routeIndex
 	 */
 	public void setIsland(int routeIndex) {
+		this.openLog.setVisible(false);
 		Route chosenRoute = this.game.getPlayer().getLocation().getRoutes().get(routeIndex);
 		this.game.executeSail(chosenRoute);
 	}
@@ -827,16 +844,20 @@ public class Display {
 		clearButtons();
 		if (!attemptedToFlee) {
 			attemptedToFlee = true;
-			if(game.getChosenRoute().getEvent().flee(enemy, game.getPlayer())) {
-				Entry entry;
-				entry = new Entry(game.getCurrentDay());
-				entry.makeEvent("Fled from pirates");
-				game.getPlayer().getLogbook().addEntry(entry);
-				updateMainDisplay(12, "Continue Sailing", true, true);
-				updateDisplayFunction(12, Actions.CONTINUE);
-			} else {
-				updateMainDisplay(12, "Continue", true, true);
-				updateDisplayFunction(12, Actions.PIRATE_MENU);
+			try {
+				if(game.getChosenRoute().getEvent().flee(enemy, game.getPlayer())) {
+					Entry entry;
+					entry = new Entry(game.getCurrentDay());
+					entry.makeEvent("Fled from pirates");
+					game.getPlayer().getLogbook().addEntry(entry);
+					updateMainDisplay(12, "Continue Sailing", true, true);
+					updateDisplayFunction(12, Actions.CONTINUE);
+				} else {
+					updateMainDisplay(12, "Continue", true, true);
+					updateDisplayFunction(12, Actions.PIRATE_MENU);
+				}
+			} catch(EndGameException e) {
+				showFinalScore();
 			}
 		} else {
 			updateDialogue("You are harpooned by the pirates. You cannot flee.");
@@ -888,7 +909,7 @@ public class Display {
 		updateDialogue("You encountered a storm. \n" 
 				+ game.getChosenRoute().getEvent().storm(game.getPlayer(), game.getCurrentDay()));
 		updateMainDisplay(12, "Continue", true, true);
-		updateDisplayFunction(12, Actions.CONTINUE); //TODO Bug, somehow, this occasionally crashes the game on completion
+		updateDisplayFunction(12, Actions.CONTINUE); 
 	}
 	
 	/**
@@ -968,15 +989,14 @@ public class Display {
 		clearButtons();
 		switch(s) {
 		case "Island":
+			this.openLog.setVisible(true);
 			changeForegroundColour(Color.WHITE);
-			changeBackground("./src/resources/Images/IslandBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/IslandBackground.png"));
 			this.statsPanel.setVisible(true);
 			makeIslandButtons();
 			break;
 		case "Sea":
-			//TODO bug noted of log duplicating storm
-			//TODO bug, currentday not updating except for days which have events.
-			changeBackground("./src/resources/Images/SeaBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/SeaBackground.png"));
 			changeForegroundColour(Color.BLACK);
 			updateMainDisplay(10, "Return to Island", true, true);
 			updateDisplayFunction(10, Actions.CLOSE_STORE);
@@ -986,9 +1006,9 @@ public class Display {
 			routes.addAll(game.getPlayer().getLocation().getRoutes());
 			for(Island island : islands) {
 				if (island == game.getPlayer().getLocation()) {
-					updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", false, true);
+					updateMainDisplay(island.getDisplay(), Display.class.getClassLoader().getResource("resources/Images/Island.png"), false, true);
 				} else {
-					updateMainDisplay(island.getDisplay(), "./src/resources/Images/Island.png", true, true);
+					updateMainDisplay(island.getDisplay(), Display.class.getClassLoader().getResource("resources/Images/Island.png"), true, true);
 					updateDisplayFunction(island.getDisplay(), Actions.SAIL);
 				}
 				for (Route route : routes) {
@@ -1001,24 +1021,23 @@ public class Display {
 			break;
 		case "Store":
 			changeForegroundColour(Color.WHITE);
-			changeBackground("./src/resources/Images/ShopBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/ShopBackground.png"));
 			this.statsPanel.setVisible(true);
 			openStore();
 			break;
 		case "Inventory":
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/InventoryBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/InventoryBackground.png"));
 			showInventory();
 			break;
 		case "Deck":
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/InventoryBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/InventoryBackground.png"));
 			showDeck();
 			break;
 		case "Repair":
-			//TODO bug, this is sometimes called at end of sailing
 			changeForegroundColour(Color.WHITE);
-			changeBackground("./src/resources/Images/ShopBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/ShopBackground.png"));
 			updateMainDisplay(11, "Repair Ship", true, true);
 			updateDisplayFunction(11, Actions.REPAIR);
 			updateDisplayValue(11, 1);
@@ -1029,36 +1048,36 @@ public class Display {
 		case "Pirates":
 			updateDialogue("You encounter a ship full of pirates.");
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/SeaBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/SeaBackground.png"));
 			this.attemptedToFlee = false;
 			this.enemy = this.game.getChosenRoute().getEvent().getEnemy();
 			pirateEncounter();
 			break;
 		case "Storm":
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/SeaBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/SeaBackground.png"));
 			stormEncounter();
 			break;
 		case "Uneventful":
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/SeaBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/SeaBackground.png"));
 			updateDialogue("The day passes uneventfully.");
 			updateMainDisplay(12, "Continue", true, true);
 			updateDisplayFunction(12, Actions.CONTINUE);
 			break;
 		case "Rescue":
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/SeaBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/SeaBackground.png"));
 			game.getChosenRoute().getEvent().rescue(game.getPlayer(), game.getCurrentDay());
 			break;
 		case "Confirm":
 			changeForegroundColour(Color.WHITE);
-			changeBackground("./src/resources/Images/ShopBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/ShopBackground.png"));
 			showConfirm();
 			break;
 		case "Reward":
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/InventoryBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/InventoryBackground.png"));
 			updateDialogue("You found " + game.getChosenRoute().getEvent().getReward().getName() + " among the wreckage. Bring it aboard?");
 			updateMainDisplay(11, "Yes", true, true);
 			updateDisplayFunction(11, Actions.GET_ITEM);
@@ -1071,7 +1090,7 @@ public class Display {
 		case "Dump":
 			currentPage = 0;
 			changeForegroundColour(Color.BLACK);
-			changeBackground("./src/resources/Images/InventoryBackground.png");
+			changeBackground(Display.class.getClassLoader().getResource("resources/Images/InventoryBackground.png"));
 			showDump();
 			break;
 		case "Menu":
@@ -1091,7 +1110,7 @@ public class Display {
 		statsPanel.add(lblPanelTitle, "cell 2 0 2 1, alignx center, aligny center");
 		
 		JLabel lblStatsDivider = new JLabel();
-		lblStatsDivider.setIcon(new ImageIcon(new ImageIcon("./src/resources/Images/ParchmentDividerHorizontal.png").getImage().getScaledInstance(90, 15, Image.SCALE_DEFAULT)));
+		lblStatsDivider.setIcon(new ImageIcon(new ImageIcon(Display.class.getClassLoader().getResource("resources/Images/ParchmentDividerHorizontal.png")).getImage().getScaledInstance(90, 15, Image.SCALE_DEFAULT)));
 		statsPanel.add(lblStatsDivider, "cell 2 1 2 1,alignx center,aligny center");
 		
 		JLabel lblAnnounceHealth = new JLabel("Health:");
@@ -1158,7 +1177,7 @@ public class Display {
 		dialogPanel = new JPanel();
 		dialogPanel.setBounds(0, 700, 1540, 122);
 		dialogPanel.setOpaque(false);
-		dialogPanel.setBorder(BorderFactory.createMatteBorder(15, 0, 0, 0, new ImageIcon("./src/resources/Images/ParchmentTop.png")));
+		dialogPanel.setBorder(BorderFactory.createMatteBorder(15, 0, 0, 0, new ImageIcon(Display.class.getClassLoader().getResource("resources/Images/ParchmentTop.png"))));
 		frmDeckgame.getContentPane().add(dialogPanel);
 		dialogPanel.setLayout(null);
 		
@@ -1179,7 +1198,7 @@ public class Display {
 		JPanel outputPanel = new JPanel();
 		outputPanel.setBackground(Color.decode("#F0DD8D"));
 		outputPanel.setBounds(200, 15, 1340, 107);
-		outputPanel.setBorder(BorderFactory.createMatteBorder(0, 15, 0, 0, new ImageIcon("./src/resources/Images/ParchmentDividerVertical.png")));
+		outputPanel.setBorder(BorderFactory.createMatteBorder(0, 15, 0, 0, new ImageIcon(Display.class.getClassLoader().getResource("resources/Images/ParchmentDividerVertical.png"))));
 		dialogPanel.add(outputPanel);
 			
 		outputArea = new JTextArea("", 3, 65);
@@ -1197,7 +1216,7 @@ public class Display {
 	private void openLog() {
 		this.logOpen = true;
 		changeForegroundColour(Color.BLACK);
-		changeBackground("./src/resources/Images/LogBackground.png");
+		changeBackground(Display.class.getClassLoader().getResource("resources/Images/LogBackground.png"));
 		this.statsPanel.setVisible(false);
 		showLog();
 	}
@@ -1281,6 +1300,7 @@ public class Display {
 	/**
 	 * Creates the menu window
 	 * @param game the game instance to connect to and send starting variables to
+	 * @wbp.parser.entryPoint
 	 */
 	private void welcome(Game game) {
 		this.game = game;
@@ -1298,33 +1318,33 @@ public class Display {
 		panel.setLayout(null);
 		
 		JLabel lblTitle = new JLabel("Welcome to DeckGame");
-		lblTitle.setBounds(193, 10, 131, 20);
+		lblTitle.setBounds(193, 10, 155, 38);
 		panel.add(lblTitle);
 		
 		JTextField userName = new JTextField();
-		userName.setBounds(136, 109, 96, 19);
+		userName.setBounds(136, 103, 116, 25);
 		panel.add(userName);
 		userName.setColumns(15);
 		info.add(userName);
 		
 		JLabel lblUsername = new JLabel("Username: Captain");
-		lblUsername.setBounds(10, 112, 116, 13);
+		lblUsername.setBounds(10, 99, 116, 38);
 		panel.add(lblUsername);
 		info.add(lblUsername);
 		
 		JTextField shipName = new JTextField();
-		shipName.setBounds(136, 138, 96, 19);
+		shipName.setBounds(136, 138, 116, 25);
 		panel.add(shipName);
 		shipName.setColumns(15);
 		info.add(shipName);
 		
 		JLabel lblShipName = new JLabel("Ship Name: The");
-		lblShipName.setBounds(24, 141, 102, 13);
+		lblShipName.setBounds(10, 141, 116, 25);
 		panel.add(lblShipName);
 		info.add(lblShipName);
 		
 		JSlider duration = new JSlider(JSlider.HORIZONTAL, 20, 50, 20);
-		duration.setBounds(187, 188, 137, 44);
+		duration.setBounds(187, 199, 137, 44);
 		duration.setMajorTickSpacing(10);
 		duration.setMinorTickSpacing(1);
 		duration.setPaintTicks(true);
@@ -1333,12 +1353,12 @@ public class Display {
 		info.add(duration);
 		
 		JLabel lblDuration = new JLabel("Duration (Days):");
-		lblDuration.setBounds(214, 167, 89, 13);
+		lblDuration.setBounds(214, 167, 110, 25);
 		panel.add(lblDuration);
 		info.add(lblDuration);
 		
 		JLabel lblShipType = new JLabel("Ship Class:");
-		lblShipType.setBounds(229, 242, 74, 13);
+		lblShipType.setBounds(82, 292, 91, 25);
 		panel.add(lblShipType);
 		info.add(lblShipType);
 		
@@ -1378,12 +1398,12 @@ public class Display {
 		group.add(rdbtnShip4);
 		
 		JLabel lblError1 = new JLabel("No special symbols.");
-		lblError1.setBounds(242, 126, 126, 13);
+		lblError1.setBounds(323, 126, 126, 13);
 		panel.add(lblError1);
 		lblError1.setVisible(false);
 		
 		JLabel lblError2 = new JLabel("Must be between 3 and 15 characters.");
-		lblError2.setBounds(242, 126, 224, 13);
+		lblError2.setBounds(146, 126, 224, 13);
 		panel.add(lblError2);
 		lblError2.setVisible(false);
 		
@@ -1413,7 +1433,7 @@ public class Display {
 		}
 		
 		JButton btnNewGame = new JButton("New Game");
-		btnNewGame.setBounds(200, 58, 96, 21);
+		btnNewGame.setBounds(180, 49, 131, 44);
 		btnNewGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(JComponent component : info) {
@@ -1432,7 +1452,7 @@ public class Display {
 	 */
 	private void initialize() {
 		try {
-			AudioInputStream audioInput = AudioSystem.getAudioInputStream(Display.class.getResource("../resources/Ketsa_Sailing_Wounded.wav"));
+			AudioInputStream audioInput = AudioSystem.getAudioInputStream(Display.class.getClassLoader().getResource("resources/Ketsa_Sailing_Wounded.wav"));
 			Clip soundtrack = AudioSystem.getClip();
 			soundtrack.open(audioInput);
 			soundtrack.start();
@@ -1453,11 +1473,13 @@ public class Display {
 		frmDeckgame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmDeckgame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		frmDeckgame.setUndecorated(false);
+		frmDeckgame.getContentPane().setBackground(Color.BLACK);
 		frmDeckgame.getContentPane().setLayout(null);
 		
 		createDialogPanel();
 		
-		displayPanel = new ImagePanel(new ImageIcon("./src/resources/Images/SeaBackground.png").getImage());
+		java.net.URL imageURL = Display.class.getClassLoader().getResource("resources/Images/SeaBackground.png");
+		displayPanel = new ImagePanel(new ImageIcon(imageURL).getImage());
 		displayPanel.setBounds(0, 0, 1540, 715);
 		displayPanel.setBackground(Color.decode("#A2E2F2"));
 		frmDeckgame.getContentPane().add(displayPanel);
@@ -1491,7 +1513,8 @@ public class Display {
 		
 		displayPanel.setLayout(gl_displayPanel);
 		
-		openLog = new JButton(new ImageIcon("./src/resources/Images/CaptainsLog.png"));
+		java.net.URL secondImageURL = Display.class.getClassLoader().getResource("resources/Images/CaptainsLog.png");
+		openLog = new JButton(new ImageIcon(secondImageURL));
 		openLog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				if (!logOpen) {

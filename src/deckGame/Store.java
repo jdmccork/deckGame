@@ -3,6 +3,7 @@ package deckGame;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Scanner;
 
 //import enums.ItemType;
@@ -133,21 +134,16 @@ public class Store {
 	 * If successful, adds each line to the list of possible advice.
 	 */
 	public static void readAdvice() {
-		try {
-			//Defines the advice file as a new file
-			File myObj = new File("src/resources/Advice.txt");
-			//Creates a scanner object to read the advice file
-		    Scanner myReader = new Scanner(myObj);
-		    //While the scanner finds new lines, keep adding them to the list
-		    while (myReader.hasNextLine()) {
-		        String data = myReader.nextLine();
-		        adviceList.add(data);
-		    }
-		    myReader.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-		    e.printStackTrace();
+		//Defines the advice file as a new file
+		InputStream myObj = Store.class.getClassLoader().getResourceAsStream("resources/Advice.txt");
+		//Creates a scanner object to read the advice file
+		Scanner myReader = new Scanner(myObj);
+		//While the scanner finds new lines, keep adding them to the list
+		while (myReader.hasNextLine()) {
+		    String data = myReader.nextLine();
+		    adviceList.add(data);
 		}
+		myReader.close();
 	}
 	
 	/**

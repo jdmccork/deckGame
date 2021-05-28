@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 import enums.Actions;
 import enums.Statuses;
 
-//TODO Going to island requires paying for the number of days
-
 public class Game {
 	
 	/**
@@ -540,9 +538,9 @@ public class Game {
 			if (display != null) {
 				ArrayList<Route> routes = player.getLocation().getRoutes();
 				for (Route route: routes) {
-					display.updateDisplayToolTip(route.getDestination().getDisplay(), "The journey to " 
+					display.updateDisplayToolTip(route.getDestination().getDisplay(), "<html>The journey to " 
 							+ route.getDestination().getName() + " will take " + route.getTime(player.getSpeed())
-							+ " days to complete." + route.viewEvents());
+							+ " days to complete.<br>" + route.viewEvents().replaceAll("\n", "<br>") + "</html>");
 				}
 			}else {
 				selectRouteCMD();
@@ -659,18 +657,27 @@ public class Game {
 		if(display != null) {
 			this.daysSailed += 1;
 			currentDay += 1;
-			display.updateDay(String.valueOf(currentDay));
-			display.setGameState(chosenRoute.getEvent().selectEvent(player, currentDay, display));
-			if(daysSailed >= time) {
-				this.daysSailed = 0;
-				if (currentDay < days) {
+			if (currentDay < days) {
+				display.updateDay(String.valueOf(currentDay));
+				display.setGameState(chosenRoute.getEvent().selectEvent(player, currentDay, display));
+				if(daysSailed >= time) {
+					this.daysSailed = 0;
 					player.sail(chosenRoute);
+					int minimumToSail = 200;
+					for (Route route: player.getLocation().getRoutes()) {
+						if (route.getTime(player.getSpeed()) * player.getNumCrew() < minimumToSail) {
+							minimumToSail = route.getTime(player.getSpeed()) * player.getNumCrew();
+						}
+					}
+					if (player.getInventory().size() == 0 && player.getCards().size() == 0 && player.getGold() < minimumToSail) {
+						throw new EndGameException();
+					}
 					player.getLocation().getStore().generateStock(player);
 					display.updateDialogue("You travelled for " + time + " days and have arrived at " + player.getLocation());
 					display.setGameState("Island");
-				} else {
-					throw new EndGameException();
-				}
+				} 
+			}else {
+				throw new EndGameException();
 			}
 		} else {
 			player.sail(chosenRoute);
